@@ -49,7 +49,6 @@ import { attributeStore }                                        from '../../dat
 
 // TRIGGERS
 
-
 class AirTrigger extends FabledTrigger {
 	public constructor() {
 		super({
@@ -1060,6 +1059,22 @@ const itemConditionOptions = (matOption: ComponentOption = new MaterialSelect(fa
 			.setTooltip('Whether the name and lore checks are regex strings. If you do not know what regex is, leave this option alone')
 	];
 };
+
+class ActionBarCondition extends FabledCondition {
+	public constructor() {
+		super({
+			name: 'Action Bar',
+			description: "Applies child componenets whether or not the action bar is showing based on the boolean set.",
+			data: [
+				new BooleanSelect("Casting", "casting", true)
+					.setTooltip('Whether the Action Bar should be showing or not. True for yes, False for no.')
+		],
+		summaryItems: ['casting']
+		});
+	}
+
+	public static override new = () => new this();
+}
 
 class AirCondition extends FabledCondition {
 	public constructor() {
@@ -5331,6 +5346,7 @@ export const initComponents = () => {
 		WORLD:    { name: 'World', component: WorldTarget }
 	});
 	conditions.set({
+		ACTIONBAR:		{ name: 'Action Bar', component: ActionBarCondition},
 		AIR:            { name: 'Air', component: AirCondition },
 		ALTITUDE:       { name: 'Altitude', component: AltitudeCondition },
 		ARMOR:          { name: 'Armor', component: ArmorCondition },
