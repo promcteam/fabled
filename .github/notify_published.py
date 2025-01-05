@@ -32,7 +32,7 @@ embed = {
     'username': 'Dev Mage',
     'author': {
         'name': 'New ' + ('Dev ' if is_dev else '') + 'Build Available!',
-        'url': 'https://github.com/promcteam/' + name
+        'url': 'https://github.com/magemonkeystudio/' + name
     },
     'image': {
         'url': 'https://fabled.magemonkey.studio/' + ('dev_build.gif' if is_dev else 'release_build.gif')
