@@ -46,7 +46,7 @@ import studio.magemonkey.codex.mccore.config.FilterType;
 import studio.magemonkey.codex.mccore.config.parse.DataSection;
 import studio.magemonkey.codex.mccore.config.parse.NumberParser;
 import studio.magemonkey.codex.mccore.util.TextFormatter;
-import studio.magemonkey.codex.registry.damage.DamageRegistry;
+import studio.magemonkey.codex.registry.DamageRegistry;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.ReadOnlySettings;
 import studio.magemonkey.fabled.api.Settings;

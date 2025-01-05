@@ -56,15 +56,28 @@ public class BuffData {
     }
 
     public double getMultiplier(final BuffType buffType, final String category) {
-        return category == null || category.isEmpty()
-                ? getMultiplier(buffType.name())
-                : getMultiplier(buffType.name(), buffType.name() + category);
+        return category == null || category.isEmpty() ? getMultiplier(buffType.getLocalizedName())
+                : getMultiplier(buffType.getLocalizedName(), buffType.getLocalizedName() + "_" + category);
     }
 
     public double getFlatBonus(final BuffType buffType, final String category) {
-        return category == null || category.isEmpty()
-                ? getFlatBonus(buffType.name())
-                : getFlatBonus(buffType.name(), buffType.name() + category);
+        return category == null || category.isEmpty() ? getFlatBonus(buffType.getLocalizedName())
+                : getFlatBonus(buffType.getLocalizedName(), buffType.getLocalizedName() + "_" + category);
+    }
+
+    /**
+     * Adds a buff to the buff collection. If a buff already exists with the same
+     * key, it will be overwritten.
+     *
+     * @param type  type of buff to add
+     * @param buff  buff details
+     * @param ticks how long to apply the buff for
+     *
+     * @deprecated Buff types are more abstract now, so {@link BuffData#addBuff(String, Buff, int)} should be preferred
+     */
+    @Deprecated
+    public void addBuff(final BuffType type, final Buff buff, final int ticks) {
+        addBuff(type.getLocalizedName(), buff, ticks);
     }
 
     /**
@@ -75,8 +88,24 @@ public class BuffData {
      * @param buff  buff details
      * @param ticks how long to apply the buff for
      */
-    public void addBuff(final BuffType type, final Buff buff, final int ticks) {
-        doAddBuff(type.name(), buff, ticks);
+    public void addBuff(final String type, final Buff buff, final int ticks) {
+        doAddBuff(type, buff, ticks);
+    }
+
+    /**
+     * Adds a buff to the buff collection. If a buff already exists with the same
+     * key, it will be overwritten.
+     *
+     * @param type     type of buff to add
+     * @param category sub category of the type to apply (e.g. damage classification)
+     * @param buff     buff details
+     * @param ticks    how long to apply the buff for
+     *
+     * @deprecated Buff types are more abstract now, so {@link BuffData#addBuff(String, Buff, int)} should be preferred
+     */
+    @Deprecated
+    public void addBuff(final BuffType type, final String category, final Buff buff, final int ticks) {
+        addBuff(type.getLocalizedName(), category, buff, ticks);
     }
 
     /**
@@ -88,15 +117,14 @@ public class BuffData {
      * @param buff     buff details
      * @param ticks    how long to apply the buff for
      */
-    public void addBuff(final BuffType type, final String category, final Buff buff, final int ticks) {
-        doAddBuff(type.name() + (category != null ? category : ""), buff, ticks);
+    public void addBuff(final String type, final String category, final Buff buff, final int ticks) {
+        doAddBuff(type + (category != null ? "_" + category : ""), buff, ticks);
     }
 
     private void doAddBuff(final String type, final Buff buff, final int ticks) {
         final Map<String, Buff> typeBuffs = buffs.computeIfAbsent(type, t -> new HashMap<>());
         final Buff              conflict  = typeBuffs.remove(buff.getKey());
-        if (conflict != null)
-            conflict.task.cancel();
+        if (conflict != null) conflict.task.cancel();
 
         typeBuffs.put(buff.getKey(), buff);
         buff.task = Fabled.schedule(new BuffTask(type, buff.getKey()), ticks);
@@ -107,7 +135,7 @@ public class BuffData {
      */
     @Deprecated
     public void addDamageBuff(Buff buff, int ticks) {
-        addBuff(BuffType.DAMAGE, buff, ticks);
+        addBuff(BuffType.DAMAGE.getLocalizedName(), buff, ticks);
     }
 
     /**
@@ -115,7 +143,7 @@ public class BuffData {
      */
     @Deprecated
     public void addDefenseBuff(Buff buff, int ticks) {
-        addBuff(BuffType.DEFENSE, buff, ticks);
+        addBuff(BuffType.DEFENSE.getLocalizedName(), buff, ticks);
     }
 
     /**
@@ -123,7 +151,7 @@ public class BuffData {
      */
     @Deprecated
     public void addSkillDamageBuff(Buff buff, int ticks) {
-        addBuff(BuffType.SKILL_DAMAGE, buff, ticks);
+        addBuff(BuffType.SKILL_DAMAGE.getLocalizedName(), buff, ticks);
     }
 
     /**
@@ -131,7 +159,7 @@ public class BuffData {
      */
     @Deprecated
     public void addSkillDefenseBuff(Buff buff, int ticks) {
-        addBuff(BuffType.SKILL_DEFENSE, buff, ticks);
+        addBuff(BuffType.SKILL_DEFENSE.getLocalizedName(), buff, ticks);
     }
 
     /**
@@ -141,12 +169,26 @@ public class BuffData {
      * @param value value to modify
      * @return value after all buff applications
      */
+    public double apply(final String type, final double value) {
+        return doApply(value, type);
+    }
+
+    /**
+     * Applies all buffs of the given type to the specified value
+     *
+     * @param type  type of buff to apply
+     * @param value value to modify
+     * @return value after all buff applications
+     *
+     * @deprecated use {@link BuffData#apply(String, double)} instead
+     */
+    @Deprecated
     public double apply(final BuffType type, final double value) {
-        return doApply(value, type.name());
+        return apply(type.getLocalizedName(), value);
     }
 
     public boolean isActive(final BuffType type) {
-        final Map<String, Buff> typeBuffs = buffs.get(type.name());
+        final Map<String, Buff> typeBuffs = buffs.get(type.getLocalizedName());
         return typeBuffs != null;
     }
 
@@ -156,13 +198,12 @@ public class BuffData {
      * @param type type of buff
      */
     public void clearByType(final BuffType type) {
-        Map<String, Buff> buffType = buffs.get(type.name());
+        Map<String, Buff> buffType = buffs.get(type.getLocalizedName());
         if (buffType == null) return;
         for (final Buff buff : buffType.values()) {
             buff.task.cancel();
         }
-        buffs.remove(type.name());
-
+        buffs.remove(type.getLocalizedName());
     }
 
     /**
@@ -174,9 +215,8 @@ public class BuffData {
      * @return value after all buff applications
      */
     public double apply(final BuffType type, final String category, final double value) {
-        return category == null || category.length() == 0
-                ? doApply(value, type.name())
-                : doApply(value, type.name(), type.name() + category);
+        return category == null || category.isEmpty() ? doApply(value, type.getLocalizedName())
+                : doApply(value, type.getLocalizedName(), type.getLocalizedName() + "_" + category);
     }
 
     private double doApply(final double value, final String... types) {
@@ -239,35 +279,35 @@ public class BuffData {
     }
 
     /**
-     * @deprecated use {@link BuffData#apply(BuffType, double)} instead
+     * @deprecated use {@link BuffData#apply(String, double)} instead
      */
     @Deprecated
     public double modifyDealtDamage(double damage) {
-        return apply(BuffType.DAMAGE, damage);
+        return apply(BuffType.DAMAGE.getLocalizedName(), damage);
     }
 
     /**
-     * @deprecated use {@link BuffData#apply(BuffType, double)} instead
+     * @deprecated use {@link BuffData#apply(String, double)} instead
      */
     @Deprecated
     public double modifyTakenDamage(double damage) {
-        return apply(BuffType.DEFENSE, damage);
+        return apply(BuffType.DEFENSE.getLocalizedName(), damage);
     }
 
     /**
-     * @deprecated use {@link BuffData#apply(BuffType, double)} instead
+     * @deprecated use {@link BuffData#apply(String, double)} instead
      */
     @Deprecated
     public double modifySkillDealtDamage(double damage) {
-        return apply(BuffType.SKILL_DAMAGE, damage);
+        return apply(BuffType.SKILL_DAMAGE.getLocalizedName(), damage);
     }
 
     /**
-     * @deprecated use {@link BuffData#apply(BuffType, double)} instead
+     * @deprecated use {@link BuffData#apply(String, double)} instead
      */
     @Deprecated
     public double modifySkillTakenDamage(double damage) {
-        return apply(BuffType.SKILL_DEFENSE, damage);
+        return apply(BuffType.SKILL_DEFENSE.getLocalizedName(), damage);
     }
 
     /**
@@ -302,13 +342,13 @@ public class BuffData {
             final Map<String, Buff> typeBuffs = buffs.get(type);
             typeBuffs.remove(key);
             // Clean up buff data if the entity doesn't hold onto any buffs
-            if (typeBuffs.size() == 0) {
+            if (typeBuffs.isEmpty()) {
                 buffs.remove(type);
-                if (buffs.size() == 0) {
+                if (buffs.isEmpty()) {
                     BuffManager.clearData(entity);
                 }
             }
-            BuffExpiredEvent event = new BuffExpiredEvent(entity, typeBuffs.get(type), BuffType.valueOf(this.type));
+            BuffExpiredEvent event = new BuffExpiredEvent(entity, typeBuffs.get(type), this.type);
             Bukkit.getPluginManager().callEvent(event);
         }
     }

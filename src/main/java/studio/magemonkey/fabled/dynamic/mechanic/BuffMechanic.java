@@ -25,17 +25,11 @@ public class BuffMechanic extends MechanicComponent {
     }
 
     /**
-     * Executes the component
-     *
-     * @param caster  caster of the skill
-     * @param level   level of the skill
-     * @param targets targets to apply to
-     * @param force
-     * @return true if applied to something, false otherwise
+     * {@inheritDoc}
      */
     @Override
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets, boolean force) {
-        if (targets.size() == 0) return false;
+        if (targets.isEmpty()) return false;
 
         boolean immediate = settings.getString(IMMEDIATE, "false").equalsIgnoreCase("true");
         double  value     = parseValues(caster, VALUE, level, 1.0);
@@ -46,17 +40,29 @@ public class BuffMechanic extends MechanicComponent {
             return true;
         }
 
-        BuffType buffType = BuffType.valueOf(settings.getString(TYPE, "DAMAGE"));
+        String   rawType  = settings.getString(TYPE, "DAMAGE");
+        BuffType buffType = BuffType.getByNameOrLocal(rawType);
         double   seconds  = parseValues(caster, SECONDS, level, 3.0);
         String   category = settings.getString(CATEGORY, null);
         int      ticks    = (int) (seconds * 20);
+
+        String qualifiedType;
+        if (buffType != null) {
+            qualifiedType = buffType.getLocalizedName();
+            if (category != null) {
+                qualifiedType += "_" + category;
+            }
+        } else {
+            qualifiedType = rawType;
+        }
+
         for (LivingEntity target : targets) {
             BuffManager.getBuffData(target).addBuff(
-                    buffType,
+                    qualifiedType,
                     category,
                     new Buff(this.skill.getName() + "-" + caster.getName(), value, percent),
                     ticks);
         }
-        return targets.size() > 0;
+        return !targets.isEmpty();
     }
 }

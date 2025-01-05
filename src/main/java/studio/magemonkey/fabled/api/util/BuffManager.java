@@ -26,16 +26,29 @@
  */
 package studio.magemonkey.fabled.api.util;
 
+import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
+import studio.magemonkey.codex.registry.BuffRegistry;
+import studio.magemonkey.codex.registry.provider.BuffProvider;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * The manager for temporary entity buff data
  */
-public class BuffManager {
-    private static final HashMap<UUID, BuffData> data = new HashMap<>();
+@Getter
+public class BuffManager implements BuffProvider {
+    private static BuffManager         instance;
+    private final  Map<UUID, BuffData> data = new HashMap<>();
+
+    public static BuffManager getInstance() {
+        if (instance == null) {
+            instance = new BuffManager();
+        }
+        return instance;
+    }
 
     /**
      * Retrieves the buff data for an entity. This returns null if
@@ -60,6 +73,7 @@ public class BuffManager {
     public static BuffData getBuffData(final LivingEntity entity, final boolean create) {
         if (entity == null) return null;
 
+        Map<UUID, BuffData> data = getInstance().getData();
         if (!data.containsKey(entity.getUniqueId()) && create) {
             data.put(entity.getUniqueId(), new BuffData(entity));
         }
@@ -74,7 +88,8 @@ public class BuffManager {
     public static void clearData(final LivingEntity entity) {
         if (entity == null) return;
 
-        final BuffData result = data.remove(entity.getUniqueId());
+        Map<UUID, BuffData> data   = getInstance().getData();
+        final BuffData      result = data.remove(entity.getUniqueId());
         if (result != null) {
             result.clear();
         }
@@ -108,7 +123,7 @@ public class BuffManager {
                                final Buff buff,
                                final int ticks) {
         if (entity == null) return;
-        getBuffData(entity, true).addBuff(type, category, buff, ticks);
+        getBuffData(entity, true).addBuff(type.getLocalizedName(), category, buff, ticks);
     }
 
     /**
@@ -151,10 +166,12 @@ public class BuffManager {
      * @param type   type of buffs to apply
      * @param amount base amount to modify
      * @return modified number
+     *
+     * @deprecated use {@link BuffRegistry#scaleValue(String, LivingEntity, double)} instead
      */
+    @Deprecated(forRemoval = true, since = "1.0.4-R0.16-SNAPSHOT")
     public static double apply(final LivingEntity entity, final BuffType type, final double amount) {
-        final BuffData data = getBuffData(entity, false);
-        return data == null ? amount : data.apply(type, amount);
+        return getInstance().scaleValue(type.getLocalizedName(), entity, amount);
     }
 
     /**
@@ -166,13 +183,26 @@ public class BuffManager {
      * @param category sub category of the buffs to apply
      * @param amount   base amount to modify
      * @return modified number
+     *
+     * @deprecated use {@link BuffRegistry#scaleValue(String, LivingEntity, double)} instead
      */
+    @Deprecated(forRemoval = true, since = "1.0.4-R0.16-SNAPSHOT")
     public static double apply(final LivingEntity entity,
                                final BuffType type,
                                final String category,
                                final double amount) {
-        final BuffData data = getBuffData(entity, false);
-        return data == null ? amount : data.apply(type, category, amount);
+        return getInstance().scaleValue(type.getLocalizedName() + (category == null ? "" : "_" + category),
+                entity,
+                amount);
+    }
+
+    @Override
+    public double scaleValue(String name, LivingEntity player, double value) {
+        final BuffData data = getBuffData(player, false);
+        if (data != null) {
+            return data.apply(name, value);
+        }
+        return value;
     }
 
     /**
