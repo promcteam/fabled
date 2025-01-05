@@ -1063,13 +1063,13 @@ const itemConditionOptions = (matOption: ComponentOption = new MaterialSelect(fa
 class ActionBarCondition extends FabledCondition {
 	public constructor() {
 		super({
-			name: 'Action Bar',
-			description: "Applies child componenets whether or not the action bar is showing based on the boolean set.",
-			data: [
-				new BooleanSelect("Casting", "casting", true)
+			name:         'Action Bar',
+			description:  'Applies child componenets whether or not the action bar is showing based on the boolean set.',
+			data:         [
+				new BooleanSelect('Casting', 'casting', true)
 					.setTooltip('Whether the Action Bar should be showing or not. True for yes, False for no.')
-		],
-		summaryItems: ['casting']
+			],
+			summaryItems: ['casting']
 		});
 	}
 
@@ -2498,13 +2498,11 @@ class BuffMechanic extends FabledMechanic {
 			data:         [
 				new BooleanSelect('Immediate', 'immediate', false)
 					.setTooltip('Whether to apply the buff to the current damage trigger'),
-				new DropdownSelect('Type', 'type', ['DAMAGE',
-					'DEFENSE',
-					'SKILL_DAMAGE',
-					'SKILL_DEFENSE',
-					'HEALING'], 'DAMAGE')
+				new StringSelect('Type', 'type', 'DAMAGE')
 					.requireValue('immediate', [false])
-					.setTooltip('What type of buff to apply. DAMAGE/DEFENSE is for regular attacks, SKILL_DAMAGE/SKILL_DEFENSE are for damage from abilities, and HEALING is for healing from abilities'),
+					.setTooltip('What type of buff to apply. DAMAGE/DEFENSE is for regular attacks, SKILL_DAMAGE/SKILL_DEFENSE are for damage from abilities, and HEALING is for healing from abilities. ' +
+						'You can also use <code>DIVINITY_damage_&lt;classifer&gt;</code>' +
+						' or <code>DIVINITY_defense_&lt;classifier&gt;</code> to apply a buff to a specific damage type from Divinity.'),
 				new DropdownSelect('Modifier', 'modifier', ['Flat', 'Multiplier'], 'Flat')
 					.setTooltip('The sort of scaling for the buff. Flat will increase/reduce incoming damage by a fixed amount where Multiplier does it by a percentage of the damage. Multipliers above 1 will increase damage taken while multipliers below 1 reduce damage taken'),
 				new StringSelect('Category', 'category', '')
@@ -5346,7 +5344,7 @@ export const initComponents = () => {
 		WORLD:    { name: 'World', component: WorldTarget }
 	});
 	conditions.set({
-		ACTIONBAR:		{ name: 'Action Bar', component: ActionBarCondition},
+		ACTIONBAR:      { name: 'Action Bar', component: ActionBarCondition },
 		AIR:            { name: 'Air', component: AirCondition },
 		ALTITUDE:       { name: 'Altitude', component: AltitudeCondition },
 		ARMOR:          { name: 'Armor', component: ArmorCondition },
