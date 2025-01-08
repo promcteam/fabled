@@ -79,8 +79,8 @@ public class PlaceholderUtil {
         actions.put("fcurrentexp", PlaceholderUtil::formatCurrentExpPlaceholder);
         actions.put("requiredexp", PlaceholderUtil::requiredExpPlaceholder);
         actions.put("frequiredexp", PlaceholderUtil::formatRequiredExpPlaceholder);
-        actions.put("requiredexpat", PlaceholderUtil::requiredExperienceAtPlaceholder);
-        actions.put("frequiredexpat", PlaceholderUtil::formatRequiredExperienceAtPlaceholder);
+        actions.put("requiredexpat", PlaceholderUtil::requiredExpAtPlaceholder);
+        actions.put("frequiredexpat", PlaceholderUtil::formatRequiredExpAtPlaceholder);
         actions.put("skillpoints", PlaceholderUtil::skillPointsPlaceholder);
         // // Accounts Placeholders
         actions.put("accounts", PlaceholderUtil::accountsPlaceholder);
@@ -292,7 +292,7 @@ public class PlaceholderUtil {
         try {
             return String.valueOf(player.getPlayer().getHealth());
         } catch (Exception e) {
-            return "";
+            return "0.0";
         }
     }
 
@@ -301,7 +301,7 @@ public class PlaceholderUtil {
         try {
             return String.valueOf((int) player.getPlayer().getHealth());
         } catch (Exception e) {
-            return "";
+            return "0";
         }
     }
 
@@ -310,7 +310,7 @@ public class PlaceholderUtil {
         try {
             return String.valueOf(player.getPlayer().getAttribute(AttributeUT.resolve("MAX_HEALTH")).getBaseValue());
         } catch (Exception e) {
-            return "";
+            return "0.0";
         }
     }
 
@@ -319,7 +319,7 @@ public class PlaceholderUtil {
         try {
             return String.valueOf((int) player.getPlayer().getAttribute(AttributeUT.resolve("MAX_HEALTH")).getBaseValue());
         } catch (Exception e) {
-            return "";
+            return "0";
         }
     }
 
@@ -387,7 +387,7 @@ public class PlaceholderUtil {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf(playerData.getMana());
         } catch (Exception e) {
-            return "0";
+            return "0.0";
         }
     } 
 
@@ -589,7 +589,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the requires experience for the specified level for a given group. 0.0 if not found.
-    private static String requiredExperienceAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String requiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             int level = Integer.parseInt(arguments.remove(0));
@@ -601,7 +601,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the requires experience for the specified level for a given group as an integer. 0 if not found.
-    private static String formatRequiredExperienceAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatRequiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             int level = Integer.parseInt(arguments.remove(0));
