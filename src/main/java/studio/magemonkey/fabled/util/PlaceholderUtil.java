@@ -108,13 +108,13 @@ public class PlaceholderUtil {
         actions.put("skillmessage", PlaceholderUtil::skillMessagePlaceholder);
         actions.put("fskillmessage", PlaceholderUtil::formatSkillMessagePlaceholder);
         actions.put("skillmodeldata", PlaceholderUtil::skillModelDataPlaceholder);
-        actions.put("skilllist", PlaceholderUtil::skillListPlaceholder);
-        actions.put("fskilllist", PlaceholderUtil::formatSkillListPlaceholder);
-        actions.put("skilllistname", PlaceholderUtil::skillListNamePlaceholder);
-        actions.put("skilllistinfo", PlaceholderUtil::skillListInfoPlaceholder);
-        actions.put("textcasting", PlaceholderUtil::textCastingPlaceholder);
-        actions.put("textcastingname", PlaceholderUtil::textCastingNamePlaceholder);
-        actions.put("textcastinginfo", PlaceholderUtil::textCastingInfoPlaceholder);
+        actions.put("skills", PlaceholderUtil::skillsPlaceholder);
+        actions.put("fskills", PlaceholderUtil::formatSkillsPlaceholder);
+        actions.put("skillsname", PlaceholderUtil::skillsNamePlaceholder);
+        actions.put("skillsinfo", PlaceholderUtil::skillsInfoPlaceholder);
+        actions.put("casting", PlaceholderUtil::castingPlaceholder);
+        actions.put("castingname", PlaceholderUtil::castingNamePlaceholder);
+        actions.put("castinginfo", PlaceholderUtil::castingInfoPlaceholder);
     }
 
     @NotNull
@@ -861,7 +861,7 @@ public class PlaceholderUtil {
     }
 
     // Returns a list of all the skills a player current has. [] if not found.
-    private static String skillListPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             ArrayList<String> skills = new ArrayList<String>();
@@ -875,7 +875,7 @@ public class PlaceholderUtil {
     }
 
     // Returns a list of all the skills a player current has. "" if not found.
-    private static String formatSkillListPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             ArrayList<String> skills = new ArrayList<String>();
@@ -889,7 +889,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the name of a skill at the specified location. "" if not found.
-    private static String skillListNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             return playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
@@ -899,7 +899,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the information of a skill at the specified location and given placeholder. "" if not found.
-    private static String skillListInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skillName = playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
@@ -911,7 +911,7 @@ public class PlaceholderUtil {
         }
 
     // Returns true if the player is skill casting. False otherwise.
-    private static String textCastingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             PlayerTextCastingData skillData = playerData.getTextCastingData();
@@ -922,7 +922,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the name of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String textCastingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             PlayerTextCastingData skillData = playerData.getTextCastingData();
@@ -934,7 +934,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the requested info of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String textCastingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
         PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
         PlayerTextCastingData skillData = playerData.getTextCastingData();
