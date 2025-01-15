@@ -14,6 +14,7 @@ import studio.magemonkey.fabled.api.classes.FabledClass;
 import studio.magemonkey.fabled.api.player.PlayerAccounts;
 import studio.magemonkey.fabled.api.player.PlayerClass;
 import studio.magemonkey.fabled.api.player.PlayerData;
+import studio.magemonkey.fabled.api.player.PlayerSkill;
 import studio.magemonkey.fabled.api.skills.Skill;
 import studio.magemonkey.fabled.api.util.FlagManager;
 import studio.magemonkey.fabled.cast.PlayerTextCastingData;
@@ -94,20 +95,26 @@ public class PlaceholderUtil {
         actions.put("fvalue", PlaceholderUtil::formatValuePlaceholder);
         // // SKill Placeholders
         actions.put("skilllevel", PlaceholderUtil::skillLevelPlaceholder);
-        actions.put("casting", PlaceholderUtil::castingPlaceholder);
-        actions.put("manacost", PlaceholderUtil::manaCostPlaceholder);
-        actions.put("fmanacost", PlaceholderUtil::formatManaCostPlaceholder);
-        actions.put("cooldown", PlaceholderUtil::cooldownPlaceholder);
-        actions.put("fcooldown", PlaceholderUtil::formatCooldownPlaceholder);
-        actions.put("cooldownleft", PlaceholderUtil::cooldownLeftPlaceholder);
-        actions.put("fcooldownleft", PlaceholderUtil::formatCooldownLeftPlaceholder);
-        actions.put("actionbar", PlaceholderUtil::actionBarPlaceholder);
-        actions.put("actionbarmanacost", PlaceholderUtil::actionBarManaCostPlaceholder);
-        actions.put("factionbarmanacost", PlaceholderUtil::formatActionBarManaCostPlaceholder);
-        actions.put("actionbarcooldown", PlaceholderUtil::actionBarCooldownPlaceholder);
-        actions.put("factionbarcooldown", PlaceholderUtil::formatActionBarCooldownPlaceholder);
-        actions.put("actionbarcooldownleft", PlaceholderUtil::actionBarCooldownLeftPlaceholder);
-        actions.put("factionbarcooldownleft", PlaceholderUtil::formatActionBarCooldownLeftPlaceholder);
+        actions.put("skillmaxlevel", PlaceholderUtil::skillMaxLevelPlaceholder);
+        actions.put("skillrequiredlevel", PlaceholderUtil::skillMaxLevelPlaceholder);
+        actions.put("skilltype", PlaceholderUtil::skillTypePlaceholder);
+        actions.put("skillcost", PlaceholderUtil::skillCostPlaceholder);
+        actions.put("skillmanacost", PlaceholderUtil::skillManaCostPlaceholder);
+        actions.put("fskillmanacost", PlaceholderUtil::formatSkillManaCostPlaceholder);
+        actions.put("skillcooldown", PlaceholderUtil::skillCooldownPlaceholder);
+        actions.put("fskillcooldown", PlaceholderUtil::formatSkillCooldownPlaceholder);
+        actions.put("skillcooldownleft", PlaceholderUtil::skillCooldownLeftPlaceholder);
+        actions.put("fskillcooldownleft", PlaceholderUtil::formatSkillCooldownLeftPlaceholder);
+        actions.put("skillmessage", PlaceholderUtil::skillMessagePlaceholder);
+        actions.put("fskillmessage", PlaceholderUtil::formatSkillMessagePlaceholder);
+        actions.put("skillmodeldata", PlaceholderUtil::skillModelDataPlaceholder);
+        actions.put("skilllist", PlaceholderUtil::skillListPlaceholder);
+        actions.put("fskilllist", PlaceholderUtil::formatSkillListPlaceholder);
+        actions.put("skilllistname", PlaceholderUtil::skillListNamePlaceholder);
+        actions.put("skilllistinfo", PlaceholderUtil::skillListInfoPlaceholder);
+        actions.put("textcasting", PlaceholderUtil::textCastingPlaceholder);
+        actions.put("textcastingname", PlaceholderUtil::textCastingNamePlaceholder);
+        actions.put("textcastinginfo", PlaceholderUtil::textCastingInfoPlaceholder);
     }
 
     @NotNull
@@ -718,19 +725,42 @@ public class PlaceholderUtil {
         }
     }
 
-    // Returns true if the player is skill casting. False otherwise.
-    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    // Returns the maximum level of the specified skill. 0 if not found.
+    private static String skillMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = playerData.getTextCastingData();
-            return String.valueOf(skillData.isCasting());
+            String skill = String.join("_",arguments);
+            return String.valueOf(playerData.getSkill(skill).getData().getMaxLevel());
         } catch (Exception e) {
-            return "false";
+            return "0";
+        }
+    }
+
+    // Returns the type of the specified skill. Empty string if not found.
+    private static String skillTypePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_",arguments);
+            return String.valueOf(playerData.getSkill(skill).getData().getType());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Returns the cost in skill points to level up the specified skill. 0 if not found.
+    private static String skillCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skillname = String.join("_",arguments);
+            PlayerSkill skill = playerData.getSkill(skillname);
+            return String.valueOf(skill.getData().getCost(skill.getLevel()));
+        } catch (Exception e) {
+            return "0";
         }
     }
 
     // Returns the mana cost of a specified skill. 0.0 if not found.
-    private static String manaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_",arguments);
@@ -741,7 +771,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the mana cost of a specified skill, as an integer. 0 if not found.
-    private static String formatManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_",arguments);
@@ -752,7 +782,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill. 0.0 if not found.
-    private static String cooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skillName = String.join("_",arguments);
@@ -764,7 +794,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill, as an integer. 0 if not found.
-    private static String formatCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skillName = String.join("_",arguments);
@@ -776,7 +806,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown remaining of a skill. 0.0 if not found.
-    private static String cooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_",arguments);
@@ -787,7 +817,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill, as an integer. 0 if not found.
-    private static String formatCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_",arguments);
@@ -797,8 +827,102 @@ public class PlaceholderUtil {
         }
     }
 
+    // Returns the cast message of a skill, empty string if not found.
+    private static String skillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_",arguments);
+            return String.valueOf(playerData.getSkill(skill).getData().getMessage());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Returns the cast message of a skill without color codes, empty string if not found.
+    private static String formatSkillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_",arguments);
+            return ChatColor.stripColor(playerData.getSkill(skill).getData().getMessage());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Returns the custom model data of the skill item, 0 if not found.
+    private static String skillModelDataPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_",arguments);
+            return String.valueOf(playerData.getSkill(skill).getData().getIcon(playerData).getItemMeta().getCustomModelData());
+        } catch (Exception e) {
+            return "0";
+        }
+    }
+
+    // Returns a list of all the skills a player current has. [] if not found.
+    private static String skillListPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            ArrayList<String> skills = new ArrayList<String>();
+            for (PlayerSkill skill: playerData.getSkills()) {
+                skills.add(skill.getData().getName());
+            }
+            return skills.toString();
+        } catch (Exception e) {
+            return "[]";
+        }
+    }
+
+    // Returns a list of all the skills a player current has. "" if not found.
+    private static String formatSkillListPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            ArrayList<String> skills = new ArrayList<String>();
+            for (PlayerSkill skill: playerData.getSkills()) {
+                skills.add(skill.getData().getName());
+            }
+            return skills.toString().replaceAll("(^\\[|\\]$)", "");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Returns the name of a skill at the specified location. "" if not found.
+    private static String skillListNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            return playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Returns the information of a skill at the specified location and given placeholder. "" if not found.
+    private static String skillListInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skillName = playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
+            arguments.add(skillName);
+            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {return null;}).apply(player, arguments, accountID);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+    // Returns true if the player is skill casting. False otherwise.
+    private static String textCastingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerTextCastingData skillData = playerData.getTextCastingData();
+            return String.valueOf(skillData.isCasting());
+        } catch (Exception e) {
+            return "false";
+        }
+    }
+
     // Returns the name of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String actionBarPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String textCastingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
             PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             PlayerTextCastingData skillData = playerData.getTextCastingData();
@@ -809,84 +933,17 @@ public class PlaceholderUtil {
         }
     }
 
-    // Returns the mana cost of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. 0.0 if not found.
-    private static String actionBarManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-            String slot = String.valueOf(arguments.remove(0));
-            String skill = skillData.getSkill(Integer.parseInt(slot));
-            return String.valueOf(playerData.getSkill(skill).getManaCost());
-        } catch (Exception e) {
-            return "0.0";
-        }
-    }
-
-    // Returns the mana cost of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. 0 if not found.
-    private static String formatActionBarManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-            String slot = String.valueOf(arguments.remove(0));
-            String skill = skillData.getSkill(Integer.parseInt(slot));
-            return String.valueOf((int) playerData.getSkill(skill).getManaCost());
-        } catch (Exception e) {
-            return "0";
-        }
-    }
-
-    // Returns the cooldown of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. 0.0 if not found.
-    private static String actionBarCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-            String slot = String.valueOf(arguments.remove(0));
-            String skillName = skillData.getSkill(Integer.parseInt(slot));
-            Skill skill = playerData.getSkill(skillName).getData();
-            return String.valueOf(skill.getCooldown(playerData.getSkillLevel(skillName)));
-        } catch (Exception e) {
-            return "0.0";
-        }
-    }
-
-    // Returns the cooldown of the skill found in a specified slot if the ACTION_BAR is being used, as an integer. Must be 1-8. 0 if not found.
-    private static String formatActionBarCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-            String slot = String.valueOf(arguments.remove(0));
-            String skillName = skillData.getSkill(Integer.parseInt(slot));
-            Skill skill = playerData.getSkill(skillName).getData();
-            return String.valueOf((int) skill.getCooldown(playerData.getSkillLevel(skillName)));
-        } catch (Exception e) {
-            return "0";
-        }
-    }
-
-    // Returns the remaining cooldown of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. 0.0 if not found.
-    private static String actionBarCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    // Returns the requested info of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
+    private static String textCastingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
         try {
         PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-        PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-        String slot = String.valueOf(arguments.remove(0));
-        String skill = skillData.getSkill(Integer.parseInt(slot));
-        return String.valueOf(playerData.getSkill(skill).getCooldownLeft());
+        PlayerTextCastingData skillData = playerData.getTextCastingData();
+        String skillName = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
+        arguments.add(skillName);
+        return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {return null;}).apply(player, arguments, accountID);
         } catch (Exception e) {
-            return "0.0";
+            return "";
         }
     }
-
-    // Returns the remaining cooldown of the skill found in a specified slot if the ACTION_BAR is being used, as an integer. Must be 1-8. 0 if not found.
-    private static String formatActionBarCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            PlayerTextCastingData skillData = Fabled.getData(player).getTextCastingData();
-            String slot = String.valueOf(arguments.remove(0));
-            String skill = skillData.getSkill(Integer.parseInt(slot));
-            return String.valueOf((int) playerData.getSkill(skill).getCooldownLeft());
-            } catch (Exception e) {
-                return "0";
-            }
-        }
 
 }
