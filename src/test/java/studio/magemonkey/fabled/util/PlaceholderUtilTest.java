@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import studio.magemonkey.codex.compat.NMS;
+import studio.magemonkey.codex.compat.VersionManager;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.classes.FabledClass;
 import studio.magemonkey.fabled.api.player.PlayerAccounts;
@@ -78,6 +80,8 @@ public class PlaceholderUtilTest {
 
         fabledMock.when(() -> Fabled.getData(player)).thenReturn(playerData);
         fabledMock.when(() -> Fabled.hasPlayerData(player)).thenReturn(true);
+
+        VersionManager.setNms(mock(NMS.class));
     }
 
     @AfterEach

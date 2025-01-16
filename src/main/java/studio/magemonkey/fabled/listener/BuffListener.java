@@ -6,6 +6,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
+import studio.magemonkey.codex.registry.BuffRegistry;
 import studio.magemonkey.fabled.api.event.BuffExpiredEvent;
 import studio.magemonkey.fabled.api.event.PhysicalDamageEvent;
 import studio.magemonkey.fabled.api.event.SkillDamageEvent;
@@ -22,63 +24,43 @@ import static studio.magemonkey.fabled.listener.attribute.AttributeListener.PHYS
  */
 public class BuffListener extends FabledListener {
 
+    private static double scaleDamage(LivingEntity damager, LivingEntity target, double damage,
+                                      @Nullable String classification) {
+        String damageType  = BuffType.DAMAGE.getLocalizedName();
+        String defenseType = BuffType.DEFENSE.getLocalizedName();
+
+        if (classification != null && !classification.equalsIgnoreCase(PHYSICAL)) {
+            damageType = BuffType.SKILL_DAMAGE.getLocalizedName() + "_" + classification;
+            defenseType = BuffType.SKILL_DEFENSE.getLocalizedName() + "_" + classification;
+        }
+
+        double withDamageBuffs = BuffRegistry.scaleValue(damageType, damager, damage);
+        // With defense buffs
+        return BuffRegistry.scaleValue(defenseType, target, withDamageBuffs);
+    }
+
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPhysical(final PhysicalDamageEvent event) {
-        final double withDamageBuffs = BuffManager.apply(
-                event.getDamager(),
-                BuffType.DAMAGE,
-                event.getDamage());
-        final double withDefenseBuffs = BuffManager.apply(
-                event.getTarget(),
-                BuffType.DEFENSE,
-                withDamageBuffs);
+        double scaledDamage = scaleDamage(event.getDamager(), event.getTarget(), event.getDamage(), null);
 
-        event.setDamage(withDefenseBuffs);
-        if (withDefenseBuffs <= 0) {
-            event.setCancelled(true);
-        }
+        if (scaledDamage <= 0) event.setCancelled(true);
+        else event.setDamage(scaledDamage);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSkill(final SkillDamageEvent event) {
-        if (event.getClassification().equalsIgnoreCase(PHYSICAL)) {
-            final double withDamageBuffs = BuffManager.apply(
-                    event.getDamager(),
-                    BuffType.DAMAGE,
-                    event.getDamage());
-            final double withDefenseBuffs = BuffManager.apply(
-                    event.getTarget(),
-                    BuffType.DEFENSE,
-                    withDamageBuffs);
+        double scaledDamage =
+                scaleDamage(event.getDamager(), event.getTarget(), event.getDamage(), event.getClassification());
 
-            event.setDamage(withDefenseBuffs);
-            if (withDefenseBuffs <= 0) {
-                event.setCancelled(true);
-            }
-        } else {
-            final double withDamageBuffs = BuffManager.apply(
-                    event.getDamager(),
-                    BuffType.SKILL_DAMAGE,
-                    event.getClassification(),
-                    event.getDamage());
-            final double withDefenseBuffs = BuffManager.apply(
-                    event.getTarget(),
-                    BuffType.SKILL_DEFENSE,
-                    event.getClassification(),
-                    withDamageBuffs);
-
-            event.setDamage(withDefenseBuffs);
-            if (withDefenseBuffs <= 0) {
-                event.setCancelled(true);
-            }
-        }
+        if (scaledDamage <= 0) event.setCancelled(true);
+        else event.setDamage(scaledDamage);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHeal(final SkillHealEvent event) {
-        final double withBuff = BuffManager.apply(
+        final double withBuff = BuffRegistry.scaleValue(
+                BuffType.HEALING.getLocalizedName(),
                 event.getTarget(),
-                BuffType.HEALING,
                 event.getAmount());
 
         event.setAmount(withBuff);
@@ -89,7 +71,7 @@ public class BuffListener extends FabledListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBuffExpire(final BuffExpiredEvent event) {
-        if (event.getType().equals(BuffType.INVISIBILITY)) {
+        if (event.getKey().equals(BuffType.INVISIBILITY.getLocalizedName())) {
             if (PluginChecker.isProtocolLibActive())
                 PacketListener.updateEquipment((Player) event.getEntity());
         }

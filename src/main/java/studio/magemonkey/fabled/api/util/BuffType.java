@@ -26,11 +26,27 @@
  */
 package studio.magemonkey.fabled.api.util;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+
+@Getter
+@RequiredArgsConstructor
 public enum BuffType {
-    DAMAGE,
-    DEFENSE,
-    SKILL_DAMAGE,
-    SKILL_DEFENSE,
-    HEALING,
-    INVISIBILITY
+    DAMAGE("FABLED_damage"),
+    DEFENSE("FABLED_defense"),
+    SKILL_DAMAGE("FABLED_skill_damage"),
+    SKILL_DEFENSE("FABLED_skill_defense"),
+    HEALING("FABLED_healing"),
+    INVISIBILITY("FABLED_invisibility");
+
+    private final String localizedName;
+
+    public static BuffType getByNameOrLocal(String name) {
+        return Arrays.stream(values())
+                .filter(type -> type.name().equalsIgnoreCase(name) || type.getLocalizedName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
 }
