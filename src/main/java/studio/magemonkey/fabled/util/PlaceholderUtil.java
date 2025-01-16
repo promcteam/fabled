@@ -348,7 +348,9 @@ public class PlaceholderUtil {
     // Returns the max health of the player, as a decimal.
     private static String maxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            return String.valueOf(player.getPlayer().getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH")).getBaseValue());
+            return String.valueOf(player.getPlayer()
+                    .getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH"))
+                    .getBaseValue());
         } catch (Exception e) {
             return "0.0";
         }
@@ -357,7 +359,9 @@ public class PlaceholderUtil {
     // Returns the max health of the player, as an integer.
     private static String formatMaxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            return String.valueOf((int) player.getPlayer().getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH")).getBaseValue());
+            return String.valueOf((int) player.getPlayer()
+                    .getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH"))
+                    .getBaseValue());
         } catch (Exception e) {
             return "0";
         }
@@ -933,7 +937,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the cast message of a skill without color codes, empty string if not found.
-    private static String formatSkillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatSkillMessagePlaceholder(OfflinePlayer player,
+                                                        List<String> arguments,
+                                                        Integer accountID) {
         try {
             PlayerData playerData =
                     (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
@@ -1471,5 +1477,4 @@ public class PlaceholderUtil {
         }
         return null;
     }
-
 }
