@@ -946,4 +946,10 @@ public class PlaceholderUtil {
         }
     }
 
+    // If any of the above Placeholders fail to compute, will attempt to return the value of a Legacy Placeholder.
+    // If successful, will message the console to let players know they are reading a depreciated placeholder.
+    public static String getLagacyPlaceholder(OfflinePlayer player, String identifier){
+        
+    }
+
 }
