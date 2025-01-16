@@ -2,7 +2,7 @@ package studio.magemonkey.fabled.api;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import studio.magemonkey.codex.registry.attribute.AttributeProvider;
+import studio.magemonkey.codex.registry.provider.AttributeProvider;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.player.PlayerData;
 

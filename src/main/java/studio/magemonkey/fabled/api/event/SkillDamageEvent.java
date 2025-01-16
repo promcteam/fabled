@@ -32,6 +32,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Nullable;
 import studio.magemonkey.fabled.api.skills.Skill;
 
 /**
@@ -55,6 +56,7 @@ public class SkillDamageEvent extends Event implements Cancellable {
     @Getter
     private final        LivingEntity target;
     @Getter
+    @Nullable
     private final        String       classification;
     /**
      * @return skill used to deal the damage
@@ -93,7 +95,7 @@ public class SkillDamageEvent extends Event implements Cancellable {
      * @param ignoreDivinity whether to ignore divinity
      */
     public SkillDamageEvent(Skill skill, LivingEntity damager, LivingEntity target, double damage,
-                            String classification, boolean knockback, boolean ignoreDivinity) {
+                            @Nullable String classification, boolean knockback, boolean ignoreDivinity) {
         this.skill = skill;
         this.damager = damager;
         this.target = target;

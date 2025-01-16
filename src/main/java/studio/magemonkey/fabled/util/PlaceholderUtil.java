@@ -1,12 +1,11 @@
 package studio.magemonkey.fabled.util;
 
+import io.lumine.mythic.bukkit.utils.interfaces.TriFunction;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-
-import io.lumine.mythic.bukkit.utils.interfaces.TriFunction;
-import studio.magemonkey.codex.util.AttributeUT;
+import studio.magemonkey.codex.compat.VersionManager;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.CastData;
@@ -22,20 +21,16 @@ import studio.magemonkey.fabled.dynamic.DynamicSkill;
 import studio.magemonkey.fabled.hook.PlaceholderAPIHook;
 import studio.magemonkey.fabled.hook.PluginChecker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class PlaceholderUtil {
 
-    private static Map<String, TriFunction<OfflinePlayer, List<String>, Integer, String>> actions = new HashMap<>(); 
-    
+    private static final Map<String, TriFunction<OfflinePlayer, List<String>, Integer, String>> actions =
+            new HashMap<>();
+
     static {
         // Class Placeholders
         actions.put("level", PlaceholderUtil::levelPlaceholder);
@@ -124,8 +119,8 @@ public class PlaceholderUtil {
         if (PluginChecker.isPlaceholderAPIActive()) {
             return StringUT.color(PlaceholderAPIHook.format(str, player.getPlayer()));
         }
-    
-        Pattern regex = Pattern.compile("%fabled_(.*?)%");
+
+        Pattern regex         = Pattern.compile("%fabled_(.*?)%");
         String  formattedLine = str;
         Matcher matcher       = regex.matcher(str);
         while (matcher.find()) {
@@ -146,39 +141,46 @@ public class PlaceholderUtil {
     }
 
     public static String replace(OfflinePlayer player, String identifier) {
-        List<String> arguments = new ArrayList<String>(Arrays.asList(identifier.toLowerCase().strip().split("_")));
-        String placeholder = arguments.remove(0);
-        return actions.getOrDefault(placeholder, (a, b, c) -> {return null;}).apply(player, arguments, null);
+        List<String> arguments   = new ArrayList<>(Arrays.asList(identifier.toLowerCase().strip().split("_")));
+        String       placeholder = arguments.remove(0);
+        return actions.getOrDefault(placeholder, (a, b, c) -> {
+            return null;
+        }).apply(player, arguments, null);
     }
 
     // ** Class ** //
     // Returns the level of the current class in the specified group. 0 if not found.
-    public static String levelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    public static String levelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getLevel() : playerData.getMainClass().getLevel());
+            return String.valueOf(
+                    group != null ? playerData.getClass(group).getLevel() : playerData.getMainClass().getLevel());
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the max level of the current class in the specified group. 0 if not found.
-    public static String maxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    public static String maxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getMaxLevel() : playerData.getMainClass().getData().getMaxLevel());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getMaxLevel()
+                    : playerData.getMainClass().getData().getMaxLevel());
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the total level of all classes. 0 if no classes are professed.
-    public static String totalLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+    public static String totalLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+        PlayerData playerData =
+                (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
         Collection<PlayerClass> playerClasses = playerData.getClasses();
-        int totalLevel = 0;
+        int                     totalLevel    = 0;
         for (PlayerClass playerClass : playerClasses) {
             totalLevel += playerClass.getLevel();
         }
@@ -186,10 +188,11 @@ public class PlaceholderUtil {
     }
 
     // Returns the total max level of all classes.
-    public static String totalMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
-        PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+    public static String totalMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+        PlayerData playerData =
+                (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
         Collection<PlayerClass> playerClasses = playerData.getClasses();
-        int totalMaxLevel = 0;
+        int                     totalMaxLevel = 0;
         for (PlayerClass playerClass : playerClasses) {
             totalMaxLevel += playerClass.getData().getMaxLevel();
         }
@@ -197,68 +200,80 @@ public class PlaceholderUtil {
     }
 
     // Returns the Prefix of the current class in the specified group. Blank if not found.
-    private static String prefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String prefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getPrefix() : playerData.getMainClass().getData().getPrefix());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getPrefix()
+                    : playerData.getMainClass().getData().getPrefix());
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the Prefix of the current class in the specified group without its color. Blank if not found.
-    private static String formatPrefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatPrefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getPrefix() : playerData.getMainClass().getData().getPrefix());
+            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getPrefix()
+                    : playerData.getMainClass().getData().getPrefix());
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the Name of the current class in the specified group. Blank if not found.
-    private static String classPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String classPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getName() : playerData.getMainClass().getData().getName());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getName()
+                    : playerData.getMainClass().getData().getName());
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the Name of the current Class in the specified group without its color. Blank if not found.
-    private static String formatClassPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatClassPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getName() : playerData.getMainClass().getData().getName());
+            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getName()
+                    : playerData.getMainClass().getData().getName());
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the Name of the Parent Class in the specified group. Blank if not found.
-    private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getParent().getName() : playerData.getMainClass().getData().getParent().getName());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getParent().getName()
+                    : playerData.getMainClass().getData().getParent().getName());
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns all the Children of the current Class in the specified group. Emptry list if not found.
-    private static String childrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String childrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            FabledClass playerClass = (group != null) ? playerData.getClass(group).getData() : playerData.getMainClass().getData();
+            FabledClass playerClass =
+                    (group != null) ? playerData.getClass(group).getData() : playerData.getMainClass().getData();
             ArrayList<String> children = new ArrayList<String>();
-            for (FabledClass classes: Fabled.getClasses().values()) {
+            for (FabledClass classes : Fabled.getClasses().values()) {
                 String classname = classes.getName();
                 if (classes.hasParent()) {
                     if (classes.getParent().getName().equalsIgnoreCase(playerClass.getName())) {
@@ -273,13 +288,15 @@ public class PlaceholderUtil {
     }
 
     // Returns all the Children of the current Class in the specified group formatted as a nice list. Blank if not found.
-    private static String formatChildrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatChildrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            FabledClass playerClass = (group != null) ? playerData.getClass(group).getData() : playerData.getMainClass().getData();
+            FabledClass playerClass =
+                    (group != null) ? playerData.getClass(group).getData() : playerData.getMainClass().getData();
             ArrayList<String> children = new ArrayList<String>();
-            for (FabledClass classes: Fabled.getClasses().values()) {
+            for (FabledClass classes : Fabled.getClasses().values()) {
                 String classname = classes.getName();
                 if (classes.hasParent()) {
                     if (classes.getParent().getName().equalsIgnoreCase(playerClass.getName())) {
@@ -295,7 +312,7 @@ public class PlaceholderUtil {
 
     // ** Health ** //
     // Returns the current health of the player, as a decimal.
-    private static String healthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String healthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             return String.valueOf(player.getPlayer().getHealth());
         } catch (Exception e) {
@@ -304,7 +321,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the current health of the player, as an integer.
-    private static String formatHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             return String.valueOf((int) player.getPlayer().getHealth());
         } catch (Exception e) {
@@ -313,103 +330,113 @@ public class PlaceholderUtil {
     }
 
     // Returns the max health of the player, as a decimal.
-    private static String maxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String maxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            return String.valueOf(player.getPlayer().getAttribute(AttributeUT.resolve("MAX_HEALTH")).getBaseValue());
+            return String.valueOf(player.getPlayer().getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH")).getBaseValue());
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the max health of the player, as an integer.
-    private static String formatMaxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatMaxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            return String.valueOf((int) player.getPlayer().getAttribute(AttributeUT.resolve("MAX_HEALTH")).getBaseValue());
+            return String.valueOf((int) player.getPlayer().getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH")).getBaseValue());
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the base health of the current class or class in the specified group. 0.0 if not found.
-    private static String baseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String baseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-        PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-        String group = arguments.isEmpty() ? null : String.join("_", arguments);
-        return String.valueOf(group != null ? playerData.getClass(group).getData().getBaseHealth() : playerData.getMainClass().getData().getBaseHealth());
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String group = arguments.isEmpty() ? null : String.join("_", arguments);
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getBaseHealth()
+                    : playerData.getMainClass().getData().getBaseHealth());
         } catch (Exception e) {
             return "0.0";
-        } 
+        }
     }
 
     // Returns the base health of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatBaseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatBaseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getBaseHealth() : (int) playerData.getMainClass().getData().getBaseHealth());
-            } catch (Exception e) {
-                return "0";
-            } 
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getBaseHealth()
+                    : (int) playerData.getMainClass().getData().getBaseHealth());
+        } catch (Exception e) {
+            return "0";
         }
+    }
 
     // Returns the health value of the current class or class in the specified group at a specific level. 0.0 if not found.
-    private static String healthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String healthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
-            String group = arguments.isEmpty() ? null : String.join("_", arguments);  
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getHealth(level) : playerData.getMainClass().getData().getHealth(level));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
+            String group = arguments.isEmpty() ? null : String.join("_", arguments);
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getHealth(level)
+                    : playerData.getMainClass().getData().getHealth(level));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the health value of the current class or class in the specified group at a specific level, as an integer. 0 if not found.
-    private static String formatHealthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatHealthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
-            String group = arguments.isEmpty() ? null : String.join("_", arguments);  
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getHealth(level) : (int) playerData.getMainClass().getData().getHealth(level));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
+            String group = arguments.isEmpty() ? null : String.join("_", arguments);
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getHealth(level)
+                    : (int) playerData.getMainClass().getData().getHealth(level));
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the value in which health scales per level of the current class or class in the specified group. 0.0 if not found.
-    private static String healthScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String healthScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getHealthScale() : (int) playerData.getMainClass().getData().getHealthScale());
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getHealthScale()
+                    : (int) playerData.getMainClass().getData().getHealthScale());
         } catch (Exception e) {
             return "0.0";
-        } 
+        }
     }
 
     // ** Mana ** //
     // Returns the amount of mana the player currently has. 0.0 if not found.
-    private static String manaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String manaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf(playerData.getMana());
         } catch (Exception e) {
             return "0.0";
         }
-    } 
+    }
 
     // Returns the amount of mana the player currently has, as an integer. 0 if not found.
-    private static String formatManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf((int) playerData.getMana());
         } catch (Exception e) {
             return "0";
         }
-    } 
+    }
 
     // Returns the maximum amount of mana the player currently has. 0.0 if not found.
-    private static String maxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String maxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf(playerData.getMaxMana());
@@ -419,212 +446,251 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum amount of mana the player currently has, as an integer. 0 if not found.
-    private static String formatMaxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatMaxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf((int) playerData.getMaxMana());
         } catch (Exception e) {
             return "0";
         }
-    } 
+    }
 
     // Returns the mana name of the current class or class in the specified group. Blank if not found.
-    private static String manaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String manaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaName() : playerData.getMainClass().getData().getManaName());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaName()
+                    : playerData.getMainClass().getData().getManaName());
         } catch (Exception e) {
             return "";
-        } 
+        }
     }
 
     // Returns the mana name of the current class or class in the specified group, wihout its color. Blank if not found.
-    private static String formatManaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatManaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getManaName() : playerData.getMainClass().getData().getManaName());
+            return ChatColor.stripColor(group != null ? playerData.getClass(group).getData().getManaName()
+                    : playerData.getMainClass().getData().getManaName());
         } catch (Exception e) {
             return "";
-        } 
+        }
     }
 
     // Returns the base mana of the current class or class in the specified group. 0.0 if not found.
-    private static String baseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String baseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getBaseMana() : playerData.getMainClass().getData().getBaseMana());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getBaseMana()
+                    : playerData.getMainClass().getData().getBaseMana());
         } catch (Exception e) {
             return "0.0";
-        } 
+        }
     }
 
     // Returns the base mana of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatBaseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatBaseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getBaseMana() : (int) playerData.getMainClass().getData().getBaseMana());
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getBaseMana()
+                    : (int) playerData.getMainClass().getData().getBaseMana());
         } catch (Exception e) {
             return "0";
-        } 
+        }
     }
 
     // Returns the mana regen rate of the current class or class in the specified group. 0.0 if not found.
-    private static String manaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String manaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaRegen() : playerData.getMainClass().getData().getManaRegen());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaRegen()
+                    : playerData.getMainClass().getData().getManaRegen());
         } catch (Exception e) {
             return "0.0";
-        } 
+        }
     }
 
     // Returns the mana regen rate of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatManaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatManaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getManaRegen() : (int) playerData.getMainClass().getData().getManaRegen());
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getManaRegen()
+                    : (int) playerData.getMainClass().getData().getManaRegen());
         } catch (Exception e) {
             return "0";
-        } 
+        }
     }
 
     // Returns the mana value of the current class or class in the specified group at a specific level. 0.0 if not found.
-    private static String manaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String manaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
-            String group = arguments.isEmpty() ? null : String.join("_", arguments);  
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getMana(level) : playerData.getMainClass().getData().getMana(level));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
+            String group = arguments.isEmpty() ? null : String.join("_", arguments);
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getMana(level)
+                    : playerData.getMainClass().getData().getMana(level));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the health value of the current class or class in the specified group at a specific level, as an integer. 0 if not found.
-    private static String formatManaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatManaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
-            String group = arguments.isEmpty() ? null : String.join("_", arguments);  
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getMana(level) : (int) playerData.getMainClass().getData().getMana(level));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
+            String group = arguments.isEmpty() ? null : String.join("_", arguments);
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getMana(level)
+                    : (int) playerData.getMainClass().getData().getMana(level));
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the value in which mana scales per level of the current class or class in the specified group. 0.0 if not found.
-    private static String manaScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String manaScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaScale() : playerData.getMainClass().getData().getManaScale());
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getManaScale()
+                    : playerData.getMainClass().getData().getManaScale());
         } catch (Exception e) {
             return "0.0";
-        } 
+        }
     }
 
     // ** Leveling ** //
     // Return how many points the player has in the specified. If no attribute is specified, all invested points are shown. 0 if not found.
-    private static String attributePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String attributePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String attribute = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(attribute != null ? playerData.getAttribute(attribute) : playerData.getInvestedAttributes().values().stream().mapToInt(Integer::intValue).sum());
+            return String.valueOf(attribute != null ? playerData.getAttribute(attribute)
+                    : playerData.getInvestedAttributes().values().stream().mapToInt(Integer::intValue).sum());
         } catch (Exception e) {
             return "0";
         }
-    } 
+    }
 
     // Return the number of unspent attribute points. 0 if not found.
-    private static String attributePointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String attributePointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             return String.valueOf(playerData.getAttributePoints());
         } catch (Exception e) {
             return "0";
         }
-    } 
+    }
 
     // Returns the current experience point for the specified group. 0.0 if not found.
-    private static String currentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String currentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getExp() : playerData.getMainClass().getExp());
+            return String.valueOf(
+                    group != null ? playerData.getClass(group).getExp() : playerData.getMainClass().getExp());
         } catch (Exception e) {
             return "0.0";
         }
-    } 
+    }
 
     // Returns the current experience points for the specified group as an integer. 0 if not found.
-    private static String formatCurrentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatCurrentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getExp() : (int) playerData.getMainClass().getExp());
+            return String.valueOf(group != null ? (int) playerData.getClass(group).getExp()
+                    : (int) playerData.getMainClass().getExp());
         } catch (Exception e) {
             return "0";
         }
-    } 
-    
+    }
+
     // Returns the required experience for the next level for the specified group. 0.0 if not found.
-    private static String requiredExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String requiredExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getRequiredExp() : playerData.getMainClass().getRequiredExp());
+            return String.valueOf(group != null ? playerData.getClass(group).getRequiredExp()
+                    : playerData.getMainClass().getRequiredExp());
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the required experience for the next level for the specified group as an integer. 0 if not found.
-    private static String formatRequiredExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatRequiredExpPlaceholder(OfflinePlayer player,
+                                                       List<String> arguments,
+                                                       Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getRequiredExp() : (int) playerData.getMainClass().getRequiredExp());
+            return String.valueOf(group != null ? playerData.getClass(group).getRequiredExp()
+                    : playerData.getMainClass().getRequiredExp());
         } catch (Exception e) {
             return "0";
         }
     }
 
-    // Returns the requires experience for the specified level for a given group. 0.0 if not found.
-    private static String requiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    // Returns the required experience for the specified level for a given group. 0.0 if not found.
+    private static String requiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getData().getRequiredExp(level) : playerData.getMainClass().getData().getRequiredExp(level));
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getRequiredExp(level)
+                    : playerData.getMainClass().getData().getRequiredExp(level));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
-    // Returns the requires experience for the specified level for a given group as an integer. 0 if not found.
-    private static String formatRequiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    // Returns the required experience for the specified level for a given group as an integer. 0 if not found.
+    private static String formatRequiredExpAtPlaceholder(OfflinePlayer player,
+                                                         List<String> arguments,
+                                                         Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            int level = Integer.parseInt(arguments.remove(0));
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            int    level = Integer.parseInt(arguments.remove(0));
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? (int) playerData.getClass(group).getData().getRequiredExp(level) : (int) playerData.getMainClass().getData().getRequiredExp(level));
+            return String.valueOf(group != null ? playerData.getClass(group).getData().getRequiredExp(level)
+                    : playerData.getMainClass().getData().getRequiredExp(level));
         } catch (Exception e) {
             return "0";
         }
     }
-    
+
     // Returns the skill points for the specified group. 0 if not found.
-    private static String skillPointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillPointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String group = arguments.isEmpty() ? null : String.join("_", arguments);
-            return String.valueOf(group != null ? playerData.getClass(group).getPoints() : playerData.getMainClass().getPoints());
+            return String.valueOf(
+                    group != null ? playerData.getClass(group).getPoints() : playerData.getMainClass().getPoints());
         } catch (Exception e) {
             return "0";
         }
@@ -632,7 +698,7 @@ public class PlaceholderUtil {
 
     //Accounts
     // Returns the number of accounts the player currently has. 0 if not available.
-    private static String accountsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String accountsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getAllData().size());
@@ -642,7 +708,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum number of accounts the player can has. 0 if not available.
-    private static String accountLimitPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String accountLimitPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getAccountLimit());
@@ -652,7 +718,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the value of the current account the player is using. 0 if not available.
-    private static String currentAccountPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String currentAccountPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getActiveId());
@@ -665,24 +731,26 @@ public class PlaceholderUtil {
     // Proper usage %fabled_accountInfo_[id]_[fabled placeholder]%.
     // Example %fabled_accountInfo_1_class_race% 
     // This will return the class name of the race group for account number 1.
-    private static String accountInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String accountInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         Integer id = Integer.valueOf(arguments.remove(0));
-        return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {return null;}).apply(player, arguments, id);
+        return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {
+            return null;
+        }).apply(player, arguments, id);
     }
 
     //Variables
-    // Retruns true if this flag is set, false otherwise.
-    private static String flagPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    // Returns true if this flag is set, false otherwise.
+    private static String flagPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             String flag = String.join("_", arguments);
             return String.valueOf(FlagManager.hasFlag((LivingEntity) player, flag));
         } catch (Exception e) {
             return "false";
         }
-    } 
+    }
 
     // Returns the remaining time the flag has. 0 if not set.
-    private static String flagleftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String flagleftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
             String flag = String.join("_", arguments);
             return String.valueOf(FlagManager.getTimeLeft((LivingEntity) player, flag));
@@ -692,10 +760,10 @@ public class PlaceholderUtil {
     }
 
     // Returns the value stored. 0.0 if not found.
-    private static String valuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String valuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            CastData data = DynamicSkill.getCastData((LivingEntity) player);
-            String value = String.join("_", arguments);
+            CastData data  = DynamicSkill.getCastData((LivingEntity) player);
+            String   value = String.join("_", arguments);
             return String.valueOf(data.getDouble(value));
         } catch (Exception e) {
             return "0.0";
@@ -703,10 +771,10 @@ public class PlaceholderUtil {
     }
 
     // Returns the formatted value stored. 0 if not found.
-    private static String formatValuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatValuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            CastData data = DynamicSkill.getCastData((LivingEntity) player);
-            String value = String.join("_", arguments);
+            CastData data  = DynamicSkill.getCastData((LivingEntity) player);
+            String   value = String.join("_", arguments);
             return String.valueOf((int) data.getDouble(value));
         } catch (Exception e) {
             return "0";
@@ -715,10 +783,11 @@ public class PlaceholderUtil {
 
     // Skills
     // Returns the level of the specified skill. 0 if not found.
-    private static String skillLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getLevel());
         } catch (Exception e) {
             return "0";
@@ -726,10 +795,11 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum level of the specified skill. 0 if not found.
-    private static String skillMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getData().getMaxLevel());
         } catch (Exception e) {
             return "0";
@@ -737,10 +807,11 @@ public class PlaceholderUtil {
     }
 
     // Returns the type of the specified skill. Empty string if not found.
-    private static String skillTypePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillTypePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getData().getType());
         } catch (Exception e) {
             return "";
@@ -748,11 +819,12 @@ public class PlaceholderUtil {
     }
 
     // Returns the cost in skill points to level up the specified skill. 0 if not found.
-    private static String skillCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skillname = String.join("_",arguments);
-            PlayerSkill skill = playerData.getSkill(skillname);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String      skillname = String.join("_", arguments);
+            PlayerSkill skill     = playerData.getSkill(skillname);
             return String.valueOf(skill.getData().getCost(skill.getLevel()));
         } catch (Exception e) {
             return "0";
@@ -760,10 +832,11 @@ public class PlaceholderUtil {
     }
 
     // Returns the mana cost of a specified skill. 0.0 if not found.
-    private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getManaCost());
         } catch (Exception e) {
             return "0.0";
@@ -771,10 +844,13 @@ public class PlaceholderUtil {
     }
 
     // Returns the mana cost of a specified skill, as an integer. 0 if not found.
-    private static String formatSkillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillManaCostPlaceholder(OfflinePlayer player,
+                                                         List<String> arguments,
+                                                         Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf((int) playerData.getSkill(skill).getManaCost());
         } catch (Exception e) {
             return "0";
@@ -782,11 +858,12 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill. 0.0 if not found.
-    private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skillName = String.join("_",arguments);
-            Skill skill = playerData.getSkill(skillName).getData();
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skillName = String.join("_", arguments);
+            Skill  skill     = playerData.getSkill(skillName).getData();
             return String.valueOf(skill.getCooldown(playerData.getSkillLevel(skillName)));
         } catch (Exception e) {
             return "0.0";
@@ -794,11 +871,14 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill, as an integer. 0 if not found.
-    private static String formatSkillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillCooldownPlaceholder(OfflinePlayer player,
+                                                         List<String> arguments,
+                                                         Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skillName = String.join("_",arguments);
-            Skill skill = playerData.getSkill(skillName).getData();
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skillName = String.join("_", arguments);
+            Skill  skill     = playerData.getSkill(skillName).getData();
             return String.valueOf((int) skill.getCooldown(playerData.getSkillLevel(skillName)));
         } catch (Exception e) {
             return "0";
@@ -806,10 +886,13 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown remaining of a skill. 0.0 if not found.
-    private static String skillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillCooldownLeftPlaceholder(OfflinePlayer player,
+                                                       List<String> arguments,
+                                                       Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getCooldownLeft());
         } catch (Exception e) {
             return "0.0";
@@ -817,21 +900,25 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill, as an integer. 0 if not found.
-    private static String formatSkillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillCooldownLeftPlaceholder(OfflinePlayer player,
+                                                             List<String> arguments,
+                                                             Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
-            return String.valueOf((int) playerData.getSkill(skill).getCooldownLeft());
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
+            return String.valueOf(playerData.getSkill(skill).getCooldownLeft());
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the cast message of a skill, empty string if not found.
-    private static String skillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getData().getMessage());
         } catch (Exception e) {
             return "";
@@ -839,10 +926,11 @@ public class PlaceholderUtil {
     }
 
     // Returns the cast message of a skill without color codes, empty string if not found.
-    private static String formatSkillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
             return ChatColor.stripColor(playerData.getSkill(skill).getData().getMessage());
         } catch (Exception e) {
             return "";
@@ -850,22 +938,28 @@ public class PlaceholderUtil {
     }
 
     // Returns the custom model data of the skill item, 0 if not found.
-    private static String skillModelDataPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillModelDataPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skill = String.join("_",arguments);
-            return String.valueOf(playerData.getSkill(skill).getData().getIcon(playerData).getItemMeta().getCustomModelData());
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skill = String.join("_", arguments);
+            return String.valueOf(playerData.getSkill(skill)
+                    .getData()
+                    .getIcon(playerData)
+                    .getItemMeta()
+                    .getCustomModelData());
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns a list of all the skills a player current has. [] if not found.
-    private static String skillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             ArrayList<String> skills = new ArrayList<String>();
-            for (PlayerSkill skill: playerData.getSkills()) {
+            for (PlayerSkill skill : playerData.getSkills()) {
                 skills.add(skill.getData().getName());
             }
             return skills.toString();
@@ -875,11 +969,12 @@ public class PlaceholderUtil {
     }
 
     // Returns a list of all the skills a player current has. "" if not found.
-    private static String formatSkillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String formatSkillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             ArrayList<String> skills = new ArrayList<String>();
-            for (PlayerSkill skill: playerData.getSkills()) {
+            for (PlayerSkill skill : playerData.getSkills()) {
                 skills.add(skill.getData().getName());
             }
             return skills.toString().replaceAll("(^\\[|\\]$)", "");
@@ -889,31 +984,37 @@ public class PlaceholderUtil {
     }
 
     // Returns the name of a skill at the specified location. "" if not found.
-    private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            return playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            return playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))
+                    - 1].getData().getName();
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the information of a skill at the specified location and given placeholder. "" if not found.
-    private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-            String skillName = playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))-1].getData().getName();
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            String skillName =
+                    playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))
+                            - 1].getData().getName();
             arguments.add(skillName);
-            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {return null;}).apply(player, arguments, accountID);
-            } catch (Exception e) {
-                return "";
-            }
+            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountID);
+        } catch (Exception e) {
+            return "";
         }
+    }
 
     // Returns true if the player is skill casting. False otherwise.
-    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             PlayerTextCastingData skillData = playerData.getTextCastingData();
             return String.valueOf(skillData.isCasting());
         } catch (Exception e) {
@@ -922,25 +1023,27 @@ public class PlaceholderUtil {
     }
 
     // Returns the name of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String castingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             PlayerTextCastingData skillData = playerData.getTextCastingData();
-            String skillName = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
-            return String.valueOf(skillName != null ? skillName : "");
+            String                skillName = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
+            return skillName != null ? skillName : "";
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the requested info of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String castingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID){
+    private static String castingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-        PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
-        PlayerTextCastingData skillData = playerData.getTextCastingData();
-        String skillName = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
-        arguments.add(skillName);
-        return actions.getOrDefault(arguments.remove(0), (a, b, c) -> {return null;}).apply(player, arguments, accountID);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerTextCastingData skillData = playerData.getTextCastingData();
+            String                skillName = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
+            arguments.add(skillName);
+            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountID);
         } catch (Exception e) {
             return "";
         }
@@ -949,7 +1052,7 @@ public class PlaceholderUtil {
     // If any of the above Placeholders fail to compute, will attempt to return the value of a Legacy Placeholder.
     // If successful, will message the console to let players know they are reading a depreciated placeholder.
     public static String getLagacyPlaceholder(OfflinePlayer player, String identifier){
-        
+
     }
 
 }
