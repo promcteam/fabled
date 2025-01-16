@@ -7,6 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.collect.Collections2;
+
 import studio.magemonkey.codex.compat.VersionManager;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
@@ -986,6 +989,7 @@ public class PlaceholderUtil {
             for (PlayerSkill skill : playerData.getSkills()) {
                 skills.add(skill.getData().getName());
             }
+            Collections.sort(skills);
             return skills.toString();
         } catch (Exception e) {
             return "[]";
@@ -1001,6 +1005,7 @@ public class PlaceholderUtil {
             for (PlayerSkill skill : playerData.getSkills()) {
                 skills.add(skill.getData().getName());
             }
+            Collections.sort(skills);
             return skills.toString().replaceAll("(^\\[|\\]$)", "");
         } catch (Exception e) {
             return "";
