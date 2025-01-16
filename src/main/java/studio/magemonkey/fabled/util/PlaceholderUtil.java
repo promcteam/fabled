@@ -46,6 +46,7 @@ public class PlaceholderUtil {
         actions.put("fprefix", PlaceholderUtil::formatPrefixPlaceholder);
         actions.put("class", PlaceholderUtil::classPlaceholder);
         actions.put("fclass", PlaceholderUtil::formatClassPlaceholder);
+        actions.put("group", PlaceholderUtil::groupPlaceholder);
         actions.put("parent", PlaceholderUtil::parentPlaceholder);
         actions.put("children", PlaceholderUtil::childrenPlaceholder);
         actions.put("fchildren", PlaceholderUtil::formatChildrenPlaceholder);
@@ -267,6 +268,16 @@ public class PlaceholderUtil {
         }
     }
 
+    // Returns the name of the main class Group. Blank if not found.
+    private static String groupPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+        try {
+            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            return playerData.getMainClass().getData().getGroup();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+    
     // Returns the Name of the Parent Class in the specified group. Blank if not found.
     private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
