@@ -176,9 +176,9 @@ public class PlaceholderUtil {
 
     // ** Class ** //
     // Returns the level of the current class in the specified group. 0 if not found.
-    public static String levelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    public static String levelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return String.valueOf(playerClass.getLevel());
         } catch (Exception e) {
             return "0";
@@ -186,9 +186,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the max level of the current class in the specified group. 0 if not found.
-    public static String maxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    public static String maxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return String.valueOf(playerClass.getData().getMaxLevel());
         } catch (Exception e) {
             return "0";
@@ -196,8 +196,8 @@ public class PlaceholderUtil {
     }
 
     // Returns the total level of all classes. 0 if no classes are professed.
-    public static String totalLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerData              playerData    = getPlayerData(player, accountID);
+    public static String totalLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerData              playerData    = getPlayerData(player, accountId);
         Collection<PlayerClass> playerClasses = playerData.getClasses();
         int                     totalLevel    = 0;
         for (PlayerClass playerClass : playerClasses) {
@@ -207,8 +207,8 @@ public class PlaceholderUtil {
     }
 
     // Returns the total max level of all classes.
-    public static String totalMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerData              playerData    = getPlayerData(player, accountID);
+    public static String totalMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerData              playerData    = getPlayerData(player, accountId);
         Collection<PlayerClass> playerClasses = playerData.getClasses();
         int                     totalMaxLevel = 0;
         for (PlayerClass playerClass : playerClasses) {
@@ -218,9 +218,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the Prefix of the current class in the specified group. Blank if not found.
-    private static String prefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String prefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return playerClass.getData().getPrefix();
         } catch (Exception e) {
             return "";
@@ -228,14 +228,14 @@ public class PlaceholderUtil {
     }
 
     // Returns the Prefix of the current class in the specified group without its color. Blank if not found.
-    private static String formatPrefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        return ChatColor.stripColor(prefixPlaceholder(player, arguments, accountID));
+    private static String formatPrefixPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        return ChatColor.stripColor(prefixPlaceholder(player, arguments, accountId));
     }
 
     // Returns the Name of the current class in the specified group. Blank if not found.
-    private static String classPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String classPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return playerClass.getData().getName();
         } catch (Exception e) {
             return "";
@@ -243,14 +243,14 @@ public class PlaceholderUtil {
     }
 
     // Returns the Name of the current Class in the specified group without its color. Blank if not found.
-    private static String formatClassPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        return ChatColor.stripColor(classPlaceholder(player, arguments, accountID));
+    private static String formatClassPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        return ChatColor.stripColor(classPlaceholder(player, arguments, accountId));
     }
 
     // Returns the name of the main class Group. Blank if not found.
-    private static String groupPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String groupPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             return playerData.getMainClass().getData().getGroup();
         } catch (Exception e) {
             return "";
@@ -258,9 +258,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the Name of the Parent Class in the specified group. Blank if not found.
-    private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return playerClass.getData().getParent().getName();
         } catch (Exception e) {
             return "";
@@ -268,9 +268,9 @@ public class PlaceholderUtil {
     }
 
     // Returns all the Children of the current Class in the specified group. Emptry list if not found.
-    private static String childrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String childrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            FabledClass  playerClass = getPlayerClass(player, arguments, accountID).getData();
+            FabledClass  playerClass = getPlayerClass(player, arguments, accountId).getData();
             List<String> children    = new ArrayList<>();
             for (FabledClass classes : Fabled.getClasses().values()) {
                 String classname = classes.getName();
@@ -287,13 +287,13 @@ public class PlaceholderUtil {
     }
 
     // Returns all the Children of the current Class in the specified group formatted as a nice list. Blank if not found.
-    private static String formatChildrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        return childrenPlaceholder(player, arguments, accountID).replaceAll("(^\\[|\\]$)", "");
+    private static String formatChildrenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        return childrenPlaceholder(player, arguments, accountId).replaceAll("(^\\[|\\]$)", "");
     }
 
     // ** Health ** //
     // Returns the current health of the player, as a decimal.
-    private static String healthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String healthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             return String.valueOf(player.getPlayer().getHealth());
         } catch (Exception e) {
@@ -302,7 +302,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the current health of the player, as an integer.
-    private static String formatHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             return String.valueOf((int) player.getPlayer().getHealth());
         } catch (Exception e) {
@@ -311,7 +311,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the max health of the player, as a decimal.
-    private static String maxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String maxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             return String.valueOf(player.getPlayer()
                     .getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH"))
@@ -322,7 +322,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the max health of the player, as an integer.
-    private static String formatMaxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatMaxHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             return String.valueOf((int) player.getPlayer()
                     .getAttribute(VersionManager.getNms().getAttribute("MAX_HEALTH"))
@@ -332,57 +332,57 @@ public class PlaceholderUtil {
         }
     }
 
-    private static double getBaseHealth(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static double getBaseHealth(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getBaseHealth();
     }
 
     // Returns the base health of the current class or class in the specified group. 0.0 if not found.
-    private static String baseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String baseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getBaseHealth(player, arguments, accountID));
+            return String.valueOf(getBaseHealth(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the base health of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatBaseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatBaseHealthPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getBaseHealth(player, arguments, accountID));
+            return String.valueOf((int) getBaseHealth(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static double getHealthAt(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static double getHealthAt(OfflinePlayer player, List<String> arguments, Integer accountId) {
         int         level       = Integer.parseInt(arguments.remove(0));
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getHealth(level);
     }
 
     // Returns the health value of the current class or class in the specified group at a specific level. 0.0 if not found.
-    private static String healthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String healthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getHealthAt(player, arguments, accountID));
+            return String.valueOf(getHealthAt(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the health value of the current class or class in the specified group at a specific level, as an integer. 0 if not found.
-    private static String formatHealthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatHealthAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getHealthAt(player, arguments, accountID));
+            return String.valueOf((int) getHealthAt(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the value in which health scales per level of the current class or class in the specified group. 0.0 if not found.
-    private static String healthScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String healthScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return String.valueOf((int) playerClass.getData().getHealthScale());
         } catch (Exception e) {
             return "0.0";
@@ -391,7 +391,7 @@ public class PlaceholderUtil {
 
     // ** Mana ** //
     // Returns the amount of mana the player currently has. 0.0 if not found.
-    private static String manaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String manaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf(playerData.getMana());
@@ -401,7 +401,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the amount of mana the player currently has, as an integer. 0 if not found.
-    private static String formatManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf((int) playerData.getMana());
@@ -411,7 +411,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum amount of mana the player currently has. 0.0 if not found.
-    private static String maxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String maxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf(playerData.getMaxMana());
@@ -421,7 +421,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum amount of mana the player currently has, as an integer. 0 if not found.
-    private static String formatMaxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatMaxManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerData playerData = Fabled.getData(player);
             return String.valueOf((int) playerData.getMaxMana());
@@ -430,103 +430,103 @@ public class PlaceholderUtil {
         }
     }
 
-    private static String getManaName(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static String getManaName(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getManaName();
     }
 
     // Returns the mana name of the current class or class in the specified group. Blank if not found.
-    private static String manaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String manaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return getManaName(player, arguments, accountID);
+            return getManaName(player, arguments, accountId);
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the mana name of the current class or class in the specified group, without its color. Blank if not found.
-    private static String formatManaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatManaNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return ChatColor.stripColor(getManaName(player, arguments, accountID));
+            return ChatColor.stripColor(getManaName(player, arguments, accountId));
         } catch (Exception e) {
             return "";
         }
     }
 
-    private static double getBaseMana(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static double getBaseMana(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getBaseMana();
     }
 
     // Returns the base mana of the current class or class in the specified group. 0.0 if not found.
-    private static String baseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String baseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getBaseMana(player, arguments, accountID));
+            return String.valueOf(getBaseMana(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the base mana of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatBaseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatBaseManaPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getBaseMana(player, arguments, accountID));
+            return String.valueOf((int) getBaseMana(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static double getManaRegen(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static double getManaRegen(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getManaRegen();
     }
 
     // Returns the mana regen rate of the current class or class in the specified group. 0.0 if not found.
-    private static String manaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String manaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getManaRegen(player, arguments, accountID));
+            return String.valueOf(getManaRegen(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the mana regen rate of the current class or class in the specified group, as an integer. 0 if not found.
-    private static String formatManaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatManaRegenPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getManaRegen(player, arguments, accountID));
+            return String.valueOf((int) getManaRegen(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static double getManaAt(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static double getManaAt(OfflinePlayer player, List<String> arguments, Integer accountId) {
         int         level       = Integer.parseInt(arguments.remove(0));
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getMana(level);
     }
 
     // Returns the mana value of the current class or class in the specified group at a specific level. 0.0 if not found.
-    private static String manaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String manaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getManaAt(player, arguments, accountID));
+            return String.valueOf(getManaAt(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the health value of the current class or class in the specified group at a specific level, as an integer. 0 if not found.
-    private static String formatManaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatManaAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getManaAt(player, arguments, accountID));
+            return String.valueOf((int) getManaAt(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the value in which mana scales per level of the current class or class in the specified group. 0.0 if not found.
-    private static String manaScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String manaScalePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return String.valueOf(playerClass.getData().getManaScale());
         } catch (Exception e) {
             return "0.0";
@@ -535,9 +535,9 @@ public class PlaceholderUtil {
 
     // ** Leveling ** //
     // Return how many points the player has in the specified. If no attribute is specified, all invested points are shown. 0 if not found.
-    private static String attributePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String attributePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     attribute  = arguments.isEmpty() ? null : String.join("_", arguments);
             return String.valueOf(attribute != null ? playerData.getAttribute(attribute)
                     : playerData.getInvestedAttributes().values().stream().mapToInt(Integer::intValue).sum());
@@ -547,71 +547,71 @@ public class PlaceholderUtil {
     }
 
     // Return the number of unspent attribute points. 0 if not found.
-    private static String attributePointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String attributePointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             return String.valueOf(playerData.getAttributePoints());
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static double getCurrentExp(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static double getCurrentExp(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getExp();
     }
 
     // Returns the current experience point for the specified group. 0.0 if not found.
-    private static String currentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String currentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getCurrentExp(player, arguments, accountID));
+            return String.valueOf(getCurrentExp(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the current experience points for the specified group as an integer. 0 if not found.
-    private static String formatCurrentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatCurrentExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getCurrentExp(player, arguments, accountID));
+            return String.valueOf((int) getCurrentExp(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static int getRequiredExp(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+    private static int getRequiredExp(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getRequiredExp();
     }
 
     // Returns the required experience for the next level for the specified group. 0 if not found.
-    private static String requiredExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String requiredExpPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getRequiredExp(player, arguments, accountID));
+            return String.valueOf(getRequiredExp(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static int getRequiredExpAt(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static int getRequiredExpAt(OfflinePlayer player, List<String> arguments, Integer accountId) {
         int         level       = Integer.parseInt(arguments.remove(0));
-        PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+        PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
         return playerClass.getData().getRequiredExp(level);
     }
 
     // Returns the required experience for the specified level for a given group. 0 if not found.
-    private static String requiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String requiredExpAtPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getRequiredExpAt(player, arguments, accountID));
+            return String.valueOf(getRequiredExpAt(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
     // Returns the skill points for the specified group. 0 if not found.
-    private static String skillPointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillPointsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerClass playerClass = getPlayerClass(player, arguments, accountID);
+            PlayerClass playerClass = getPlayerClass(player, arguments, accountId);
             return String.valueOf(playerClass.getPoints());
         } catch (Exception e) {
             return "0";
@@ -620,7 +620,7 @@ public class PlaceholderUtil {
 
     //Accounts
     // Returns the number of accounts the player currently has. 0 if not available.
-    private static String accountsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String accountsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getAllData().size());
@@ -630,7 +630,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum number of accounts the player can have. 0 if not available.
-    private static String accountLimitPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String accountLimitPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getAccountLimit());
@@ -640,7 +640,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the value of the current account the player is using. 0 if not available.
-    private static String currentAccountPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String currentAccountPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerAccounts playerData = Fabled.getPlayerAccounts(player);
             return String.valueOf(playerData.getActiveId());
@@ -653,14 +653,14 @@ public class PlaceholderUtil {
     // Proper usage %fabled_accountInfo_[id]_[fabled placeholder]%.
     // Example %fabled_accountInfo_1_class_race% 
     // This will return the class name of the race group for account number 1.
-    private static String accountInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String accountInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         Integer id = Integer.valueOf(arguments.remove(0));
         return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, id);
     }
 
     //Variables
     // Returns true if this flag is set, false otherwise.
-    private static String flagPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String flagPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             String flag = String.join("_", arguments);
             return String.valueOf(FlagManager.hasFlag((LivingEntity) player, flag));
@@ -670,7 +670,7 @@ public class PlaceholderUtil {
     }
 
     // Returns the remaining time the flag has. 0 if not set.
-    private static String flagLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String flagLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             String flag = String.join("_", arguments);
             return String.valueOf(FlagManager.getTimeLeft((LivingEntity) player, flag));
@@ -679,7 +679,7 @@ public class PlaceholderUtil {
         }
     }
 
-    private static double getValue(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static double getValue(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             CastData data  = DynamicSkill.getCastData((LivingEntity) player);
             String   value = String.join("_", arguments);
@@ -690,18 +690,18 @@ public class PlaceholderUtil {
     }
 
     // Returns the value stored. 0.0 if not found.
-    private static String valuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String valuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getValue(player, arguments, accountID));
+            return String.valueOf(getValue(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
     }
 
     // Returns the formatted value stored. 0 if not found.
-    private static String formatValuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatValuePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf((int) getValue(player, arguments, accountID));
+            return String.valueOf((int) getValue(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
@@ -709,9 +709,9 @@ public class PlaceholderUtil {
 
     // Skills
     // Returns the level of the specified skill. 0 if not found.
-    private static String skillLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     skill      = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getLevel());
         } catch (Exception e) {
@@ -720,9 +720,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the maximum level of the specified skill. 0 if not found.
-    private static String skillMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillMaxLevelPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     skill      = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getData().getMaxLevel());
         } catch (Exception e) {
@@ -731,9 +731,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the type of the specified skill. Empty string if not found.
-    private static String skillTypePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillTypePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     skill      = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getData().getType());
         } catch (Exception e) {
@@ -742,9 +742,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the cost in skill points to level up the specified skill. 0 if not found.
-    private static String skillCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData  playerData = getPlayerData(player, accountID);
+            PlayerData  playerData = getPlayerData(player, accountId);
             String      skillName  = String.join("_", arguments);
             PlayerSkill skill      = playerData.getSkill(skillName);
             return String.valueOf(skill.getData().getCost(skill.getLevel()));
@@ -753,16 +753,16 @@ public class PlaceholderUtil {
         }
     }
 
-    private static double getManaCost(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerData playerData = getPlayerData(player, accountID);
+    private static double getManaCost(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerData playerData = getPlayerData(player, accountId);
         String     skill      = String.join("_", arguments);
         return playerData.getSkill(skill).getManaCost();
     }
 
     // Returns the mana cost of a specified skill. 0.0 if not found.
-    private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getManaCost(player, arguments, accountID));
+            return String.valueOf(getManaCost(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
@@ -771,25 +771,25 @@ public class PlaceholderUtil {
     // Returns the mana cost of a specified skill, as an integer. 0 if not found.
     private static String formatSkillManaCostPlaceholder(OfflinePlayer player,
                                                          List<String> arguments,
-                                                         Integer accountID) {
+                                                         Integer accountId) {
         try {
-            return String.valueOf((int) getManaCost(player, arguments, accountID));
+            return String.valueOf((int) getManaCost(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
     }
 
-    private static double getSkillCooldown(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerData playerData = getPlayerData(player, accountID);
+    private static double getSkillCooldown(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerData playerData = getPlayerData(player, accountId);
         String     skillName  = String.join("_", arguments);
         Skill      skill      = playerData.getSkill(skillName).getData();
         return skill.getCooldown(playerData.getSkillLevel(skillName));
     }
 
     // Returns the cooldown of a skill. 0.0 if not found.
-    private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return String.valueOf(getSkillCooldown(player, arguments, accountID));
+            return String.valueOf(getSkillCooldown(player, arguments, accountId));
         } catch (Exception e) {
             return "0.0";
         }
@@ -798,9 +798,9 @@ public class PlaceholderUtil {
     // Returns the cooldown of a skill, as an integer. 0 if not found.
     private static String formatSkillCooldownPlaceholder(OfflinePlayer player,
                                                          List<String> arguments,
-                                                         Integer accountID) {
+                                                         Integer accountId) {
         try {
-            return String.valueOf((int) getSkillCooldown(player, arguments, accountID));
+            return String.valueOf((int) getSkillCooldown(player, arguments, accountId));
         } catch (Exception e) {
             return "0";
         }
@@ -809,9 +809,9 @@ public class PlaceholderUtil {
     // Returns the cooldown remaining of a skill. 0 if not found.
     private static String skillCooldownLeftPlaceholder(OfflinePlayer player,
                                                        List<String> arguments,
-                                                       Integer accountID) {
+                                                       Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     skill      = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getCooldownLeft());
         } catch (Exception e) {
@@ -819,16 +819,16 @@ public class PlaceholderUtil {
         }
     }
 
-    private static String getSkillMessage(OfflinePlayer player, List<String> arguments, Integer accountID) {
-        PlayerData playerData = getPlayerData(player, accountID);
+    private static String getSkillMessage(OfflinePlayer player, List<String> arguments, Integer accountId) {
+        PlayerData playerData = getPlayerData(player, accountId);
         String     skill      = String.join("_", arguments);
         return playerData.getSkill(skill).getData().getMessage();
     }
 
     // Returns the cast message of a skill, empty string if not found.
-    private static String skillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillMessagePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return getSkillMessage(player, arguments, accountID);
+            return getSkillMessage(player, arguments, accountId);
         } catch (Exception e) {
             return "";
         }
@@ -837,18 +837,18 @@ public class PlaceholderUtil {
     // Returns the cast message of a skill without color codes, empty string if not found.
     private static String formatSkillMessagePlaceholder(OfflinePlayer player,
                                                         List<String> arguments,
-                                                        Integer accountID) {
+                                                        Integer accountId) {
         try {
-            return ChatColor.stripColor(getSkillMessage(player, arguments, accountID));
+            return ChatColor.stripColor(getSkillMessage(player, arguments, accountId));
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the custom model data of the skill item, 0 if not found.
-    private static String skillModelDataPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillModelDataPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String     skill      = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill)
                     .getData()
@@ -860,9 +860,9 @@ public class PlaceholderUtil {
         }
     }
 
-    private static String getSkills(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String getSkills(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData   playerData = getPlayerData(player, accountID);
+            PlayerData   playerData = getPlayerData(player, accountId);
             List<String> skills     = new ArrayList<>();
             for (PlayerSkill skill : playerData.getSkills()) {
                 skills.add(skill.getData().getName());
@@ -875,27 +875,27 @@ public class PlaceholderUtil {
     }
 
     // Returns a list of all the skills a player current has. [] if not found.
-    private static String skillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return getSkills(player, arguments, accountID);
+            return getSkills(player, arguments, accountId);
         } catch (Exception e) {
             return "[]";
         }
     }
 
     // Returns a list of all the skills a player current has. "" if not found.
-    private static String formatSkillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatSkillsPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return getSkills(player, arguments, accountID).replaceAll("(^\\[|\\]$)", "");
+            return getSkills(player, arguments, accountId).replaceAll("(^\\[|\\]$)", "");
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns the name of a skill at the specified location. "" if not found.
-    private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             return playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))
                     - 1].getData().getName();
         } catch (Exception e) {
@@ -904,22 +904,22 @@ public class PlaceholderUtil {
     }
 
     // Returns the information of a skill at the specified location and given placeholder. "" if not found.
-    private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData playerData = getPlayerData(player, accountID);
+            PlayerData playerData = getPlayerData(player, accountId);
             String skillName = playerData.getSkills().toArray(new PlayerSkill[0])[Integer.parseInt(arguments.remove(0))
                     - 1].getData().getName();
             arguments.add(skillName);
-            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountID);
+            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountId);
         } catch (Exception e) {
             return "";
         }
     }
 
     // Returns true if the player is skill casting. False otherwise.
-    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData            playerData = getPlayerData(player, accountID);
+            PlayerData            playerData = getPlayerData(player, accountId);
             PlayerTextCastingData skillData  = playerData.getTextCastingData();
             return String.valueOf(skillData.isCasting());
         } catch (Exception e) {
@@ -928,9 +928,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the name of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String castingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String castingNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData            playerData = getPlayerData(player, accountID);
+            PlayerData            playerData = getPlayerData(player, accountId);
             PlayerTextCastingData skillData  = playerData.getTextCastingData();
             String                skillName  = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
             return skillName != null ? skillName : "";
@@ -940,13 +940,13 @@ public class PlaceholderUtil {
     }
 
     // Returns the requested info of the skill found in a specified slot if the ACTION_BAR is being used. Must be 1-8. Blank if not found.
-    private static String castingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String castingInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            PlayerData            playerData = getPlayerData(player, accountID);
+            PlayerData            playerData = getPlayerData(player, accountId);
             PlayerTextCastingData skillData  = playerData.getTextCastingData();
             String                skillName  = skillData.getSkill(Integer.parseInt(arguments.remove(0)));
             arguments.add(skillName);
-            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountID);
+            return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountId);
         } catch (Exception e) {
             return "";
         }
