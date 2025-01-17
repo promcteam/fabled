@@ -1,15 +1,11 @@
 package studio.magemonkey.fabled.util;
 
 import io.lumine.mythic.bukkit.utils.interfaces.TriFunction;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-
-import com.google.common.collect.Collections2;
-
 import studio.magemonkey.codex.compat.VersionManager;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
@@ -35,7 +31,7 @@ import java.util.stream.Stream;
 
 public class PlaceholderUtil {
 
-    private static long legacyMessageTime;
+    private static       long                                                                   legacyMessageTime;
     private static final Map<String, TriFunction<OfflinePlayer, List<String>, Integer, String>> actions =
             new HashMap<>();
 
@@ -154,12 +150,14 @@ public class PlaceholderUtil {
         String       placeholder = arguments.remove(0);
         return actions.getOrDefault(placeholder, (a, b, c) -> {
 
-            String legacyPlaceholder = getLagacyPlaceholder(player, identifier);
+            String legacyPlaceholder = getLegacyPlaceholder(player, identifier);
             if (legacyPlaceholder != null) {
                 long currentTime = System.currentTimeMillis();
-                if (currentTime - legacyMessageTime > 300000){
-                    Bukkit.getServer().getConsoleSender().sendMessage(
-                        "[Fabled] %fabled_"+identifier+"% is a depreciated Placeholder and is marked for removal. Please see the Wiki for updated Placeholders."
+                if (currentTime - legacyMessageTime > 300000) {
+                    Fabled.inst().getLogger().warning(
+                            "[Fabled] %fabled_" + identifier
+                                    + "% is a deprecated Placeholder and will be removed at some point in the future. Please see the Wiki for updated Placeholders.\n"
+                                    + "https://github.com/magemonkeystudio/fabled/wiki/placeholder-rework#legacy-placeholders"
                     );
                     legacyMessageTime = currentTime;
                 }
@@ -274,13 +272,14 @@ public class PlaceholderUtil {
     // Returns the name of the main class Group. Blank if not found.
     private static String groupPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             return playerData.getMainClass().getData().getGroup();
         } catch (Exception e) {
             return "";
         }
     }
-    
+
     // Returns the Name of the Parent Class in the specified group. Blank if not found.
     private static String parentPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
@@ -868,7 +867,8 @@ public class PlaceholderUtil {
     // Returns the mana cost of a specified skill. 0.0 if not found.
     private static String skillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_", arguments);
             return String.valueOf(playerData.getSkill(skill).getManaCost());
         } catch (Exception e) {
@@ -877,9 +877,12 @@ public class PlaceholderUtil {
     }
 
     // Returns the mana cost of a specified skill, as an integer. 0 if not found.
-    private static String formatSkillManaCostPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatSkillManaCostPlaceholder(OfflinePlayer player,
+                                                         List<String> arguments,
+                                                         Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skill = String.join("_", arguments);
             return String.valueOf((int) playerData.getSkill(skill).getManaCost());
         } catch (Exception e) {
@@ -890,7 +893,8 @@ public class PlaceholderUtil {
     // Returns the cooldown of a skill. 0.0 if not found.
     private static String skillCooldownPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
         try {
-            PlayerData playerData = (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
+            PlayerData playerData =
+                    (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
             String skillName = String.join("_", arguments);
             Skill  skill     = playerData.getSkill(skillName).getData();
             return String.valueOf(skill.getCooldown(playerData.getSkillLevel(skillName)));
@@ -915,7 +919,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown remaining of a skill. 0.0 if not found.
-    private static String skillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String skillCooldownLeftPlaceholder(OfflinePlayer player,
+                                                       List<String> arguments,
+                                                       Integer accountID) {
         try {
             PlayerData playerData =
                     (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
@@ -927,7 +933,9 @@ public class PlaceholderUtil {
     }
 
     // Returns the cooldown of a skill, as an integer. 0 if not found.
-    private static String formatSkillCooldownLeftPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountID) {
+    private static String formatSkillCooldownLeftPlaceholder(OfflinePlayer player,
+                                                             List<String> arguments,
+                                                             Integer accountID) {
         try {
             PlayerData playerData =
                     (accountID != null) ? Fabled.getPlayerAccounts(player).getData(accountID) : Fabled.getData(player);
@@ -1080,7 +1088,7 @@ public class PlaceholderUtil {
 
     // If any of the above Placeholders fail to compute, will attempt to return the value of a Legacy Placeholder.
     // If successful, will message the console to let players know they are reading a depreciated placeholder and to check the Wiki.
-    public static String getLagacyPlaceholder(OfflinePlayer player, String identifier){
+    public static String getLegacyPlaceholder(OfflinePlayer player, String identifier) {
         PlayerData playerData = Fabled.getData(player);
 
         if (identifier.startsWith("group_")) {
