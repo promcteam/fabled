@@ -46,13 +46,13 @@ public class PlaceholderAPIHookTest extends MockedTest {
 
     @Test
     public void account1MainClass() {
-        String placeholder = hook.onRequest(player, "fabled_player_account_1_mainclass");
+        String placeholder = hook.onRequest(player, "fabled_accountinfo_1_class");
         assertEquals("Honor Guard", placeholder);
     }
 
     @Test
     public void account1Level() {
-        String placeholder = hook.onRequest(player, "fabled_player_account_1_level");
+        String placeholder = hook.onRequest(player, "fabled_accountinfo_1_level");
         assertEquals("1", placeholder);
     }
 }
