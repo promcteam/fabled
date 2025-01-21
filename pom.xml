@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>fabled</artifactId>
-    <version>1.0.4-R0.16-SNAPSHOT</version>
+    <version>1.0.4-R0.19-SNAPSHOT</version>
     <name>Fabled</name>
     <description>A Minecraft Bukkit plugin aiming to provide an easy code API and skill editor for all server owners to
         create unique and fully custom classes and skills.
@@ -22,7 +22,7 @@
 
     <properties>
         <java.version>14</java.version>
-        <codex.version>1.1.0-R0.4-SNAPSHOT</codex.version>
+        <codex.version>1.1.0-R0.6-SNAPSHOT</codex.version>
 
         <delombok.dir>${project.build.directory}/javadoc-delombok</delombok.dir>
     </properties>
@@ -220,8 +220,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/promcteam/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:ssh://github.com:promcteam/${project.artifactId}.git</developerConnection>
-        <url>https://github.com/promcteam/${project.artifactId}</url>
+        <connection>scm:git:git://github.com/magemonkeystudio/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:ssh://github.com:magemonkeystudio/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/magemonkeystudio/${project.artifactId}</url>
     </scm>
 </project>

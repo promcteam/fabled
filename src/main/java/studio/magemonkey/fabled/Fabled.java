@@ -42,8 +42,10 @@ import studio.magemonkey.codex.manager.api.menu.YAMLMenu;
 import studio.magemonkey.codex.mccore.config.CommentedConfig;
 import studio.magemonkey.codex.mccore.config.CommentedLanguageConfig;
 import studio.magemonkey.codex.migration.MigrationUtil;
-import studio.magemonkey.codex.registry.attribute.AttributeProvider;
-import studio.magemonkey.codex.registry.attribute.AttributeRegistry;
+import studio.magemonkey.codex.registry.AttributeRegistry;
+import studio.magemonkey.codex.registry.BuffRegistry;
+import studio.magemonkey.codex.registry.provider.AttributeProvider;
+import studio.magemonkey.codex.registry.provider.BuffProvider;
 import studio.magemonkey.fabled.api.FabledAttributeProvider;
 import studio.magemonkey.fabled.api.armorstand.ArmorStandManager;
 import studio.magemonkey.fabled.api.classes.FabledClass;
@@ -53,6 +55,7 @@ import studio.magemonkey.fabled.api.player.PlayerClass;
 import studio.magemonkey.fabled.api.player.PlayerData;
 import studio.magemonkey.fabled.api.player.PlayerSkill;
 import studio.magemonkey.fabled.api.skills.Skill;
+import studio.magemonkey.fabled.api.util.BuffManager;
 import studio.magemonkey.fabled.data.PlayerStats;
 import studio.magemonkey.fabled.data.Settings;
 import studio.magemonkey.fabled.data.io.ConfigIO;
@@ -102,6 +105,7 @@ public class Fabled extends SkillAPI {
     private RegistrationManager registrationManager;
     private IAttributeManager   attributeManager = new NullAttributeManager();
     private AttributeProvider   fabledProvider   = null;
+    private BuffProvider        buffManager      = null;
 
     private MainThread mainThread;
     private BukkitTask manaTask;
@@ -513,6 +517,7 @@ public class Fabled extends SkillAPI {
         disabling = true;
 
         AttributeRegistry.unregisterProvider(fabledProvider);
+        BuffRegistry.unregisterProvider(buffManager);
 
         GUITool.cleanUp();
         EffectManager.cleanUp();
@@ -693,23 +698,25 @@ public class Fabled extends SkillAPI {
 
         fabledProvider = new FabledAttributeProvider();
         AttributeRegistry.registerProvider(fabledProvider);
+        buffManager = new BuffManager();
+        BuffRegistry.registerProvider(buffManager);
 
         loaded = true;
     }
 
     public void listen(FabledListener listener, boolean enabled) {
-        if (enabled) {
-            // Prevent double listener registering
-            for (Iterator<FabledListener> iterator = this.listeners.iterator(); iterator.hasNext(); ) {
-                FabledListener listener1 = iterator.next();
-                if (listener.getClass().equals(listener1.getClass())) {
-                    HandlerList.unregisterAll(listener1);
-                    iterator.remove();
-                }
+        if (!enabled) return;
+
+        // Prevent double listener registering
+        for (Iterator<FabledListener> iterator = this.listeners.iterator(); iterator.hasNext(); ) {
+            FabledListener listener1 = iterator.next();
+            if (listener.getClass().equals(listener1.getClass())) {
+                HandlerList.unregisterAll(listener1);
+                iterator.remove();
             }
-            Bukkit.getPluginManager().registerEvents(listener, this);
-            this.listeners.add(listener);
         }
+        Bukkit.getPluginManager().registerEvents(listener, this);
+        this.listeners.add(listener);
     }
 
     /**

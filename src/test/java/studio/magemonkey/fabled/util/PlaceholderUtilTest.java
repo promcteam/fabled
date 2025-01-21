@@ -65,10 +65,14 @@ public class PlaceholderUtilTest {
         classClass = mock(FabledClass.class);
         when(classClass.getName()).thenReturn("warrior");
         when(classClass.getGroup()).thenReturn("class");
+        when(classClass.getPrefix()).thenReturn("&6warrior");
+        when(classClass.getMaxLevel()).thenReturn(5);
         when(classClass.getGroupSettings()).thenReturn(classSettings);
         raceClass = mock(FabledClass.class);
         when(raceClass.getName()).thenReturn("human");
         when(raceClass.getGroup()).thenReturn("race");
+        when(raceClass.getPrefix()).thenReturn("&6human");
+        when(raceClass.getMaxLevel()).thenReturn(10);
         when(raceClass.getGroupSettings()).thenReturn(mock(GroupSettings.class));
 
         playerData.setClass(null, classClass, false);
@@ -88,25 +92,55 @@ public class PlaceholderUtilTest {
 
     @Test
     void replace_mainClass() {
-        String replaced = PlaceholderUtil.replace(player, "player_class_mainclass");
+        String replaced = PlaceholderUtil.replace(player, "class");
         assertEquals("warrior", replaced);
     }
 
     @Test
     void replace_class() {
-        String replaced = PlaceholderUtil.replace(player, "player_class_class");
-        assertEquals("warrior", replaced);
-    }
-
-    @Test
-    void replace_alternate_mainClass() {
-        String replaced = PlaceholderUtil.replace(player, "player_race_mainclass");
+        String replaced = PlaceholderUtil.replace(player, "class_class");
         assertEquals("warrior", replaced);
     }
 
     @Test
     void replace_alternate_class() {
-        String replaced = PlaceholderUtil.replace(player, "player_race_class");
+        String replaced = PlaceholderUtil.replace(player, "class_race");
         assertEquals("human", replaced);
+    }
+
+    @Test
+    void replace_race_maxlevel() {
+        String replaced = PlaceholderUtil.replace(player, "maxlevel_race");
+        assertEquals("10", replaced);
+    }
+
+    @Test
+    void replace_class_maxlevel() {
+        String replaced = PlaceholderUtil.replace(player, "maxlevel");
+        assertEquals("5", replaced);
+    }
+
+    @Test
+    void replace_class_level() {
+        String replaced = PlaceholderUtil.replace(player, "level");
+        assertEquals("1", replaced);
+    }
+
+    @Test
+    void replace_race_level() {
+        String replaced = PlaceholderUtil.replace(player, "level_race");
+        assertEquals("1", replaced);
+    }
+
+    @Test
+    void replace_class_prefix() {
+        String replaced = PlaceholderUtil.replace(player, "prefix");
+        assertEquals("&6warrior", replaced);
+    }
+
+    @Test
+    void replace_race_prefix() {
+        String replaced = PlaceholderUtil.replace(player, "prefix_race");
+        assertEquals("&6human", replaced);
     }
 }
