@@ -34,6 +34,7 @@ export const showSidebar: Writable<boolean>                                     
 export const sidebarOpen: Writable<boolean>                                                 = writable(true);
 export const shownTab: Writable<Tab>                                                        = writable(Tab.CLASSES);
 export const importing: Writable<boolean>                                                   = writable(false);
+export const localSyncList: Writable<Map<FileSystemFileHandle, FabledSkill | FabledClass | FabledAttribute>> = writable(new Map());
 
 export const toggleSidebar = (e: Event) => {
 	e.stopPropagation();
@@ -235,6 +236,62 @@ const saveToFile = (file: string, data: string) => {
 	document.body.appendChild(element);
 	element.click();
 	document.body.removeChild(element);
+};
+
+export const isSyncLocal = (data: FabledSkill | FabledClass | FabledAttribute) => {
+	return findFileHandle(data) !== undefined;
+};
+
+export const toggleSyncLocal = async (data: FabledSkill | FabledClass | FabledAttribute) => {
+	if (isSyncLocal(data)) {
+		removeSyncLocal(data);
+	} else {
+		await addSyncLocal(data);
+	}
+};
+
+export const triggerAutoSync = async (data: FabledSkill | FabledClass | FabledAttribute) => {
+	console.log('triggerAutoSync');
+	const fileHandle = findFileHandle(data);
+	if (fileHandle) {
+		const writable = await fileHandle.createWritable();
+		await writable.write(YAML.stringify({ [data.name]: data.serializeYaml() }, { lineWidth: 0, aliasDuplicateObjects: false }));
+		await writable.close();
+
+		console.log(fileHandle.name);
+	}
+};
+
+const addSyncLocal = async (data: FabledSkill | FabledClass | FabledAttribute) => {
+	if (!('showOpenFilePicker' in window)) return;
+
+	// @ts-ignore
+	const file = await window.showOpenFilePicker({
+		types: [{ description: 'Choose a yaml file to sync', accept: { 'text/yaml': ['.yml', '.yaml'] } }],
+		multiple: false,
+		excludeAcceptAllOption: true
+	});
+	const fileHandle = await file[0] as FileSystemFileHandle;
+	const writable = await fileHandle.createWritable();
+	if (!writable || writable.locked) return;
+	localSyncList.update(list => {
+		list.set(fileHandle, data);
+		return list;
+	});
+};
+
+const removeSyncLocal = (data: FabledSkill | FabledClass | FabledAttribute) => {
+	localSyncList.update(list => {
+		const fileHandle = findFileHandle(data);
+		if (fileHandle) {
+			list.delete(fileHandle);
+		}
+		return list;
+	});
+};
+
+const findFileHandle = (data: FabledSkill | FabledClass | FabledAttribute) => {
+	return get(localSyncList).entries().find(([_, value]) => value === data)?.[0];
 };
 
 export const saveError: Writable<{ name: string, acknowledged: boolean } | undefined> = writable();
