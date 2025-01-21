@@ -508,6 +508,8 @@
 		const block = workspace.getBlockById($selected) as FabledBlockSvg;
 		if (!block) return;
 		block.updateSummary();
+		const component = block.component;
+		block.setCommentText(component.comment.length > 0 ? component.comment : null);
 		workspaceToSkill(workspace, skill);
 		if (onupdate) onupdate();
 	}
