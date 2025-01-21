@@ -1,6 +1,5 @@
 package studio.magemonkey.fabled.util;
 
-import io.lumine.mythic.bukkit.utils.interfaces.TriFunction;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,10 +29,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+abstract interface PlaceholderFunction<T, U, V, R> {
+    R apply(T t, U u, V v);
+}
+
 public class PlaceholderUtil {
 
     private static       long                                                                   legacyMessageTime;
-    private static final Map<String, TriFunction<OfflinePlayer, List<String>, Integer, String>> actions =
+    private static final Map<String, PlaceholderFunction<OfflinePlayer, List<String>, Integer, String>> actions =
             new HashMap<>();
 
     static {
