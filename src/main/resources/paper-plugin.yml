@@ -13,45 +13,43 @@ authors:
 has-open-classloader: true
 
 dependencies:
-  - name: CodexCore
-    required: true
-    bootstrap: true
-  - name: Vault
-    required: false
-    bootstrap: true
-  - name: Citizens
-    required: false
-    bootstrap: true
-  - name: LibsDisguises
-    required: false
-    bootstrap: true
-  - name: PlaceholderAPI
-    required: false
-    bootstrap: true
-  - name: NoCheatPlus
-    required: false
-    bootstrap: true
-  - name: MythicMobs
-    required: false
-    bootstrap: true
-  - name: WorldGuard
-    required: false
-    bootstrap: true
-  - name: WorldEdit
-    required: false
-    bootstrap: true
-  - name: Mimic
-    required: false
-    bootstrap: true
+  server:
+    CodexCore:
+      load: BEFORE
+      required: true
+    Vault:
+      load: BEFORE
+      required: false
+    Citizens:
+      load: BEFORE
+      required: false
+    LibsDisguises:
+      load: BEFORE
+      required: false
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+    NoCheatPlus:
+      load: BEFORE
+      required: false
+    MythicMobs:
+      load: BEFORE
+      required: false
+    WorldGuard:
+      load: BEFORE
+      required: false
+    WorldEdit:
+      load: BEFORE
+      required: false
+    Mimic:
+      load: BEFORE
+      required: false
 load-before:
   - name: Divinity
     boostrap: false
   - name: Quests
     boostrap: false
   - name: TAB
-    boostrap: false
-load-after:
-  - name: CodexCore
     boostrap: false
 
 permissions:
