@@ -683,17 +683,26 @@ class WorldChangeTrigger extends FabledTrigger {
 
 // TARGETS
 
-const targetOptions = (): ComponentOption[] => {
-	return [new DropdownSelect('Group', 'group', ['Ally', 'Enemy', 'Both'], 'Enemy')
-		.setTooltip('The alignment of targets to get'),
+const targetOptions = (includeMax = true): ComponentOption[] => {
+	const options: ComponentOption[] = [
+		new DropdownSelect('Group', 'group', ['Ally', 'Enemy', 'Both'], 'Enemy')
+			.setTooltip('The alignment of targets to get'),
 		new BooleanSelect('Through Wall', 'wall', false)
 			.setTooltip('Whether to allow targets to be on the other side of a wall'),
 		new BooleanSelect('Include Invulnerable', 'invulnerable', false)
 			.setTooltip('Whether to target on invulnerable entities'),
 		new DropdownSelect('Include Caster', 'caster', ['True', 'False', 'In area'], 'False')
-			.setTooltip('Whether to include the caster in the target list. "True" will always include them, "False" will never, and "In area" will only if they are within the targeted area'),
-		new AttributeSelect('Max Targets', 'max', 99)
-			.setTooltip('The max amount of targets to apply children to')];
+			.setTooltip('Whether to include the caster in the target list. "True" will always include them, "False" will never, and "In area" will only if they are within the targeted area')
+	];
+
+	if (includeMax) {
+		options.push(
+			new AttributeSelect('Max Targets', 'max', 99)
+				.setTooltip('The max amount of targets to apply children to')
+		);
+	}
+
+	return options;
 };
 
 const particlesAtTargetPreviewOptions = (): ComponentOption[] => {
@@ -880,7 +889,7 @@ class NearestTarget extends FabledTarget {
 			data:         [
 				new AttributeSelect('Range', 'range', 3)
 					.setTooltip('The radius of the area to target in blocks'),
-				...targetOptions()
+				...targetOptions(false)
 			],
 			preview:      [
 				...particlesAtTargetPreviewOptions(),
@@ -899,7 +908,7 @@ class NearestTarget extends FabledTarget {
 					.requireValue('sphere', [true]),
 				...particlePreviewOptions('sphere')
 			],
-			summaryItems: ['range', 'group', 'wall', 'caster', 'max']
+			summaryItems: ['range', 'group', 'wall', 'caster']
 		});
 	}
 
