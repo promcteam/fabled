@@ -2,10 +2,6 @@ package studio.magemonkey.fabled.dynamic.mechanic;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import studio.magemonkey.fabled.Fabled;
-import studio.magemonkey.fabled.api.enums.ExpSource;
-import studio.magemonkey.fabled.api.player.PlayerClass;
-import studio.magemonkey.fabled.listener.MechanicListener;
 
 import java.util.List;
 
@@ -13,15 +9,13 @@ import java.util.List;
  * Modifies player's class experience
  */
 public class ExperienceMechanic extends MechanicComponent {
-    private static final String TYPE       = "type";
-    private static final String GROUP      = "group";
     private static final String EXP        = "value";
-    private static final String LEVEL_DOWN = "level-down";
     private static final String MODE       = "mode";
+    private static final String LEVELS     = "levels";
 
     @Override
     public String getKey() {
-        return "experience";
+        return "vanilla experience";
     }
 
     /**
@@ -37,36 +31,37 @@ public class ExperienceMechanic extends MechanicComponent {
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets, boolean force) {
         if (!(caster instanceof Player)) return false;
         Player player = (Player) caster;
-        String group  = settings.getString(GROUP, "class");
-        if (Fabled.getGroups().stream().noneMatch(c -> c.equalsIgnoreCase(group))) return false;
 
         int         expValue        = settings.getInt(EXP, 0);
-        boolean     levelDown       = settings.getBool(LEVEL_DOWN, false);
         String      mode            = settings.getString(MODE, "give").toLowerCase();
-        String      type            = settings.getString(TYPE, "flat");
-        boolean     flat            = type.equalsIgnoreCase("flat");
-        boolean     percent         = type.equalsIgnoreCase("percent");
-        PlayerClass playerClass     = Fabled.getData(player).getClass(group);
-        double      allNextLevelExp = playerClass.getData().getRequiredExp(playerClass.getLevel());
-        double      amount          = 0;
-        if (flat)
-            amount = expValue;
-        else if (percent)
-            amount = allNextLevelExp * expValue / 100;
-        switch (mode) {
+        Boolean     levels          = settings.getBool(LEVELS, false);
+
+        if (levels) {
+            switch (mode) {
             case "give":
-                MechanicListener.addExemptExperience(player, amount);
-                playerClass.giveExp(amount, ExpSource.PLUGIN);
-                break;
-            case "take":
-                if (!levelDown && amount > playerClass.getExp()) return false;
-                playerClass.loseExp(amount, false, levelDown);
+                player.giveExpLevels(expValue);
                 break;
             case "set":
-                playerClass.setExp(amount);
+                player.setLevel(expValue);
+                player.setExp(0);
                 break;
             default:
                 return false;
+            }
+        }
+        else {
+            switch (mode) {
+            case "give":
+                player.giveExp(expValue);
+                break;
+            case "set":
+                player.setLevel(0);
+                player.setExp(0);
+                player.giveExp(expValue);
+                break;
+            default:
+                return false;
+            }
         }
         return true;
     }
