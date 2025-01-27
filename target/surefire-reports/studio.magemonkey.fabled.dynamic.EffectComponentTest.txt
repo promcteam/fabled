@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: studio.magemonkey.fabled.dynamic.EffectComponentTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.920 s -- in studio.magemonkey.fabled.dynamic.EffectComponentTest

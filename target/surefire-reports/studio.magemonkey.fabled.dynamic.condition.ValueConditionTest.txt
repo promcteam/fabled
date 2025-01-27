@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: studio.magemonkey.fabled.dynamic.condition.ValueConditionTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.820 s -- in studio.magemonkey.fabled.dynamic.condition.ValueConditionTest
