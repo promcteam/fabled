@@ -371,7 +371,7 @@ class HarvestTrigger extends FabledTrigger {
 			summaryItems: ['block','data']
 		});
 	}
-	
+
 	public static override new = () => new this();
 }
 
@@ -2664,7 +2664,7 @@ class ChannelMechanic extends FabledMechanic {
 class ClassExperienceMechanic extends FabledMechanic {
 	public constructor() {
 		super({
-			name:         'Experience',
+			name:         'Class Experience',
 			description:  'Modifies target\'s specified class experience',
 			data:         [
 				new IntSelect('Value', 'value', 1),
@@ -2959,7 +2959,7 @@ class DurabilityMechanic extends FabledMechanic {
 class ExperienceMechanic extends FabledMechanic {
 	public constructor() {
 		super({
-			name:         'Vanilla Experience',
+			name:         'Experience',
 			description:  'Modifies targetted player\'s vanilla experience',
 			data:         [
 				new IntSelect('Value', 'value', 1),
