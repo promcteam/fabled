@@ -21,7 +21,7 @@ public class ClassExperienceMechanic extends MechanicComponent {
 
     @Override
     public String getKey() {
-        return "experience";
+        return "class experience";
     }
 
     /**

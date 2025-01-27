@@ -15,7 +15,7 @@ public class ExperienceMechanic extends MechanicComponent {
 
     @Override
     public String getKey() {
-        return "vanilla experience";
+        return "experience";
     }
 
     /**
