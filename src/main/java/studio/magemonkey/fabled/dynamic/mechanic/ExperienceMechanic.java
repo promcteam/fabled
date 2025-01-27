@@ -40,6 +40,7 @@ public class ExperienceMechanic extends MechanicComponent {
             switch (mode) {
             case "give":
                 player.giveExpLevels(expValue);
+                player.setExp(0);
                 break;
             case "set":
                 player.setLevel(expValue);
