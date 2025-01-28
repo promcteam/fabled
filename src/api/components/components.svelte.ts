@@ -2937,19 +2937,21 @@ class ExperienceMechanic extends FabledMechanic {
 	public constructor() {
 		super({
 			name:         'Experience',
-			description:  'Modifies targetted player\'s vanilla or specified group\'s class experience',
+			description:  'Modifies target player\'s vanilla or specified group\'s class experience',
 			data:         [
-				new IntSelect('Value', 'value', 1),
+				new BooleanSelect('Vanilla', 'vanilla', false)
+					.setTooltip('Whether to give the target vanilla experience levels instead of fabled class ones.'),
+				new IntSelect('Value', 'value', 1)
+					.setTooltip('How much experience, levels, or percent to give.'),
 				new DropdownSelect('Mode', 'mode', ['give', 'set', 'take'], 'give', false)
-					.setTooltip('To give, take or set specified valued'),
+					.setTooltip('To give, take or set specified valued. When using the percent type this will mean value%. Example: Value of 50 would mean 50%'),
 				new DropdownSelect('Type', 'type', ['flat', 'percent', 'levels'], 'flat', false)
 					.setTooltip('To a flat, percentage, or levels'),
 				new StringSelect('Group', 'group', 'class')
-					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.'),
-				new BooleanSelect('Level Down', 'level_down', false)
-					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),
-				new BooleanSelect('Vanilla', 'vanilla', false)
-					.setTooltip('Whether to give vanilla experience levels instead of fabled class ones.')],
+					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.')
+					.requireValue('vanilla', [false]),
+				new BooleanSelect('Level Down', 'level_down', true)
+					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),],
 			summaryItems: ['value', 'mode', 'type','group','level_down','vanilla']
 		}, false);
 	}
