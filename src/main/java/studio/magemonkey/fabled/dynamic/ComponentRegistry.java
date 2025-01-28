@@ -156,7 +156,6 @@ public class ComponentRegistry {
         register(new CancelEffectMechanic());
         register(new CancelMechanic());
         register(new ChannelMechanic());
-        register(new ExperienceMechanic());
         register(new CleanseMechanic());
         register(new CommandMechanic());
         register(new CooldownMechanic());
