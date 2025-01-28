@@ -2950,9 +2950,9 @@ class ExperienceMechanic extends FabledMechanic {
 				new StringSelect('Group', 'group', 'class')
 					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.')
 					.requireValue('vanilla', [false]),
-				new BooleanSelect('Level Down', 'level_down', true)
+				new BooleanSelect('Level Down', 'level-down', true)
 					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),],
-			summaryItems: ['value', 'mode', 'type','group','level_down','vanilla']
+			summaryItems: ['value', 'mode', 'type','group','level-down','vanilla']
 		}, false);
 	}
 
