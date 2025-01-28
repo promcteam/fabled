@@ -112,6 +112,7 @@ public class ComponentRegistry {
         register(new FireCondition());
         register(new FlagCondition());
         register(new FoodCondition());
+        register(new GlideCondition());
         register(new GroundCondition());
         register(new HealthCondition());
         register(new InventoryCondition());
@@ -165,8 +166,8 @@ public class ComponentRegistry {
         register(new DelayMechanic());
         register(new DisguiseMechanic());
         register(new DurabilityMechanic());
-        register(new ExperienceMechanic());
         register(new ExplosionMechanic());
+        register(new ExperienceMechanic());
         register(new FireMechanic());
         register(new FlagClearMechanic());
         register(new FlagMechanic());
