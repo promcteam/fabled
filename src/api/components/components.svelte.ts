@@ -268,7 +268,7 @@ class ExperienceTrigger extends FabledTrigger {
 	public constructor() {
 		super({
 			name:         'Experience',
-			description:  'Applies skill effects when a player earns vanilla experience',
+			description:  'Applies skill effects when a player earns vanilla experience by natural sources. Use {api-experience} to get amount of experience picked up.',
 			data:         [new DoubleSelect('Min Experience', 'min-experience')
 				.setTooltip('The minimum amount of experience to collect to trigger the skill.')],
 			summaryItems: ['min-experience']
