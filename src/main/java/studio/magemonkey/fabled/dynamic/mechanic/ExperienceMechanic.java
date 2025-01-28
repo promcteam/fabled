@@ -60,7 +60,7 @@ public class ExperienceMechanic extends MechanicComponent {
         int expValue = settings.getInt(EXP, 0);
         String mode = settings.getString(MODE, "give").toLowerCase();
         String type = settings.getString(TYPE, "flat").toLowerCase();
-        boolean levelDown = settings.getBool(LEVEL_DOWN, false);
+        boolean levelDown = settings.getBool(LEVEL_DOWN, true);
     
         int previousLevel = caster.getLevel();
     
@@ -120,9 +120,11 @@ public class ExperienceMechanic extends MechanicComponent {
         }
     
         // Prevent level down if not allowed
-        if (!levelDown && caster.getLevel() < previousLevel) {
-            caster.setLevel(previousLevel);
-            caster.setExp(0);
+        if (caster.getLevel() < previousLevel){
+            if (!levelDown) {
+                caster.setLevel(previousLevel);
+                caster.setExp(0);
+            }
         }
     
         return true;
@@ -132,7 +134,7 @@ public class ExperienceMechanic extends MechanicComponent {
         int expValue = settings.getInt(EXP, 0);
         String mode = settings.getString(MODE, "give").toLowerCase();
         String type = settings.getString(TYPE, "flat").toLowerCase();
-        boolean levelDown = settings.getBool(LEVEL_DOWN, false);
+        boolean levelDown = settings.getBool(LEVEL_DOWN, true);
         String group  = settings.getString(GROUP, "class");
         if (Fabled.getGroups().stream().noneMatch(c -> c.equalsIgnoreCase(group))) return false;
         PlayerClass playerClass     = Fabled.getData(caster).getClass(group);
