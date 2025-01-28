@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: studio.magemonkey.fabled.listener.PhysicalDamageListenerTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.717 s -- in studio.magemonkey.fabled.listener.PhysicalDamageListenerTest
