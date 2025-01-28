@@ -126,7 +126,7 @@ public class ParticleProjectile extends CustomProjectile {
         super(shooter, settings);
 
         this.loc = loc;
-        this.startingLocation = loc;
+        this.startingLocation = loc.clone();
         this.vel = loc.getDirection().multiply(settings.getAttr(SPEED, level, 1.0));
         this.life = lifespan;
         this.distance = distance;

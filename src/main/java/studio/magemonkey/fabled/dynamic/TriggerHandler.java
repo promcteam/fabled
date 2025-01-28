@@ -2,6 +2,7 @@ package studio.magemonkey.fabled.dynamic;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -81,16 +82,15 @@ public class TriggerHandler implements Listener {
                         getExecutor(trigger),
                         plugin,
                         !trigger.getEvent().getTypeName().equals("org.bukkit.event.player.PlayerInteractEvent")
-                                && !trigger.getEvent()
-                                .getTypeName()
-                                .contains("PlayerSwapHandItemsEvent"));
+                                && !trigger.getEvent().getTypeName().contains("PlayerSwapHandItemsEvent"));
 
     }
 
     <T extends Event> void apply(final T event, final Trigger<T> trigger) {
 
         final LivingEntity caster = trigger.getCaster(event);
-        if (caster == null || !active.containsKey(caster.getEntityId())) {
+        if ((caster instanceof Player && ((Player) caster).getGameMode() == GameMode.SPECTATOR) || caster == null
+                || !active.containsKey(caster.getEntityId())) {
             return;
         }
 
@@ -104,27 +104,18 @@ public class TriggerHandler implements Listener {
             // child components, we need to make subsequent calls _synchronously_.
             // This effectively means that ChatTriggers won't be able to cancel the original
             // AsyncPlayerChatEvent.
-            Bukkit.getScheduler()
-                    .runTask(Fabled.inst(),
-                            () -> {
-                                Bukkit.getPluginManager()
-                                        .callEvent(new DynamicTriggerEvent(caster,
-                                                this.skill,
-                                                event,
-                                                trigger.getKey()));
+            Bukkit.getScheduler().runTask(Fabled.inst(), () -> {
+                Bukkit.getPluginManager()
+                        .callEvent(new DynamicTriggerEvent(caster, this.skill, event, trigger.getKey()));
 
-                                final LivingEntity target = trigger.getTarget(event, component.settings);
-                                trigger.setValues(event, DynamicSkill.getCastData(caster));
-                                trigger(caster, target, level);
+                final LivingEntity target = trigger.getTarget(event, component.settings);
+                trigger.setValues(event, DynamicSkill.getCastData(caster));
+                trigger(caster, target, level);
 
-                                trigger.postProcess(event, skill);
-                            });
+                trigger.postProcess(event, skill);
+            });
         } else {
-            Bukkit.getPluginManager()
-                    .callEvent(new DynamicTriggerEvent(caster,
-                            this.skill,
-                            event,
-                            trigger.getKey()));
+            Bukkit.getPluginManager().callEvent(new DynamicTriggerEvent(caster, this.skill, event, trigger.getKey()));
 
             final LivingEntity target = trigger.getTarget(event, component.settings);
             trigger.setValues(event, DynamicSkill.getCastData(caster));

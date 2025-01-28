@@ -26,6 +26,8 @@
  */
 package studio.magemonkey.fabled.api.event;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -33,12 +35,15 @@ import org.bukkit.event.HandlerList;
 import studio.magemonkey.fabled.api.player.PlayerData;
 import studio.magemonkey.fabled.api.player.PlayerSkill;
 
+@Getter
 public class PlayerCastSkillEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final        PlayerData  playerData;
     private final        PlayerSkill skill;
     private final        Player      player;
+    @Setter
     private              double      manaCost;
+    @Setter
     private              boolean     cancelled;
 
     public PlayerCastSkillEvent(PlayerData playerData, PlayerSkill skill, Player player) {
@@ -47,36 +52,6 @@ public class PlayerCastSkillEvent extends Event implements Cancellable {
         this.player = player;
         this.manaCost = skill.getManaCost();
         this.cancelled = false;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public PlayerData getPlayerData() {
-        return playerData;
-    }
-
-    public PlayerSkill getSkill() {
-        return skill;
-    }
-
-    public double getManaCost() {
-        return manaCost;
-    }
-
-    public void setManaCost(final double manaCost) {
-        this.manaCost = manaCost;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
     @Override
