@@ -2661,29 +2661,6 @@ class ChannelMechanic extends FabledMechanic {
 	public static override new = () => new this();
 }
 
-class ClassExperienceMechanic extends FabledMechanic {
-	public constructor() {
-		super({
-			name:         'Class Experience',
-			description:  'Modifies target\'s specified class experience',
-			data:         [
-				new IntSelect('Value', 'value', 1),
-				new DropdownSelect('Mode', 'mode', ['give', 'take', 'set'], 'give', false)
-					.setTooltip('To give, take or set specified valued'),
-				new DropdownSelect('Type', 'type', ['flat', 'percent'], 'flat', false)
-					.setTooltip('Flat value or percent from next level experience'),
-				new StringSelect('Group', 'group', 'class')
-					.setTooltip('Group name to modify experience'),
-				new BooleanSelect('Level Down', 'level-down', false)
-					.setTooltip('Whether to use skill and level down player class if current exp is insufficient')
-			],
-			summaryItems: ['value', 'mode', 'type', 'group']
-		}, false);
-	}
-
-	public static override new = () => new this();
-}
-
 class CleanseMechanic extends FabledMechanic {
 	public constructor() {
 		super({
@@ -2960,14 +2937,20 @@ class ExperienceMechanic extends FabledMechanic {
 	public constructor() {
 		super({
 			name:         'Experience',
-			description:  'Modifies targetted player\'s vanilla experience',
+			description:  'Modifies targetted player\'s vanilla or specified group\'s class experience',
 			data:         [
 				new IntSelect('Value', 'value', 1),
-				new DropdownSelect('Mode', 'mode', ['give', 'set'], 'give', false)
-					.setTooltip('To give or set specified valued'),
-				new BooleanSelect('Levels', 'levels', false)
-					.setTooltip('Whether to give levels or experience values.')],
-			summaryItems: ['value', 'mode', 'levels']
+				new DropdownSelect('Mode', 'mode', ['give', 'set', 'take'], 'give', false)
+					.setTooltip('To give, take or set specified valued'),
+				new DropdownSelect('Type', 'type', ['flat', 'percent', 'levels'], 'flat', false)
+					.setTooltip('To a flat, percentage, or levels'),
+				new StringSelect('Group', 'group', 'class')
+					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.'),
+				new BooleanSelect('Level Down', 'level_down', false)
+					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),
+				new BooleanSelect('Vanilla', 'vanilla', false)
+					.setTooltip('Whether to give vanilla experience levels instead of fabled class ones.')],
+			summaryItems: ['value', 'mode', 'type','group','level_down','vanilla']
 		}, false);
 	}
 
@@ -5538,7 +5521,6 @@ export const initComponents = () => {
 		DELAY:              { name: 'Delay', component: DelayMechanic },
 		DISGUISE:           { name: 'Disguise', component: DisguiseMechanic },
 		DURABILITY:         { name: 'Durability', component: DurabilityMechanic },
-		CLASS_EXPERIENCE:         { name: 'Class Experience', component: ClassExperienceMechanic },
 		EXPERIENCE:         { name: 'Experience', component: ExperienceMechanic },
 		EXPLOSION:          { name: 'Explosion', component: ExplosionMechanic },
 		FIRE:               { name: 'Fire', component: FireMechanic },
