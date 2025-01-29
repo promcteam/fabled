@@ -263,6 +263,20 @@ class EnvironmentDamageTrigger extends FabledTrigger {
 	public static override new = () => new this();
 }
 
+class ExperienceTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Experience',
+			description:  'Applies skill effects when a player earns vanilla experience by natural sources. Use {api-experience} to get amount of experience picked up.',
+			data:         [new DoubleSelect('Min Experience', 'min-experience')
+				.setTooltip('The minimum amount of experience to collect to trigger the skill.')],
+			summaryItems: ['min-experience']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class FishingTrigger extends FabledTrigger {
 	public constructor() {
 		super({
@@ -323,6 +337,37 @@ class FishingReelTrigger extends FabledTrigger {
 		super({
 			name:        'Fishing Reel',
 			description: 'Applies skill effects when a player reels in a fishing rod out of water or air with no fish on the rod'
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+class GlideTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Glide',
+			description:  'Applies skill effects when a player starts or stops gliding with an elytra.',
+			data:         [
+				new DropdownSelect('Gliding', 'type', ['Start Gliding', 'Stop Gliding', 'Both'])
+			],
+			summaryItems: ['type']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+class HarvestTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Harvest',
+			description:  'Applies skill effects when a player harvests a block matching the given details. Typically crops such as Glow Berries.',
+			data:         [new BlockSelect(
+				'The type of block expected to be harvested',
+				'The expected data value of the block (-1 for any data value)'
+			)],
+			summaryItems: ['block','data']
 		});
 	}
 
@@ -535,6 +580,37 @@ class RightClickTrigger extends FabledTrigger {
 	public static override new = () => new this();
 }
 
+class RiptideTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:        'Riptide',
+			description: 'Applies skill effects when a player uses the riptide enchantment.'
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+class ShearTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Shear',
+			description:  'Applies skill effects when a player shears an entity',
+			data:         [
+				new BooleanSelect('Target Caster', 'target', true)
+					.setTooltip('True makes children target the caster. False makes children target the sheared entity'),
+				new DropdownSelect('Types', 'types', ['Any', ...getEntities()], ['Any'], true)
+					.setTooltip('The entity types to target'),
+				new BooleanSelect('Blacklist', 'blacklist', false)
+					.setTooltip('Whether to consider the listed types as a blacklist, meaning only entities that do NOT match one of them will trigger.')
+			],
+			summaryItems: ['target', 'types', 'blacklist']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class SkillCastTrigger extends FabledTrigger {
 	public constructor() {
 		super({
@@ -571,6 +647,21 @@ class SkillDamageTrigger extends FabledTrigger {
 					.setTooltip('The type of skill damage to apply for. Leave this empty to apply to all skill damage')
 			],
 			summaryItems: ['target', 'dmg-min', 'dmg-max', 'category']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+class SprintTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Sprint',
+			description:  'Applies skill effects when a player starts or stops sprinting.',
+			data:         [
+				new DropdownSelect('Sprinting', 'type', ['Start Sprinting', 'Stop Sprinting', 'Both'])
+			],
+			summaryItems: ['type']
 		});
 	}
 
@@ -1499,6 +1590,23 @@ class GroundCondition extends FabledCondition {
 					.setTooltip('Whether the target should be on the ground')
 			],
 			summaryItems: ['type']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+
+class GlideCondition extends FabledCondition {
+	public constructor() {
+		super({
+			name:         'Glide',
+			description:  'Applies child components if the target player(s) are gliding with an elytra',
+			data:         [
+				new BooleanSelect('Gliding', 'glide', true)
+					.setTooltip('Whether the player should be gliding with an elytra')
+			],
+			summaryItems: ['glide']
 		});
 	}
 
@@ -2851,19 +2959,22 @@ class ExperienceMechanic extends FabledMechanic {
 	public constructor() {
 		super({
 			name:         'Experience',
-			description:  'Modifies target\'s specified class experience',
+			description:  'Modifies target player\'s vanilla or specified group\'s class experience',
 			data:         [
-				new IntSelect('Value', 'value', 1),
-				new DropdownSelect('Mode', 'mode', ['give', 'take', 'set'], 'give', false)
-					.setTooltip('To give, take or set specified valued'),
-				new DropdownSelect('Type', 'type', ['flat', 'percent'], 'flat', false)
-					.setTooltip('Flat value or percent from next level experience'),
+				new BooleanSelect('Vanilla', 'vanilla', false)
+					.setTooltip('Whether to give the target vanilla experience levels instead of fabled class ones.'),
+				new IntSelect('Value', 'value', 1)
+					.setTooltip('How much experience, levels, or percent to give.'),
+				new DropdownSelect('Mode', 'mode', ['give', 'set', 'take'], 'give', false)
+					.setTooltip('To give, take or set specified valued. When using the percent type this will mean value%. Example: Value of 50 would mean 50%'),
+				new DropdownSelect('Type', 'type', ['flat', 'percent', 'levels'], 'flat', false)
+					.setTooltip('To a flat, percentage, or levels'),
 				new StringSelect('Group', 'group', 'class')
-					.setTooltip('Group name to modify experience'),
-				new BooleanSelect('Level Down', 'level-down', false)
-					.setTooltip('Whether to use skill and level down player class if current exp is insufficient')
-			],
-			summaryItems: ['value', 'mode', 'type', 'group']
+					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.')
+					.requireValue('vanilla', [false]),
+				new BooleanSelect('Level Down', 'level-down', true)
+					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),],
+			summaryItems: ['value', 'mode', 'type','group','level-down','vanilla']
 		}, false);
 	}
 
@@ -5306,6 +5417,9 @@ export const initComponents = () => {
 		CROUCH:        { name: 'Crouch', component: CrouchTrigger },
 		DEATH:         { name: 'Death', component: DeathTrigger },
 		ENTITY_TARGET: { name: 'Entity Target', component: EntityTargetTrigger },
+		EXPERIENCE:        { name: 'Experience', component: ExperienceTrigger },
+		GLIDE:        { name: 'Glide', component: GlideTrigger },
+		HARVEST:        { name: 'Harvest', component: HarvestTrigger },
 		HEAL:          { name: 'Heal', component: HealTrigger },
 		INIT:          { name: 'Initialize', component: InitializeTrigger },
 		JUMP:          { name: 'Jump', component: JumpTrigger },
@@ -5317,9 +5431,12 @@ export const initComponents = () => {
 		PROJ_HIT:      { name: 'Projectile Hit', component: ProjectileHitTrigger },
 		PROJ_LAUNCH:   { name: 'Projectile Launch', alias: 'Launch', component: LaunchTrigger },
 		PROJ_TICK:     { name: 'Projectile Tick', component: ProjectileTickTrigger },
+		RIPTIDE:        { name: 'Riptide', component: RiptideTrigger },
+		SHEAR:        { name: 'Shear', component: ShearTrigger },
 		SHIELD:        { name: 'Shield', component: ShieldTrigger },
 		SIGNAL:        { name: 'Signal', component: SignalTrigger },
 		SKILL_CAST:    { name: 'Skill Cast', component: SkillCastTrigger },
+		SPRINT:        { name: 'Sprint', component: SprintTrigger },
 		WORLD_CHANGE:  { name: 'World Change', component: WorldChangeTrigger },
 
 		ARMOR_EQUIP: { name: 'Armor Equip', component: ArmorEquipTrigger, section: 'Item' },
@@ -5377,6 +5494,7 @@ export const initComponents = () => {
 		FIRE:           { name: 'Fire', component: FireCondition },
 		FLAG:           { name: 'Flag', component: FlagCondition },
 		FOOD:           { name: 'Food', component: FoodCondition },
+		GLIDE:         { name: 'Glide', component: GlideCondition },
 		GROUND:         { name: 'Ground', component: GroundCondition },
 		HEALTH:         { name: 'Health', component: HealthCondition },
 		INVENTORY:      { name: 'Inventory', component: InventoryCondition },
