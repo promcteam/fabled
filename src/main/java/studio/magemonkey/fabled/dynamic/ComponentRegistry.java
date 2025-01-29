@@ -166,8 +166,8 @@ public class ComponentRegistry {
         register(new DelayMechanic());
         register(new DisguiseMechanic());
         register(new DurabilityMechanic());
-        register(new ExplosionMechanic());
         register(new ExperienceMechanic());
+        register(new ExplosionMechanic());
         register(new FireMechanic());
         register(new FlagClearMechanic());
         register(new FlagMechanic());
