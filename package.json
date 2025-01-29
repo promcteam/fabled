@@ -14,10 +14,10 @@
   "devDependencies": {
     "@sveltejs/adapter-auto": "^4.0.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/kit": "^2.16.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
@@ -25,7 +25,7 @@
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.3",
-    "svelte": "^5.19.3",
+    "svelte": "^5.19.4",
     "svelte-check": "^4.1.4",
     "svelte-preprocess": "^6.0.3",
     "tslib": "^2.8.1",
@@ -35,10 +35,13 @@
   },
   "type": "module",
   "dependencies": {
-    "blockly": "^11.1.1",
+    "blockly": "^11.2.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.0.5",
     "yaml": "^2.7.0"
+  },
+  "overrides": {
+    "cookie": "1.0.2"
   }
 }
