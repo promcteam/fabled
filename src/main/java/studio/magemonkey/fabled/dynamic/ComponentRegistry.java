@@ -118,6 +118,7 @@ public class ComponentRegistry {
         register(new FireCondition());
         register(new FlagCondition());
         register(new FoodCondition());
+        register(new GlideCondition());
         register(new GroundCondition());
         register(new HealthCondition());
         register(new InventoryCondition());
