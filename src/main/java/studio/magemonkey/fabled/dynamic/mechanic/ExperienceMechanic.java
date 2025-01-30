@@ -57,7 +57,7 @@ public class ExperienceMechanic extends MechanicComponent {
     }
 
     public boolean vanillaExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force){
-        int expValue = settings.getInt(EXP, 0);
+        int expValue = (int) parseValues(caster, EXP, level, 0.0);
         String mode = settings.getString(MODE, "give").toLowerCase();
         String type = settings.getString(TYPE, "flat").toLowerCase();
         boolean levelDown = settings.getBool(LEVEL_DOWN, true);
@@ -131,7 +131,7 @@ public class ExperienceMechanic extends MechanicComponent {
     }
 
     public boolean classExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force){
-        int expValue = settings.getInt(EXP, 0);
+        int expValue = (int) parseValues(caster, EXP, level, 0.0);
         String mode = settings.getString(MODE, "give").toLowerCase();
         String type = settings.getString(TYPE, "flat").toLowerCase();
         boolean levelDown = settings.getBool(LEVEL_DOWN, true);
