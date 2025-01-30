@@ -51,12 +51,15 @@ public class ComponentRegistry {
         register(new DropItemTrigger());
         register(new EntityTargetTrigger());
         register(new EnvironmentalTrigger());
+        register(new ExperienceTrigger());
         register(new FishingBiteTrigger());
         register(new FishingFailTrigger());
         register(new FishingFishTrigger());
         register(new FishingGrabTrigger());
         register(new FishingGroundTrigger());
         register(new FishingReelTrigger());
+        register(new GlideTrigger());
+        register(new HarvestTrigger());
         register(new HealTrigger());
         register(new ItemSwapTrigger());
         register(new JumpTrigger());
@@ -68,8 +71,11 @@ public class ComponentRegistry {
         register(new PhysicalTakenTrigger());
         register(new ProjectileHitTrigger());
         register(new ProjectileTickTrigger());
+        register(new RiptideTrigger());
+        register(new ShearTrigger());
         register(new ShieldTrigger());
         register(new SignalTrigger());
+        register(new SprintTrigger());
         register(new SkillCastTrigger());
         register(new SkillDealtTrigger());
         register(new SkillTakenTrigger());
