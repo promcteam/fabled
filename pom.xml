@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>fabled</artifactId>
-    <version>1.0.4-R0.25-SNAPSHOT</version>
+    <version>1.0.4-R0.26-SNAPSHOT</version>
     <name>Fabled</name>
     <description>A Minecraft Bukkit plugin aiming to provide an easy code API and skill editor for all server owners to
         create unique and fully custom classes and skills.
@@ -35,10 +35,6 @@
         <repository>
             <id>dmulloy2-repo</id>
             <url>https://repo.dmulloy2.net/repository/public/</url>
-        </repository>
-        <repository>
-            <id>sk89q-repo</id>
-            <url>https://maven.enginehub.org/repo/</url>
         </repository>
     </repositories>
 
