@@ -32,7 +32,7 @@ export const localStore = <T>(key: string, def: T) => {
 			}
 		}
 
-		if (typeof def === 'number') saved = <T>parseInt(<string>localStorage.getItem(key));
+		if (typeof def === 'number') saved = <T>parseFloat(<string>localStorage.getItem(key));
 		else if (typeof def === 'boolean') saved = <T>(<string>localStorage.getItem(key) === 'true');
 		else if (typeof def === 'string') saved = <T>localStorage.getItem(key);
 		else saved = JSON.parse(<string>localStorage.getItem(key));

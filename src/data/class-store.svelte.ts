@@ -185,25 +185,25 @@ export default class FabledClass implements Serializable {
 
 		// Attempt to convert health/mana base & scale to numbers, if applicable
 		if (typeof (health.base) === 'string') {
-			const base = parseInt(health.base);
+			const base = parseFloat(health.base);
 			if (!isNaN(base)) {
 				health.base = base;
 			}
 		}
 		if (typeof (health.scale) === 'string') {
-			const scale = parseInt(health.scale);
+			const scale = parseFloat(health.scale);
 			if (!isNaN(scale)) {
 				health.scale = scale;
 			}
 		}
 		if (typeof (mana.base) === 'string') {
-			const base = parseInt(mana.base);
+			const base = parseFloat(mana.base);
 			if (!isNaN(base)) {
 				mana.base = base;
 			}
 		}
 		if (typeof (mana.scale) === 'string') {
-			const scale = parseInt(mana.scale);
+			const scale = parseFloat(mana.scale);
 			if (!isNaN(scale)) {
 				mana.scale = scale;
 			}
@@ -246,13 +246,13 @@ export default class FabledClass implements Serializable {
 
 		this.attributes.forEach(attr => {
 			if (typeof attr.base === 'string') {
-				const base = parseInt(attr.base);
+				const base = parseFloat(attr.base);
 				if (!isNaN(base)) {
 					attr.base = base;
 				}
 			}
 			if (typeof attr.scale === 'string') {
-				const scale = parseInt(attr.scale);
+				const scale = parseFloat(attr.scale);
 				if (!isNaN(scale)) {
 					attr.scale = scale;
 				}
