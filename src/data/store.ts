@@ -276,6 +276,7 @@ const addSyncLocal = async (data: FabledSkill | FabledClass | FabledAttribute) =
 	if (!writable || writable.locked) return;
 	localSyncList.update(list => {
 		list.set(fileHandle, data);
+		triggerAutoSync(data)
 		return list;
 	});
 };

@@ -9,7 +9,8 @@
 		saveData,
 		saveDataToServer,
 		saveError,
-		showSidebar
+		showSidebar,
+		triggerAutoSync
 	}                                                                        from '../data/store';
 	import { closeModal, modalData, ModalService, openModal }                from '../data/modal-service.svelte';
 	import { skillStore }                                                    from '../data/skill-store.svelte.js';
@@ -125,7 +126,11 @@
 
 	const save = () => {
 		skillStore.skills.set([...get(skillStore.skills)]);
-		get(active)?.save();
+		const vActive = get(active)
+		if (vActive) {
+			vActive.save();
+			triggerAutoSync(vActive)
+		}
 	};
 
 	const acknowledgeSaveError = () => {
