@@ -62,7 +62,7 @@ public class PlayerStats implements StatHolder {
      * by the API on startup so do not call this method.
      */
     public static void init() {
-        if (statMap.size() == 0) {
+        if (statMap.isEmpty()) {
             load(EXP, BASE + EXP);
             load(HEALTH, BASE + HEALTH);
             load(LEVEL, BASE + LEVEL);
@@ -84,7 +84,7 @@ public class PlayerStats implements StatHolder {
     }
 
     /**
-     * @return map of stats for the scoreboard
+     * @return list of stats for the scoreboard
      */
     @Override
     public List<String> getNames() {

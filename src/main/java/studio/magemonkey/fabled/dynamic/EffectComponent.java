@@ -51,15 +51,15 @@ import java.util.regex.Pattern;
  * A component for dynamic skills which takes care of one effect
  */
 public abstract class EffectComponent {
-    private static final String                     ICON_KEY         = "icon-key";
-    private static final String                     COUNTS_KEY       = "counts";
-    private static final String                     TYPE             = "type";
-    private static final String                     PREVIEW          = "preview";
-    private static       boolean                    passed;
+    private static final String                ICON_KEY         = "icon-key";
+    private static final String                COUNTS_KEY       = "counts";
+    private static final String                TYPE             = "type";
+    private static final String                PREVIEW          = "preview";
+    private static       boolean               passed;
     /**
      * Child components
      */
-    public final         ArrayList<EffectComponent> children         = new ArrayList<>();
+    public final         List<EffectComponent> children         = new ArrayList<>();
     /**
      * The settings for the component
      * -- GETTER --
@@ -69,19 +69,19 @@ public abstract class EffectComponent {
 
      */
     @Getter
-    protected final      Settings                   settings         = new Settings();
+    protected final      Settings              settings         = new Settings();
     /**
      * Whether the component should display preview effects
      */
-    private              boolean                    isPreviewEnabled = false;
+    private              boolean               isPreviewEnabled = false;
     /**
      * The preview settings for the component
      */
-    protected final      Settings                   preview          = new Settings();
+    protected final      Settings              preview          = new Settings();
     /**
      * Parent class of the component
      */
-    protected            DynamicSkill               skill;
+    protected            DynamicSkill          skill;
     /**
      * -- GETTER --
      *  Retrieves the config key for the component
@@ -89,7 +89,7 @@ public abstract class EffectComponent {
      * @return config key of the component
      */
     @Getter
-    private              String                     instanceKey;
+    private              String                instanceKey;
 
     private static String filterSpecialChars(String string) {
         int           i       = 0;
@@ -216,7 +216,7 @@ public abstract class EffectComponent {
      * @param caster  caster of the skill
      * @param level   level of the skill
      * @param targets targets to execute on
-     * @param force whether skill should be forced
+     * @param force   whether skill should be forced
      * @return true if executed, false if conditions not met
      */
     protected boolean executeChildren(LivingEntity caster,
@@ -292,6 +292,13 @@ public abstract class EffectComponent {
         return filterSpecialChars(text);
     }
 
+    /**
+     * Executes the component
+     *
+     * @param caster  caster of the skill
+     * @param level   level of the skill
+     * @param targets targets
+     **/
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets) {
         return execute(caster, level, targets, false);
     }
@@ -327,9 +334,11 @@ public abstract class EffectComponent {
                 @Override
                 public void run() {
                     for (LivingEntity target : targetSupplier.get()) {
-                        ParticleHelper.play(target.getLocation(), preview, Set.of(caster), "per-target-",
-                                preview.getBool("per-target-" + "hitbox") ? target.getBoundingBox() : null
-                        );
+                        ParticleHelper.play(target.getLocation(),
+                                preview,
+                                Set.of(caster),
+                                "per-target-",
+                                preview.getBool("per-target-" + "hitbox") ? target.getBoundingBox() : null);
                     }
                 }
             }.runTaskTimer((Plugin) Fabled.inst(), 0, Math.max(1, preview.getInt("per-target-" + "period", 5)));
