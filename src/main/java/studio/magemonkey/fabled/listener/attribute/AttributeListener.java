@@ -26,6 +26,7 @@
  */
 package studio.magemonkey.fabled.listener.attribute;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -63,7 +64,7 @@ public class AttributeListener extends FabledListener {
      * Refresh player stats on login
      */
     public void onJoin(final Player player) {
-        updatePlayer(Fabled.getData(player));
+        Bukkit.getScheduler().runTaskLater(Fabled.inst(), () -> updatePlayer(Fabled.getData(player)), 5);
     }
 
     /**
