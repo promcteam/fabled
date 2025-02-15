@@ -57,7 +57,5 @@ public final class SkillAttribute {
      */
     public static final String RANGE = "range";
 
-    public static final String INCOMPATIBLE = "incompatible";
-
     public static final String POINTS_SPENT_REQ = "points-spent-req";
 }
