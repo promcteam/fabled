@@ -48,12 +48,21 @@ import studio.magemonkey.fabled.api.player.PlayerData;
 import studio.magemonkey.fabled.language.RPGFilter;
 import studio.magemonkey.fabled.manager.CmdManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * A command that gives a player class levels
+ * <p>
+ * /class level [player] &lt;add|remove|set&gt; &lt;amount&gt; [class] [true|false] - Gives a player class levels
+ * Arguments:
+ * - player: The player to give levels to
+ * - add/remove/set: The action to perform
+ * - amount: The amount of levels to give
+ * - class: The class to give levels to
+ * - true/false: Whether to show the message to the player
  */
 public class CmdLevel implements IFunction, TabCompleter {
     private static final Pattern IS_NUMBER = Pattern.compile("-?[0-9]+");
@@ -75,101 +84,143 @@ public class CmdLevel implements IFunction, TabCompleter {
      */
     @Override
     public void execute(ConfigurableCommand cmd, Plugin plugin, CommandSender sender, String[] args) {
-        // Disabled world
-        if (sender instanceof Player && !Fabled.getSettings().isWorldEnabled(((Player) sender).getWorld())
-                && args.length == 1) {
-            cmd.sendMessage(sender, DISABLED, "&4You cannot use this command in this world");
+        boolean silent = isSilent(args);
+        // Filter out the silent argument, this could be in any location
+        if (silent) {
+            args = Arrays.stream(args)
+                    .filter(arg -> !IS_BOOL.matcher(arg).matches() && !arg.equalsIgnoreCase("-s") && !arg.equalsIgnoreCase("--silent"))
+                    .toArray(String[]::new);
         }
+
+        int           numberIndex = getNumberIndex(args);
+        OfflinePlayer target;
+        if (!(sender instanceof Player)) {
+            // Not enough arguments -- Console needs to supply a user and an amount
+            if (args.length < 2) {
+                CommandManager.displayUsage(cmd, sender);
+                return;
+            }
+
+            target = Bukkit.getOfflinePlayer(args[0]);
+        } else {
+            // Disabled world
+            if (!Fabled.getSettings().isWorldEnabled(((Player) sender).getWorld()) && args.length == 1) {
+                cmd.sendMessage(sender, DISABLED, "&4You cannot use this command in this world");
+                return;
+            }
+
+            // Not enough arguments -- Player needs to supply at least an amount
+            if (args.length < 1) {
+                CommandManager.displayUsage(cmd, sender);
+                return;
+            }
+
+            target = numberIndex == 0 ? (OfflinePlayer) sender : Bukkit.getOfflinePlayer(args[0]);
+        }
+
 
         // Only can show info of a player so console needs to provide a name
-        else if ((args.length >= 1 && sender instanceof Player && IS_NUMBER.matcher(args[0]).matches())
-                || (args.length >= 2 && !IS_NUMBER.matcher(args[0]).matches())) {
-            int numberIndex = IS_NUMBER.matcher(args[0]).matches() ? 0 : 1;
-            if (args.length > 1 && IS_NUMBER.matcher(args[1]).matches()) numberIndex = 1;
+        if (target == null) {
+            cmd.sendMessage(sender, NOT_PLAYER, ChatColor.RED + "That is not a valid player name");
+            return;
+        }
+        // Get the player data
+        PlayerData data = Fabled.getData(target);
 
-            // Get the player data
-            OfflinePlayer target = numberIndex == 0 ? (OfflinePlayer) sender : Bukkit.getOfflinePlayer(args[0]);
-            if (target == null) {
-                cmd.sendMessage(sender, NOT_PLAYER, ChatColor.RED + "That is not a valid player name");
+        // Parse the levels
+        int amount = NumberParser.parseInt(args[numberIndex]);
+        // Invalid amount of levels
+        if (amount == 0) {
+            return;
+        }
+
+        int     lastArg = args.length - 1;
+        boolean message = IS_BOOL.matcher(args[lastArg]).matches();
+        if (message) lastArg--;
+
+
+        // Give levels to a specific class group
+        boolean success;
+        if (numberIndex + 1 <= lastArg) {
+            PlayerClass playerClass = data.getClass(CmdManager.join(args, numberIndex + 1, lastArg));
+            if (playerClass == null) {
+                CommandManager.displayUsage(cmd, sender);
                 return;
             }
-            PlayerData data = Fabled.getData(target);
 
-            // Parse the levels
-            int amount = NumberParser.parseInt(args[numberIndex]);
-
-            // Invalid amount of levels
-            if (amount == 0) {
-                return;
+            if (amount > 0) {
+                playerClass.giveLevels(amount);
+            } else {
+                playerClass.loseLevels(-amount);
             }
+            success = true;
+        }
 
-            int     lastArg     = args.length - 1;
-            boolean message     = IS_BOOL.matcher(args[lastArg]).matches();
-            boolean showMessage = !message || Boolean.parseBoolean(args[lastArg]);
-            if (message) lastArg--;
-
-
-            // Give levels to a specific class group
-            boolean success;
-            if (numberIndex + 1 <= lastArg) {
-                PlayerClass playerClass = data.getClass(CmdManager.join(args, numberIndex + 1, lastArg));
-                if (playerClass == null) {
-                    CommandManager.displayUsage(cmd, sender);
-                    return;
-                }
-
-                if (amount > 0) {
-                    playerClass.giveLevels(amount);
-                } else {
-                    playerClass.loseLevels(-amount);
-                }
+        // Give levels
+        else {
+            if (amount > 0) {
+                success = data.giveLevels(amount, ExpSource.COMMAND);
+            } else {
+                data.loseLevels(-amount);
                 success = true;
             }
+        }
 
-            // Give levels
-            else {
-                if (amount > 0) {
-                    success = data.giveLevels(amount, ExpSource.COMMAND);
-                } else {
-                    data.loseLevels(-amount);
-                    success = true;
-                }
-            }
+        // Messages
+        if (silent) return;
 
-            // Messages
-            if (showMessage) {
-                if (!success) {
-                    cmd.sendMessage(
-                            sender,
-                            NO_CLASSES,
-                            ChatColor.RED + "You aren't professed as a class that receives experience from commands",
-                            Filter.PLAYER.setReplacement(target.getName()),
-                            RPGFilter.LEVEL.setReplacement("" + amount)
-                    );
-                } else if (target != sender) {
-                    cmd.sendMessage(
-                            sender,
-                            GAVE_LEVEL,
-                            ChatColor.DARK_GREEN + "You have given " + ChatColor.GOLD + "{player} {level} levels",
-                            Filter.PLAYER.setReplacement(target.getName()),
-                            RPGFilter.LEVEL.setReplacement("" + amount));
-                }
-                if (target.isOnline()) {
-                    cmd.sendMessage(
-                            target.getPlayer(),
-                            RECEIVED_LEVEL,
-                            ChatColor.DARK_GREEN + "You have received " + ChatColor.GOLD + "{level} levels "
-                                    + ChatColor.DARK_GREEN + "from " + ChatColor.GOLD + "{player}",
-                            Filter.PLAYER.setReplacement(sender.getName()),
-                            RPGFilter.LEVEL.setReplacement("" + amount));
-                }
+        if (!success) {
+            cmd.sendMessage(
+                    sender,
+                    NO_CLASSES,
+                    ChatColor.RED + "You aren't professed as a class that receives experience from commands",
+                    Filter.PLAYER.setReplacement(target.getName()),
+                    RPGFilter.LEVEL.setReplacement("" + amount)
+            );
+        } else if (target != sender) {
+            cmd.sendMessage(
+                    sender,
+                    GAVE_LEVEL,
+                    ChatColor.DARK_GREEN + "You have given " + ChatColor.GOLD + "{player} {level} levels",
+                    Filter.PLAYER.setReplacement(target.getName()),
+                    RPGFilter.LEVEL.setReplacement("" + amount));
+        }
+        if (target.isOnline()) {
+            cmd.sendMessage(
+                    target.getPlayer(),
+                    RECEIVED_LEVEL,
+                    ChatColor.DARK_GREEN + "You have received " + ChatColor.GOLD + "{level} levels "
+                            + ChatColor.DARK_GREEN + "from " + ChatColor.GOLD + "{player}",
+                    Filter.PLAYER.setReplacement(sender.getName()),
+                    RPGFilter.LEVEL.setReplacement("" + amount));
+        }
+    }
+
+    private int getNumberIndex(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if (IS_NUMBER.matcher(args[i]).matches()) {
+                return i;
             }
         }
 
-        // Not enough arguments
-        else {
-            CommandManager.displayUsage(cmd, sender);
+        return -1;
+    }
+
+    private boolean isSilent(String[] args) {
+        if (args == null || args.length == 0) return false;
+
+        if (IS_BOOL.matcher(args[args.length - 1]).matches()) {
+            return !Boolean.parseBoolean(args[args.length - 1]);
         }
+
+        // If any arg is `-s` or `--silent`, return true
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("-s") || arg.equalsIgnoreCase("--silent")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -178,12 +229,25 @@ public class CmdLevel implements IFunction, TabCompleter {
                                       @NotNull Command command,
                                       @NotNull String s,
                                       @NotNull String[] args) {
+        // Filter -s and --silent out of the args
+        if (args.length > 0) {
+            args = Arrays.stream(args)
+                    .filter(arg -> !arg.equalsIgnoreCase("-s") && !arg.equalsIgnoreCase("--silent"))
+                    .toArray(String[]::new);
+        }
+
         if (args.length == 1) {
-            return ConfigurableCommand.getPlayerTabCompletions(commandSender, args[0]);
-        } else if (args.length > 1 && !args[1].isBlank()) {
-            int i = CmdExp.IS_NUMBER.matcher(args[1]).matches() ? 2 : 1;
-            if (i >= args.length) return null;
-            return ConfigurableCommand.getTabCompletions(Fabled.getGroups(), Arrays.copyOfRange(args, i, args.length));
+            // For the first arg, it could be a player, or a number
+            List<String> list = new ArrayList<>(ConfigurableCommand.getPlayerTabCompletions(commandSender, args[0]));
+            list.add("<level>");
+            return list;
+        } else if (args.length > 1) {
+            // If the first arg is a number, the second arg could be a class
+            int numberIndex = getNumberIndex(args);
+
+            if (numberIndex == -1) return List.of("<level>");
+            return ConfigurableCommand.getTabCompletions(Fabled.getGroups(),
+                    Arrays.copyOfRange(args, numberIndex + 1, args.length));
         }
         return null;
     }
