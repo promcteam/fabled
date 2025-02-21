@@ -88,7 +88,8 @@ public class CmdLevel implements IFunction, TabCompleter {
         // Filter out the silent argument, this could be in any location
         if (silent) {
             args = Arrays.stream(args)
-                    .filter(arg -> !IS_BOOL.matcher(arg).matches() && !arg.equalsIgnoreCase("-s") && !arg.equalsIgnoreCase("--silent"))
+                    .filter(arg -> !IS_BOOL.matcher(arg).matches() && !arg.equalsIgnoreCase("-s")
+                            && !arg.equalsIgnoreCase("--silent"))
                     .toArray(String[]::new);
         }
 
@@ -134,10 +135,7 @@ public class CmdLevel implements IFunction, TabCompleter {
             return;
         }
 
-        int     lastArg = args.length - 1;
-        boolean message = IS_BOOL.matcher(args[lastArg]).matches();
-        if (message) lastArg--;
-
+        int lastArg = args.length - 1;
 
         // Give levels to a specific class group
         boolean success;
