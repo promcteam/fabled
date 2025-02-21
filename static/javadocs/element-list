@@ -24,6 +24,7 @@ studio.magemonkey.fabled.api.target
 studio.magemonkey.fabled.api.util
 studio.magemonkey.fabled.cast
 studio.magemonkey.fabled.cmd
+studio.magemonkey.fabled.cmd.api
 studio.magemonkey.fabled.data
 studio.magemonkey.fabled.data.formula
 studio.magemonkey.fabled.data.formula.func
