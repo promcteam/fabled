@@ -1791,10 +1791,12 @@ public class PlayerData {
      *
      * @param amount  percent of experience to lose
      * @param percent whether to take the amount as a percentage
+     * @param changeLevel whether to change the level of the player
+     * @param showMessage whether to show the configured message if enabled
      */
-    public void loseExp(double amount, boolean percent, boolean changeLevel) {
+    public void loseExp(double amount, boolean percent, boolean changeLevel, boolean showMessage) {
         for (PlayerClass playerClass : classes.values()) {
-            playerClass.loseExp(amount, percent, changeLevel);
+            playerClass.loseExp(amount, percent, changeLevel, showMessage);
         }
     }
 
@@ -1806,6 +1808,19 @@ public class PlayerData {
             double penalty = playerClass.getData().getGroupSettings().getDeathPenalty();
             if (penalty > 0) {
                 playerClass.loseExp(penalty);
+            }
+        }
+    }
+
+    public void setExp(double amount, ExpSource expSource, boolean showMessage) {
+        for (PlayerClass playerClass : classes.values()) {
+            // We want to use lose/giveExp to trigger the event and change their level,
+            // so we need to calculate the difference
+            double diff = amount - playerClass.getExp();
+            if (diff > 0) {
+                playerClass.giveExp(diff, expSource, showMessage);
+            } else {
+                playerClass.loseExp(-diff, false, true, showMessage);
             }
         }
     }
@@ -1840,8 +1855,23 @@ public class PlayerData {
      */
     public void loseLevels(int amount) {
         classes.values().stream()
-                .filter(playerClass -> amount > 0)
                 .forEach(playerClass -> playerClass.loseLevels(amount));
+    }
+
+    public boolean setLevel(int amount, ExpSource source) {
+        boolean success = true;
+
+        for (PlayerClass playerClass : classes.values()) {
+            int diff = amount - playerClass.getLevel();
+
+            if (diff > 0) {
+                success = success && giveLevels(diff, source);
+            } else if (diff < 0) {
+                loseLevels(-diff);
+            }
+        }
+
+        return success;
     }
 
     public int getPoints() {

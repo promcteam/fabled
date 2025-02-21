@@ -55,7 +55,7 @@ public class CommandMechanic extends MechanicComponent {
      */
     @Override
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets, boolean force) {
-        if (targets.size() == 0 || !settings.has(COMMAND)) {
+        if (targets.isEmpty() || !settings.has(COMMAND)) {
             return false;
         }
 

@@ -400,8 +400,9 @@ public class PlayerClass {
      * @param percent     whether to take the amount as a percentage
      * @param changeLevel whether to lower the level if the exp lost exceeds the current exp,
      *                    or to cap at 0 exp and keep the current level
+     * @param showMessage whether to display the loss message
      */
-    public void loseExp(double amount, boolean percent, boolean changeLevel) {
+    public void loseExp(double amount, boolean percent, boolean changeLevel, boolean showMessage) {
         Preconditions.checkArgument(amount > 0, "Amount must be positive");
         if (percent) {
             amount *= getRequiredExp();
@@ -421,7 +422,7 @@ public class PlayerClass {
 
 
             // Exp loss message
-            if (Fabled.getSettings().isShowLossExpMessages() && (int) amount > 0) {
+            if (showMessage && Fabled.getSettings().isShowLossExpMessages() && (int) amount > 0) {
                 TitleManager.show(
                         player.getPlayer(),
                         TitleType.EXP_LOST,
@@ -440,7 +441,7 @@ public class PlayerClass {
      *
      * @param percent percent of experience to lose
      */
-    public void loseExp(double percent) {loseExp(percent, true, false);}
+    public void loseExp(double percent) {loseExp(percent, true, false, true);}
 
     /**
      * <p>Checks whether the player has leveled up based on
