@@ -45,12 +45,14 @@ import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.enums.ExpSource;
 import studio.magemonkey.fabled.api.player.PlayerClass;
 import studio.magemonkey.fabled.api.player.PlayerData;
+import studio.magemonkey.fabled.cmd.api.NumericAction;
 import studio.magemonkey.fabled.language.RPGFilter;
 import studio.magemonkey.fabled.manager.CmdManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -97,7 +99,7 @@ public class CmdLevel implements IFunction, TabCompleter {
         OfflinePlayer target;
         if (!(sender instanceof Player)) {
             // Not enough arguments -- Console needs to supply a user and an amount
-            if (args.length < 2) {
+            if (args.length < 3) {
                 CommandManager.displayUsage(cmd, sender);
                 return;
             }
@@ -105,18 +107,18 @@ public class CmdLevel implements IFunction, TabCompleter {
             target = Bukkit.getOfflinePlayer(args[0]);
         } else {
             // Disabled world
-            if (!Fabled.getSettings().isWorldEnabled(((Player) sender).getWorld()) && args.length == 1) {
+            if (!Fabled.getSettings().isWorldEnabled(((Player) sender).getWorld()) && args.length == 2) {
                 cmd.sendMessage(sender, DISABLED, "&4You cannot use this command in this world");
                 return;
             }
 
             // Not enough arguments -- Player needs to supply at least an amount
-            if (args.length < 1) {
+            if (args.length < 2) {
                 CommandManager.displayUsage(cmd, sender);
                 return;
             }
 
-            target = numberIndex == 0 ? (OfflinePlayer) sender : Bukkit.getOfflinePlayer(args[0]);
+            target = numberIndex == 1 ? (OfflinePlayer) sender : Bukkit.getOfflinePlayer(args[0]);
         }
 
 
@@ -128,12 +130,22 @@ public class CmdLevel implements IFunction, TabCompleter {
         // Get the player data
         PlayerData data = Fabled.getData(target);
 
+        NumericAction action;
+        try {
+            action = NumericAction.valueOf(args[numberIndex - 1].toUpperCase(Locale.US));
+        } catch (IllegalArgumentException e) {
+            CommandManager.displayUsage(cmd, sender);
+            return;
+        }
+
         // Parse the levels
         int amount = NumberParser.parseInt(args[numberIndex]);
         // Invalid amount of levels
         if (amount == 0) {
             return;
         }
+
+        if (action == NumericAction.REMOVE) amount = -amount;
 
         int lastArg = args.length - 1;
 
@@ -146,6 +158,8 @@ public class CmdLevel implements IFunction, TabCompleter {
                 return;
             }
 
+            if (action == NumericAction.SET) amount = amount - playerClass.getLevel();
+
             if (amount > 0) {
                 playerClass.giveLevels(amount);
             } else {
@@ -156,7 +170,9 @@ public class CmdLevel implements IFunction, TabCompleter {
 
         // Give levels
         else {
-            if (amount > 0) {
+            if (action == NumericAction.SET) {
+                success = data.setLevel(amount, ExpSource.COMMAND);
+            } else if (amount > 0) {
                 success = data.giveLevels(amount, ExpSource.COMMAND);
             } else {
                 data.loseLevels(-amount);
@@ -235,15 +251,25 @@ public class CmdLevel implements IFunction, TabCompleter {
         }
 
         if (args.length == 1) {
-            // For the first arg, it could be a player, or a number
-            List<String> list = new ArrayList<>(ConfigurableCommand.getPlayerTabCompletions(commandSender, args[0]));
-            list.add("<level>");
+            List<String> list = new ArrayList<>(
+                    ConfigurableCommand.getPlayerTabCompletions(commandSender, args[0]));
+            list.add("add");
+            list.add("remove");
+            list.add("set");
             return list;
-        } else if (args.length > 1) {
-            // If the first arg is a number, the second arg could be a class
+        } else if (args.length == 2) {
+            // The second arg is add/set/remove if the first arg isn't add/set/remove
+            if (!args[args.length - 2].equalsIgnoreCase("add") && !args[args.length - 2].equalsIgnoreCase("set")
+                    && !args[args.length - 2].equalsIgnoreCase("remove")) {
+                return List.of("add", "remove", "set");
+            } else {
+                return List.of("<level>");
+            }
+        } else if (args.length > 2) {
+            // If the first arg is a number, the second arg could be a player or a class
             int numberIndex = getNumberIndex(args);
-
             if (numberIndex == -1) return List.of("<level>");
+
             return ConfigurableCommand.getTabCompletions(Fabled.getGroups(),
                     Arrays.copyOfRange(args, numberIndex + 1, args.length));
         }

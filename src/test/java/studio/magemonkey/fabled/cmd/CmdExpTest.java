@@ -100,7 +100,7 @@ class CmdExpTest {
 
         @Test
         void execute_invalidTarget() {
-            command.execute(classCmd, plugin, player, "not-a-player", "5");
+            command.execute(classCmd, plugin, player, "not-a-player", "add", "5");
 
             verify(classCmd).sendMessage(eq(player),
                     eq("not-player"),
@@ -109,21 +109,21 @@ class CmdExpTest {
 
         @Test
         void execute_plainExp() {
-            command.execute(classCmd, plugin, player, "5");
+            command.execute(classCmd, plugin, player, "add", "5");
 
             verify(playerData).giveExp(5, ExpSource.COMMAND, true);
         }
 
         @Test
         void execute_negativeExp() {
-            command.execute(classCmd, plugin, player, "-5");
+            command.execute(classCmd, plugin, player, "add", "-5");
 
-            verify(playerData).loseExp(5, false, true);
+            verify(playerData).loseExp(5, false, true, true);
         }
 
         @Test
         void execute_targetPlayer() {
-            command.execute(classCmd, plugin, player, "player", "5");
+            command.execute(classCmd, plugin, player, "player", "add", "5");
 
             verify(playerData).giveExp(5, ExpSource.COMMAND, true);
             verify(classCmd).sendMessage(eq(player),
@@ -137,9 +137,9 @@ class CmdExpTest {
 
         @Test
         void execute_targetPlayerNegativeExp() {
-            command.execute(classCmd, plugin, player, "player", "-5");
+            command.execute(classCmd, plugin, player, "player", "remove", "5");
 
-            verify(playerData).loseExp(5, false, true);
+            verify(playerData).loseExp(5, false, true, true);
             verify(classCmd).sendMessage(eq(player),
                     eq("took-exp"),
                     eq(ChatColor.DARK_GREEN + "You have taken "
@@ -154,21 +154,21 @@ class CmdExpTest {
         // Class-based modifications
         @Test
         void execute_classExp() {
-            command.execute(classCmd, plugin, player, "5", "class");
+            command.execute(classCmd, plugin, player, "add", "5", "class");
 
             verify(playerClass).giveExp(5, ExpSource.COMMAND, true);
         }
 
         @Test
         void execute_classNegativeExp() {
-            command.execute(classCmd, plugin, player, "-5", "class");
+            command.execute(classCmd, plugin, player, "remove", "5", "class");
 
-            verify(playerClass).loseExp(5, false, true);
+            verify(playerClass).loseExp(5, false, true, true);
         }
 
         @Test
         void execute_playerClassExp() {
-            command.execute(classCmd, plugin, player, "player", "5", "class");
+            command.execute(classCmd, plugin, player, "player", "add", "5", "class");
 
             verify(playerClass).giveExp(5, ExpSource.COMMAND, true);
             verify(classCmd).sendMessage(eq(player),
@@ -182,9 +182,9 @@ class CmdExpTest {
 
         @Test
         void execute_playerClassNegativeExp() {
-            command.execute(classCmd, plugin, player, "player", "-5", "class");
+            command.execute(classCmd, plugin, player, "player", "remove", "5", "class");
 
-            verify(playerClass).loseExp(5, false, true);
+            verify(playerClass).loseExp(5, false, true, true);
             verify(classCmd).sendMessage(eq(player),
                     eq("took-exp"),
                     eq(ChatColor.DARK_GREEN + "You have taken "
@@ -196,10 +196,35 @@ class CmdExpTest {
                     any(CustomFilter.class));
         }
 
+        @Test
+        void execute_setExp() {
+            command.execute(classCmd, plugin, player, "set", "5");
+
+            verify(playerData).setExp(5, ExpSource.COMMAND, true);
+        }
+
+        @Test
+        void execute_playerClassSet() {
+            when(playerClass.getTotalExp()).thenReturn(15.0);
+            command.execute(classCmd, plugin, player, "player", "set", "5", "class");
+
+            verify(playerClass).loseExp(10, false, true, true);
+        }
+
+        @Test
+        void execute_invalidOperation() {
+            command.execute(classCmd, plugin, player, new String[]{
+                    "invalid", "5"
+            });
+
+            // Display usage
+            commandManager.verify(() -> CommandManager.displayUsage(classCmd, player));
+        }
+
         // Silent mode
         @Test
         void execute_silent() {
-            command.execute(classCmd, plugin, player, "5", "-s");
+            command.execute(classCmd, plugin, player, "add", "5", "-s");
 
             verify(playerData).giveExp(5, ExpSource.COMMAND, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
@@ -207,7 +232,7 @@ class CmdExpTest {
 
         @Test
         void execute_silentTargetPlayer() {
-            command.execute(classCmd, plugin, player, "player", "5", "-s");
+            command.execute(classCmd, plugin, player, "player", "add", "5", "-s");
 
             verify(playerData).giveExp(5, ExpSource.COMMAND, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
@@ -215,15 +240,15 @@ class CmdExpTest {
 
         @Test
         void execute_silentClassExp() {
-            command.execute(classCmd, plugin, player, "5", "class", "-s");
+            command.execute(classCmd, plugin, player, "remove", "5", "class", "-s");
 
-            verify(playerClass).giveExp(5, ExpSource.COMMAND, false);
+            verify(playerClass).loseExp(5, false, true, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
         }
 
         @Test
         void execute_silentPlayerClassExp() {
-            command.execute(classCmd, plugin, player, "player", "5", "class", "-s");
+            command.execute(classCmd, plugin, player, "player", "add", "5", "class", "-s");
 
             verify(playerClass).giveExp(5, ExpSource.COMMAND, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
@@ -231,7 +256,7 @@ class CmdExpTest {
 
         @Test
         void execute_silentFirst() {
-            command.execute(classCmd, plugin, player, "-s", "player", "5", "class");
+            command.execute(classCmd, plugin, player, "-s", "player", "add", "5", "class");
 
             verify(playerClass).giveExp(5, ExpSource.COMMAND, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
@@ -239,7 +264,7 @@ class CmdExpTest {
 
         @Test
         void execute_silentInOtherSpot() {
-            command.execute(classCmd, plugin, player, "5", "-s", "class");
+            command.execute(classCmd, plugin, player, "add", "5", "-s", "class");
 
             verify(playerClass).giveExp(5, ExpSource.COMMAND, false);
             verify(classCmd, never()).sendMessage(any(), any(), any(), any(), any());
@@ -270,19 +295,34 @@ class CmdExpTest {
         void tabComplete_noArgs() {
             List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{""});
 
-            assertEquals(List.of("player", "player2", "<exp>"), completions);
+            assertEquals(List.of("player", "player2", "add", "remove", "set"), completions);
         }
 
         @Test
-        void tabComplete_secondArg() {
+        void tabComplete_playerInFirst() {
             List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"player", ""});
+
+            assertEquals(List.of("add", "remove", "set"), completions);
+        }
+
+        @Test
+        void tabComplete_addFirst() {
+            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"add", ""});
 
             assertEquals(List.of("<exp>"), completions);
         }
 
         @Test
-        void tabComplete_firstNumber() {
-            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"5", ""});
+        void tabComplete_playerAdd() {
+            List<String> completions =
+                    command.onTabComplete(player, classCmd, "level", new String[]{"player", "add", ""});
+
+            assertEquals(List.of("<exp>"), completions);
+        }
+
+        @Test
+        void tabComplete_numberInSecond() {
+            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"add", "5", ""});
 
             assertEquals(List.of("class"), completions);
         }
@@ -290,7 +330,7 @@ class CmdExpTest {
         @Test
         void tabComplete_playerWithNumber() {
             List<String> completions =
-                    command.onTabComplete(player, classCmd, "level", new String[]{"player", "5", ""});
+                    command.onTabComplete(player, classCmd, "level", new String[]{"player", "add", "5", ""});
 
             assertEquals(List.of("class"), completions);
         }

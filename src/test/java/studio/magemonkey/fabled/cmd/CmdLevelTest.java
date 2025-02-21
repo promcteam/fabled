@@ -99,7 +99,7 @@ class CmdLevelTest {
         @Test
         void execute_invalidTarget() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "not-a-player", "5"
+                    "not-a-player", "add", "5"
             });
 
             verify(classCmd).sendMessage(eq(player), eq("not-player"),
@@ -109,7 +109,7 @@ class CmdLevelTest {
         @Test
         void execute_plainLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "5"
+                    "add", "5"
             });
 
             verify(playerData).giveLevels(5, ExpSource.COMMAND);
@@ -125,7 +125,7 @@ class CmdLevelTest {
         @Test
         void execute_negativeLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "-5"
+                    "add", "-5"
             });
 
             verify(playerData).loseLevels(5);
@@ -141,7 +141,7 @@ class CmdLevelTest {
         @Test
         void execute_targetPlayer() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "5"
+                    "player", "add", "5"
             });
 
             verify(playerData).giveLevels(5, ExpSource.COMMAND);
@@ -162,7 +162,7 @@ class CmdLevelTest {
         @Test
         void execute_targetPlayerNegativeLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "-5"
+                    "player", "remove", "5"
             });
 
             verify(playerData).loseLevels(5);
@@ -184,7 +184,7 @@ class CmdLevelTest {
         @Test
         void execute_classLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "5", "class"
+                    "add", "5", "class"
             });
 
             verify(playerClass).giveLevels(5);
@@ -200,7 +200,7 @@ class CmdLevelTest {
         @Test
         void execute_classNegativeLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "-5", "class"
+                    "remove", "5", "class"
             });
 
             verify(playerClass).loseLevels(5);
@@ -216,7 +216,7 @@ class CmdLevelTest {
         @Test
         void execute_playerClassLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "5", "class"
+                    "player", "add", "5", "class"
             });
 
             verify(playerClass).giveLevels(5);
@@ -237,7 +237,7 @@ class CmdLevelTest {
         @Test
         void execute_playerClassNegativeLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "-5", "class"
+                    "player", "add", "-5", "class"
             });
 
             verify(playerClass).loseLevels(5);
@@ -255,11 +255,59 @@ class CmdLevelTest {
                     any(CustomFilter.class));
         }
 
+        @Test
+        void execute_playerClassLevelsSet() {
+            when(playerClass.getLevel()).thenReturn(15);
+            command.execute(classCmd, plugin, player, new String[]{
+                    "player", "set", "5", "class"
+            });
+
+            verify(playerClass).loseLevels(10);
+            verify(classCmd).sendMessage(eq(player), eq("gave-level"),
+                    eq(ChatColor.DARK_GREEN + "You have given " +
+                            ChatColor.GOLD + "{player} {level} levels"),
+                    any(CustomFilter.class),
+                    any(CustomFilter.class));
+            verify(classCmd).sendMessage(eq(targetPlayer), eq("received-level"),
+                    eq(ChatColor.DARK_GREEN + "You have received " +
+                            ChatColor.GOLD + "{level} levels " +
+                            ChatColor.DARK_GREEN + "from " +
+                            ChatColor.GOLD + "{player}"),
+                    any(CustomFilter.class),
+                    any(CustomFilter.class));
+        }
+
+        @Test
+        void execute_setLevels() {
+            command.execute(classCmd, plugin, player, new String[]{
+                    "set", "5"
+            });
+
+            verify(playerData).setLevel(5, ExpSource.COMMAND);
+            verify(classCmd).sendMessage(eq(player), eq("received-level"),
+                    eq(ChatColor.DARK_GREEN + "You have received " +
+                            ChatColor.GOLD + "{level} levels " +
+                            ChatColor.DARK_GREEN + "from " +
+                            ChatColor.GOLD + "{player}"),
+                    any(CustomFilter.class),
+                    any(CustomFilter.class));
+        }
+
+        @Test
+        void execute_invalidOperation() {
+            command.execute(classCmd, plugin, player, new String[]{
+                    "invalid", "5"
+            });
+
+            // Display usage
+            commandManager.verify(() -> CommandManager.displayUsage(classCmd, player));
+        }
+
         // Silent mode
         @Test
         void execute_silent() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "5", "-s"
+                    "add", "5", "-s"
             });
 
             verify(playerData).giveLevels(5, ExpSource.COMMAND);
@@ -269,7 +317,7 @@ class CmdLevelTest {
         @Test
         void execute_silentTargetPlayer() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "5", "-s"
+                    "player", "add", "5", "-s"
             });
 
             verify(playerData).giveLevels(5, ExpSource.COMMAND);
@@ -279,7 +327,7 @@ class CmdLevelTest {
         @Test
         void execute_silentClassLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "5", "class", "-s"
+                    "add", "5", "class", "-s"
             });
 
             verify(playerClass).giveLevels(5);
@@ -289,7 +337,7 @@ class CmdLevelTest {
         @Test
         void execute_silentPlayerClassLevels() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "player", "5", "class", "-s"
+                    "player", "add", "5", "class", "-s"
             });
 
             verify(playerClass).giveLevels(5);
@@ -299,7 +347,7 @@ class CmdLevelTest {
         @Test
         void execute_silentFirst() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "-s", "player", "5", "class"
+                    "-s", "player", "add", "5", "class"
             });
 
             verify(playerClass).giveLevels(5);
@@ -309,7 +357,7 @@ class CmdLevelTest {
         @Test
         void execute_silentInOtherSpot() {
             command.execute(classCmd, plugin, player, new String[]{
-                    "5", "-s", "class"
+                    "add", "5", "-s", "class"
             });
 
             verify(playerClass).giveLevels(5);
@@ -341,26 +389,42 @@ class CmdLevelTest {
         void tabComplete_noArgs() {
             List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{""});
 
-            assertEquals(List.of("player", "player2", "<level>"), completions);
+            assertEquals(List.of("player", "player2", "add", "remove", "set"), completions);
         }
 
         @Test
-        void tabComplete_secondArg() {
+        void tabComplete_playerInFirst() {
             List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"player", ""});
+
+            assertEquals(List.of("add", "remove", "set"), completions);
+        }
+
+        @Test
+        void tabComplete_addFirst() {
+            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"add", ""});
 
             assertEquals(List.of("<level>"), completions);
         }
 
         @Test
-        void tabComplete_firstNumber() {
-            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"5", ""});
+        void tabComplete_playerAdd() {
+            List<String> completions =
+                    command.onTabComplete(player, classCmd, "level", new String[]{"player", "add", ""});
+
+            assertEquals(List.of("<level>"), completions);
+        }
+
+        @Test
+        void tabComplete_numberInSecond() {
+            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"add", "5", ""});
 
             assertEquals(List.of("class"), completions);
         }
 
         @Test
         void tabComplete_playerWithNumber() {
-            List<String> completions = command.onTabComplete(player, classCmd, "level", new String[]{"player", "5", ""});
+            List<String> completions =
+                    command.onTabComplete(player, classCmd, "level", new String[]{"player", "add", "5", ""});
 
             assertEquals(List.of("class"), completions);
         }

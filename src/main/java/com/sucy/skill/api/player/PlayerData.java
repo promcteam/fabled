@@ -392,7 +392,7 @@ public class PlayerData {
     }
 
     public void loseExp(double amount, boolean percent, boolean changeLevel) {
-        _data.loseExp(amount, percent, changeLevel);
+        _data.loseExp(amount, percent, changeLevel, true);
     }
 
     public void loseExp() {

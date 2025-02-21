@@ -166,7 +166,7 @@ public class ExperienceMechanic extends MechanicComponent {
                 case "set":
                     playerClass.setExp(percentExp);
                 case "take":
-                    playerClass.loseExp(percentExp, false, levelDown);
+                    playerClass.loseExp(percentExp, false, levelDown, true);
                 default:
                     return false;
             }
@@ -180,7 +180,7 @@ public class ExperienceMechanic extends MechanicComponent {
                 case "set":
                     playerClass.setExp(expValue);
                 case "take":
-                    playerClass.loseExp(expValue, false, levelDown);
+                    playerClass.loseExp(expValue, false, levelDown, true);
                 default:
                     return false;
             }

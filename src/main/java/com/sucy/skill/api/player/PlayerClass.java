@@ -227,7 +227,7 @@ public class PlayerClass {
      *                    or to cap at 0 exp and keep the current level
      */
     public void loseExp(double amount, boolean percent, boolean changeLevel) {
-        _data.loseExp(amount, percent, changeLevel);
+        _data.loseExp(amount, percent, changeLevel, true);
     }
 
     /**
