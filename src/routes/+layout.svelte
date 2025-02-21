@@ -98,7 +98,7 @@
 	});
 
 	const dragover = (e: DragEvent) => {
-		if (!e?.dataTransfer?.types || !(e.dataTransfer.types.length > 0 && e.dataTransfer?.types[0] == 'Files')) return;
+		if (!e?.dataTransfer?.types || !(e.dataTransfer.types.length > 0 && e.dataTransfer?.types.includes('Files'))) return;
 
 		e.dataTransfer.dropEffect = 'copy';
 		e.stopPropagation();
