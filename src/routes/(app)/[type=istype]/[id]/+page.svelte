@@ -13,6 +13,7 @@
 	import { base }                                       from '$app/paths';
 	import FabledSkill, { skillStore }                    from '../../../../data/skill-store.svelte';
 	import { blocklyMode }                                from '../../../../data/settings';
+	import { triggerAutoSync } from '../../../../data/store';
 
 	interface Props {
 		data: { data: FabledSkill };
@@ -47,6 +48,7 @@
 	const save = () => {
 		skillStore.skills.set([...get(skillStore.skills)]);
 		skill.save();
+		triggerAutoSync(skill);
 	};
 </script>
 

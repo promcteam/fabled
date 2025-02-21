@@ -1,5 +1,6 @@
 <script lang='ts'>
-	import { active, deleteProData, dragging, saveData, shownTab, sidebarOpen } from '../../data/store';
+	import { active, deleteProData, dragging, isSyncLocal, localSyncList, saveData, shownTab, sidebarOpen, toggleSyncLocal } from '../../data/store';
+	import { browser } 															from '$app/environment';
 	import FabledAttribute                                                      from '$api/fabled-attribute.svelte';
 	import { get }                                                              from 'svelte/store';
 	import { fly, type TransitionConfig }                                       from 'svelte/transition';
@@ -32,6 +33,7 @@
 
 	let over     = $state(false);
 	let deleting = $state(false);
+	let sync     = $state(data ? isSyncLocal(data) : false);
 
 	const startDrag = (e: DragEvent) => {
 		if (!data) {
@@ -113,6 +115,7 @@
 		 class:active={data && $active === data}
 		 class:in-folder={!!folderStore.getFolder(data)}
 		 class:over
+		 class:activeSync={sync}
 		 draggable='{!!data}'
 		 in:maybe={{fn: fly, x: (direction === "left" ? -100 : 100), duration: 500, delay: $sidebarOpen ? 0 : delay}}
 		 {onclick}
@@ -138,6 +141,21 @@
           </span>
 				</a>
 			{/if}
+			
+			{#if !browser || ('showOpenFilePicker' in window)}
+			{#key sync}
+			<div onclick={(e) => toggleSyncLocal(data).then(() => sync = isSyncLocal(data))}
+				onkeypress={(event) => {if (event?.key === 'Enter') toggleSyncLocal(data).then(() => sync = isSyncLocal(data));}}
+				class:activeSync={sync}
+				tabindex='0'
+				role='button'
+				class='sync'
+				title='Local Sync: {sync ? "On" : "Off"}'>
+			   <span class='material-symbols-rounded'>sync</span>
+			</div>
+			{/key}
+			{/if}
+
 			<div onclick={(e) => saveData(data, e)}
 					 onkeypress={(event) => {if (event?.key === 'Enter') saveData(data, event);}}
 					 tabindex='0'
@@ -271,7 +289,7 @@
         transition: opacity 0.25s ease;
     }
 
-    .download, .delete, .edit, .clone {
+    .download, .delete, .edit, .clone, .sync {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -302,6 +320,14 @@
         background-color: #00568c;
 
     }
+
+	.sync:hover {
+		background-color: #8200F3;
+	}
+
+	.activeSync {
+		color: limegreen;
+	}
 
     .modal-buttons {
         display: flex;
