@@ -44,7 +44,7 @@ public class WorldTarget extends TargetComponent {
      * {@inheritDoc}
      */
     @Override
-    List<LivingEntity> getTargets(
+    public List<LivingEntity> getTargets(
             final LivingEntity caster, final int level, final List<LivingEntity> targets) {
         final int max = (int) parseValues(caster, MAX, level, 99);
         return caster.getWorld().getLivingEntities().stream()

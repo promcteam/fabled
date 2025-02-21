@@ -52,7 +52,7 @@ public class LinearTarget extends TargetComponent {
      * {@inheritDoc}
      */
     @Override
-    List<LivingEntity> getTargets(
+    public List<LivingEntity> getTargets(
             final LivingEntity caster, final int level, final List<LivingEntity> targets) {
         final double tolerance = parseValues(caster, TOLERANCE, level, 4.0);
         final double range     = parseValues(caster, RANGE, level, 5.0);

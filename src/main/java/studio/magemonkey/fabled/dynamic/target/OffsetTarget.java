@@ -48,7 +48,7 @@ public class OffsetTarget extends TargetComponent {
      * {@inheritDoc}
      */
     @Override
-    List<LivingEntity> getTargets(
+    public List<LivingEntity> getTargets(
             final LivingEntity caster, final int level, final List<LivingEntity> targets) {
         return determineTargets(caster, level, targets, t -> ImmutableList.of(getTargetLoc(caster, level, t)));
     }

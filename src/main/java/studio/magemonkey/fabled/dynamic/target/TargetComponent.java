@@ -30,11 +30,11 @@ public abstract class TargetComponent extends EffectComponent {
     protected static final String MAX          = "max";
     private static final   String INVULNERABLE = "invulnerable";
 
-    boolean       everyone;
-    boolean       allies;
-    boolean       throughWall;
-    boolean       invulnerable;
-    IncludeCaster self;
+    protected boolean       everyone;
+    protected boolean       allies;
+    protected boolean       throughWall;
+    protected boolean       invulnerable;
+    protected IncludeCaster self;
 
     @Override
     public ComponentType getType() {
@@ -69,9 +69,9 @@ public abstract class TargetComponent extends EffectComponent {
         self = IncludeCaster.valueOf(settings.getString(CASTER, "false").toUpperCase(Locale.US).replace(' ', '_'));
     }
 
-    abstract List<LivingEntity> getTargets(final LivingEntity caster,
-                                           final int level,
-                                           final List<LivingEntity> targets);
+    public abstract List<LivingEntity> getTargets(final LivingEntity caster,
+                                                  final int level,
+                                                  final List<LivingEntity> targets);
 
     /**
      * {@inheritDoc}
@@ -86,10 +86,10 @@ public abstract class TargetComponent extends EffectComponent {
         playChildrenPreviews(onPreviewStop, caster, level, supplier);
     }
 
-    List<LivingEntity> determineTargets(final LivingEntity caster,
-                                        final int level,
-                                        final List<LivingEntity> from,
-                                        final Function<LivingEntity, List<LivingEntity>> conversion) {
+    public List<LivingEntity> determineTargets(final LivingEntity caster,
+                                               final int level,
+                                               final List<LivingEntity> from,
+                                               final Function<LivingEntity, List<LivingEntity>> conversion) {
 
         final double max = parseValues(caster, MAX, level, 99);
 
@@ -117,8 +117,8 @@ public abstract class TargetComponent extends EffectComponent {
                 || ((Player) target).getGameMode() == GameMode.CREATIVE)) return false;
 
         return target != caster && Fabled.getSettings().isValidTarget(target) && (throughWall
-                || !TargetHelper.isObstructed(from.getEyeLocation(), target.getEyeLocation()))
-                && (everyone || allies == Fabled.getSettings().isAlly(caster, target));
+                || !TargetHelper.isObstructed(from.getEyeLocation(), target.getEyeLocation())) && (everyone
+                || allies == Fabled.getSettings().isAlly(caster, target));
     }
 
     public enum IncludeCaster {

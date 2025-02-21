@@ -159,7 +159,7 @@ public class ConeTarget extends TargetComponent {
      * {@inheritDoc}
      */
     @Override
-    List<LivingEntity> getTargets(LivingEntity caster, int level, List<LivingEntity> targets) {
+    public List<LivingEntity> getTargets(LivingEntity caster, int level, List<LivingEntity> targets) {
         double  range    = parseValues(caster, RANGE, level, 3.0);
         double  angle    = parseValues(caster, ANGLE, level, 90.0);
         double  rotation = parseValues(caster, ROTATION, level, 0.0);
