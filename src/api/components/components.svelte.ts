@@ -367,7 +367,7 @@ class HarvestTrigger extends FabledTrigger {
 				'The type of block expected to be harvested',
 				'The expected data value of the block (-1 for any data value)'
 			)],
-			summaryItems: ['block','data']
+			summaryItems: ['block', 'data']
 		});
 	}
 
@@ -1024,6 +1024,26 @@ class OffsetTarget extends FabledTarget {
 				...particlesAtTargetPreviewOptions()
 			],
 			summaryItems: ['forward', 'upward', 'right']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
+class PartyTarget extends FabledTarget {
+	public constructor() {
+		super({
+			name:         'Party',
+			description:  'Targets players in your party (requires FabledParties to be installed)',
+			data:         [
+				new AttributeSelect('Range', 'range', 5)
+					.setTooltip('The max distance the location can be from the target\'s eyes'),
+				...targetOptions().splice(1),
+			],
+			preview:      [
+				...particlesAtTargetPreviewOptions()
+			],
+			summaryItems: ['range', 'max']
 		});
 	}
 
@@ -2973,8 +2993,8 @@ class ExperienceMechanic extends FabledMechanic {
 					.setTooltip('Which group to give experience too. This will be ignored if vanilla is set to true.')
 					.requireValue('vanilla', [false]),
 				new BooleanSelect('Level Down', 'level-down', true)
-					.setTooltip('If losing experience allows leveling down or remaining at the current level.'),],
-			summaryItems: ['value', 'mode', 'type','group','level-down','vanilla']
+					.setTooltip('If losing experience allows leveling down or remaining at the current level.')],
+			summaryItems: ['value', 'mode', 'type', 'group', 'level-down', 'vanilla']
 		}, false);
 	}
 
@@ -5417,9 +5437,9 @@ export const initComponents = () => {
 		CROUCH:        { name: 'Crouch', component: CrouchTrigger },
 		DEATH:         { name: 'Death', component: DeathTrigger },
 		ENTITY_TARGET: { name: 'Entity Target', component: EntityTargetTrigger },
-		EXPERIENCE:        { name: 'Experience', component: ExperienceTrigger },
-		GLIDE:        { name: 'Glide', component: GlideTrigger },
-		HARVEST:        { name: 'Harvest', component: HarvestTrigger },
+		EXPERIENCE:    { name: 'Experience', component: ExperienceTrigger },
+		GLIDE:         { name: 'Glide', component: GlideTrigger },
+		HARVEST:       { name: 'Harvest', component: HarvestTrigger },
 		HEAL:          { name: 'Heal', component: HealTrigger },
 		INIT:          { name: 'Initialize', component: InitializeTrigger },
 		JUMP:          { name: 'Jump', component: JumpTrigger },
@@ -5431,8 +5451,8 @@ export const initComponents = () => {
 		PROJ_HIT:      { name: 'Projectile Hit', component: ProjectileHitTrigger },
 		PROJ_LAUNCH:   { name: 'Projectile Launch', alias: 'Launch', component: LaunchTrigger },
 		PROJ_TICK:     { name: 'Projectile Tick', component: ProjectileTickTrigger },
-		RIPTIDE:        { name: 'Riptide', component: RiptideTrigger },
-		SHEAR:        { name: 'Shear', component: ShearTrigger },
+		RIPTIDE:       { name: 'Riptide', component: RiptideTrigger },
+		SHEAR:         { name: 'Shear', component: ShearTrigger },
 		SHIELD:        { name: 'Shield', component: ShieldTrigger },
 		SIGNAL:        { name: 'Signal', component: SignalTrigger },
 		SKILL_CAST:    { name: 'Skill Cast', component: SkillCastTrigger },
@@ -5465,6 +5485,7 @@ export const initComponents = () => {
 		NEAREST:  { name: 'Nearest', component: NearestTarget },
 		OFFSET:   { name: 'Offset', component: OffsetTarget },
 		REMEMBER: { name: 'Remember', component: RememberTarget },
+		PARTY:    { name: 'Party', component: PartyTarget },
 		SELF:     { name: 'Self', component: SelfTarget },
 		SINGLE:   { name: 'Single', component: SingleTarget },
 		WORLD:    { name: 'World', component: WorldTarget }
@@ -5494,7 +5515,7 @@ export const initComponents = () => {
 		FIRE:           { name: 'Fire', component: FireCondition },
 		FLAG:           { name: 'Flag', component: FlagCondition },
 		FOOD:           { name: 'Food', component: FoodCondition },
-		GLIDE:         { name: 'Glide', component: GlideCondition },
+		GLIDE:          { name: 'Glide', component: GlideCondition },
 		GROUND:         { name: 'Ground', component: GroundCondition },
 		HEALTH:         { name: 'Health', component: HealthCondition },
 		INVENTORY:      { name: 'Inventory', component: InventoryCondition },
