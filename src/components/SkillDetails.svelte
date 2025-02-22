@@ -69,7 +69,7 @@
 						tooltip='The level that the required skill needs to reach before this one can be unlocked'
 						bind:value={data.skillReqLevel} />
 	<ProInput label='Permission'
-						tooltip='Whether this skill requires a permission to unlock. The permission would be "skillapi.skill.{data.name}"'>
+						tooltip='Whether this skill requires a permission to unlock. The permission would be "fabled.skill.{data.name}"'>
 		<Toggle bind:data={data.permission} />
 	</ProInput>
 	<ProInput label='Level Req'

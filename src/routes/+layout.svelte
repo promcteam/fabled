@@ -9,7 +9,8 @@
 		saveData,
 		saveDataToServer,
 		saveError,
-		showSidebar
+		showSidebar,
+		triggerAutoSync
 	}                                                                        from '../data/store';
 	import { closeModal, modalData, ModalService, openModal }                from '../data/modal-service.svelte';
 	import { skillStore }                                                    from '../data/skill-store.svelte.js';
@@ -97,7 +98,7 @@
 	});
 
 	const dragover = (e: DragEvent) => {
-		if (!e?.dataTransfer?.types || !(e.dataTransfer.types.length > 0 && e.dataTransfer?.types[0] == 'Files')) return;
+		if (!e?.dataTransfer?.types || !(e.dataTransfer.types.length > 0 && e.dataTransfer?.types.includes('Files'))) return;
 
 		e.dataTransfer.dropEffect = 'copy';
 		e.stopPropagation();
@@ -125,7 +126,11 @@
 
 	const save = () => {
 		skillStore.skills.set([...get(skillStore.skills)]);
-		get(active)?.save();
+		const vActive = get(active)
+		if (vActive) {
+			vActive.save();
+			triggerAutoSync(vActive)
+		}
 	};
 
 	const acknowledgeSaveError = () => {
