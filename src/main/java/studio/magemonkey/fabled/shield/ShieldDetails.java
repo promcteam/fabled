@@ -1,8 +1,13 @@
 package studio.magemonkey.fabled.shield;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+import studio.magemonkey.fabled.Fabled;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +19,10 @@ public class ShieldDetails {
 
     private final List<ShieldEffect> effects = new ArrayList<>();
 
+    @Getter
+    @Setter
+    private BukkitTask displayTask;
+
     public ShieldDetails(LivingEntity entity) {
         this.uniqueId = entity.getUniqueId();
     }
@@ -22,16 +31,25 @@ public class ShieldDetails {
         return (LivingEntity) Bukkit.getEntity(uniqueId);
     }
 
-    public void addEffect(ShieldEffect effect) {
+    public void addEffect(ShieldEffect effect, int ticks) {
         effects.add(effect);
+        effect.setTask(Fabled.schedule(new ShieldTask(effect), ticks));
     }
 
     public void removeEffect(ShieldEffect effect) {
+        effect.destroy();
         effects.remove(effect);
     }
 
     public void removeEffect(String classifier) {
-        effects.removeIf(effect -> effect.getClassifier().equals(classifier));
+        effects.removeIf(effect -> {
+            if (effect.getClassifier().equals(classifier)) {
+                effect.destroy();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     public ShieldEffect getEffect(String classifier) {
@@ -45,7 +63,11 @@ public class ShieldDetails {
     }
 
     public void clearEffects() {
+        effects.forEach(ShieldEffect::destroy);
         effects.clear();
+
+        displayTask.cancel();
+        displayTask = null;
     }
 
     public boolean hasEffects() {
@@ -68,7 +90,30 @@ public class ShieldDetails {
      * Updates the shield details, removing any expired or exhausted effects.
      */
     public void update() {
-        effects.removeIf(ShieldEffect::isExpired);
-        effects.removeIf(ShieldEffect::isExhausted);
+        effects.removeIf(shieldEffect -> {
+            if (shieldEffect.isExhausted()) {
+                if (getEntity() instanceof Player)
+                    shieldEffect.display((Player) getEntity());
+                shieldEffect.destroy();
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    @RequiredArgsConstructor
+    private class ShieldTask implements Runnable {
+        private final ShieldEffect effect;
+
+        @Override
+        public void run() {
+            if (!getEntity().isValid()) {
+                Fabled.inst().getShieldManager().removeShieldDetails(getEntity());
+                return;
+            }
+
+            removeEffect(effect);
+        }
     }
 }
