@@ -111,9 +111,7 @@ public class Fabled extends SkillAPI {
     private BuffProvider        buffManager      = null;
 
     @Getter
-    private ShieldManager   shieldManager;
-    @Getter
-    private BukkitAudiences audience;
+    private ShieldManager shieldManager;
 
     private MainThread mainThread;
     private BukkitTask manaTask;
@@ -572,7 +570,6 @@ public class Fabled extends SkillAPI {
      */
     @Override
     public void onEnable() {
-        audience = BukkitAudiences.create(this);
         // Set up the singleton
         if (singleton != null) {
             throw new IllegalStateException("Cannot enable Fabled twice!");

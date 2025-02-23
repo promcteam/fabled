@@ -1,8 +1,6 @@
 package studio.magemonkey.fabled.shield;
 
 import lombok.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -10,7 +8,6 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import studio.magemonkey.codex.util.MsgUT;
-import studio.magemonkey.fabled.Fabled;
 
 @Data
 @RequiredArgsConstructor
@@ -26,6 +23,8 @@ public class ShieldEffect {
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
     private BossBar    bossBar;
+    private BarColor   barColor = BarColor.GREEN;
+    private BarStyle   barStyle = BarStyle.SOLID;
     private BukkitTask task;
 
     public ShieldEffect(String name, String classifier, double amount, double percent) {
@@ -100,20 +99,16 @@ public class ShieldEffect {
     }
 
     private void displayActionBar(Player player) {
-        Component component =
-                LegacyComponentSerializer.legacySection().deserialize(name + ": " + getFormattedShieldString());
-        Fabled.inst().getAudience().player(player)
-                .sendActionBar(component);
+        MsgUT.sendActionBar(player, name + ": " + getFormattedShieldString());
     }
 
     private void displayTitle(Player player) {
-        // TODO Eventually this will need to be updated to use Adventure API, but we aren't quite ready to make that change yet
         MsgUT.sendTitles(player, getFormattedShieldString(), name, 0, 20, 0);
     }
 
     private void displayBossBar(Player player) {
         if (bossBar == null) {
-            bossBar = player.getServer().createBossBar(name, BarColor.GREEN, BarStyle.SOLID);
+            bossBar = player.getServer().createBossBar(name, barColor, barStyle);
         }
 
         bossBar.setProgress(getRemaining() / amount);

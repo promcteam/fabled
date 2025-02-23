@@ -1,5 +1,7 @@
 package studio.magemonkey.fabled.dynamic.mechanic;
 
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
@@ -20,6 +22,8 @@ public class ShieldMechanic extends MechanicComponent {
     private static final String AMOUNT     = "amount";
     private static final String PERCENT    = "percent";
     private static final String DURATION   = "duration";
+    private static final String COLOR      = "color";
+    private static final String STYLE      = "style";
 
     @Override
     public String getKey() {
@@ -48,9 +52,31 @@ public class ShieldMechanic extends MechanicComponent {
             Fabled.inst().getLogger().warning("Invalid shield display type: " + settings.getString("display"));
         }
 
+        BarColor color = BarColor.GREEN;
+        BarStyle style = BarStyle.SOLID;
+        if (display == ShieldDisplay.BOSS_BAR) {
+            try {
+                color = BarColor.valueOf(settings.getString(COLOR, "GREEN")
+                        .toUpperCase(Locale.US));
+            } catch (NullPointerException | IllegalArgumentException e) {
+                Fabled.inst().getLogger().warning("Invalid boss bar color: " + settings.getString("color"));
+            }
+
+            try {
+                style = BarStyle.valueOf(settings.getString(STYLE, "SOLID")
+                        .replace(" ", "_")
+                        .replace("-", "_")
+                        .toUpperCase(Locale.US));
+            } catch (NullPointerException | IllegalArgumentException e) {
+                Fabled.inst().getLogger().warning("Invalid boss bar style: " + settings.getString("style"));
+            }
+        }
+
         for (LivingEntity target : targets) {
             ShieldEffect effect =
                     new ShieldEffect(name, classifier, amount, percent);
+            effect.setBarColor(color);
+            effect.setBarStyle(style);
             effect.setDisplayLocation(display);
             manager.addEffect(target, effect, ticks);
         }
