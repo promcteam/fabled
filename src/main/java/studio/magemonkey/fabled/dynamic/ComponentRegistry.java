@@ -212,6 +212,7 @@ public class ComponentRegistry {
         register(new PushMechanic());
         register(new RememberTargetsMechanic());
         register(new RepeatMechanic());
+        register(new ShieldMechanic());
         register(new SignalEmitMechanic());
         register(new SkillCastMechanic());
         register(new SoundMechanic());
