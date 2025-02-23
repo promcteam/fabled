@@ -1,8 +1,8 @@
 package studio.magemonkey.fabled.shield;
 
 import lombok.*;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -10,6 +10,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import studio.magemonkey.codex.util.MsgUT;
+import studio.magemonkey.fabled.Fabled;
 
 @Data
 @RequiredArgsConstructor
@@ -99,11 +100,10 @@ public class ShieldEffect {
     }
 
     private void displayActionBar(Player player) {
-        // TODO sending the message this way absolutely BREAKS hex colors
-        //  How do we convert from legacy text to Components with hex?
-        player.spigot()
-                .sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(name + ": " + getFormattedShieldString()));
+        Component component =
+                LegacyComponentSerializer.legacySection().deserialize(name + ": " + getFormattedShieldString());
+        Fabled.inst().getAudience().player(player)
+                .sendActionBar(component);
     }
 
     private void displayTitle(Player player) {
