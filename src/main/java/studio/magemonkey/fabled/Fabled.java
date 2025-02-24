@@ -26,7 +26,6 @@ package studio.magemonkey.fabled;
 
 import com.sucy.skill.SkillAPI;
 import lombok.Getter;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -524,6 +523,7 @@ public class Fabled extends SkillAPI {
 
         AttributeRegistry.unregisterProvider(fabledProvider);
         BuffRegistry.unregisterProvider(buffManager);
+        BuffRegistry.unregisterProvider(shieldManager);
 
         GUITool.cleanUp();
         EffectManager.cleanUp();
@@ -702,12 +702,13 @@ public class Fabled extends SkillAPI {
             ResourceManager.copyQuestsModule();
         }
 
-        shieldManager = new ShieldManager(this);
-
         fabledProvider = new FabledAttributeProvider();
         AttributeRegistry.registerProvider(fabledProvider);
+
         buffManager = new BuffManager();
+        shieldManager = new ShieldManager(this);
         BuffRegistry.registerProvider(buffManager);
+        BuffRegistry.registerProvider(shieldManager);
 
         loaded = true;
     }

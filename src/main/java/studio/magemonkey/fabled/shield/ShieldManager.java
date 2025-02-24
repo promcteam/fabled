@@ -3,6 +3,8 @@ package studio.magemonkey.fabled.shield;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import studio.magemonkey.codex.api.items.PrefixHelper;
+import studio.magemonkey.codex.registry.provider.BuffProvider;
 import studio.magemonkey.fabled.Fabled;
 
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class ShieldManager {
+public class ShieldManager implements BuffProvider {
     private final Fabled                   plugin;
     private final Map<UUID, ShieldDetails> shieldDetails = new HashMap<>();
 
@@ -76,5 +78,47 @@ public class ShieldManager {
                 effect.display((Player) entity);
             }
         }, 0, 20));
+    }
+
+    @Override
+    public double scaleValue(String identifier, LivingEntity entity, double value) {
+        identifier = PrefixHelper.stripPrefix("FABLED", identifier);
+
+        ShieldDetails details = getShieldDetails(entity);
+        // If they don't have any shield effects, return the unmodified value
+        if (details == null) {
+            return value;
+        }
+
+        double scaled = value;
+        for (ShieldEffect effect : details.getActiveEffects()) {
+            // If the effect's classifier matches the identifier, scale the value
+            if (!effect.getClassifier().equals(identifier)) continue;
+
+            scaled = effect.damageAndDisplay(scaled, entity);
+        }
+
+        return scaled;
+    }
+
+    @Override
+    public double scaleDamageForDefense(String identifier, LivingEntity entity, double damage) {
+        identifier = PrefixHelper.stripPrefix("FABLED", identifier);
+
+        ShieldDetails details = getShieldDetails(entity);
+        // If they don't have any shield effects, return the unmodified value
+        if (details == null) {
+            return damage;
+        }
+
+        double actualDamage = damage;
+        for (ShieldEffect effect : details.getActiveEffects()) {
+            // If the effect's classifier matches the identifier, scale the value
+            if (!effect.getClassifier().equals(identifier)) continue;
+
+            actualDamage = effect.damageAndDisplay(actualDamage, entity);
+        }
+
+        return actualDamage;
     }
 }

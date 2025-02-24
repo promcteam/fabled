@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import studio.magemonkey.codex.util.MsgUT;
@@ -44,6 +45,12 @@ public class ShieldEffect {
         }
     }
 
+    public void breakShield() {
+        // TODO Play a sound? Send a message? Call an event?
+
+        destroy();
+    }
+
     /**
      * Applies damage to the shield effect, first reducing the damage by the percent value.
      * If the shield does not absorb all the damage, the remaining damage is returned.
@@ -53,11 +60,18 @@ public class ShieldEffect {
      */
     public double damage(double amount) {
         double modified = amount * percent;
-        double actual   = Math.min(modified, getRemaining());
-        double diff     = modified - actual;
+        modified = Math.min(modified, getRemaining());
 
-        taken += actual;
-        return diff;
+        taken += modified;
+        if (isExhausted()) breakShield();
+
+        return amount - modified;
+    }
+
+    public double damageAndDisplay(double amount, LivingEntity entity) {
+        double remaining = damage(amount);
+        if (entity instanceof Player) display((Player) entity);
+        return remaining;
     }
 
     public double getRemaining() {
