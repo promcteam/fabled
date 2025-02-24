@@ -54,7 +54,6 @@ import studio.magemonkey.fabled.data.formula.value.CustomValue;
 import studio.magemonkey.fabled.dynamic.DynamicSkill;
 import studio.magemonkey.fabled.gui.tool.GUITool;
 import studio.magemonkey.fabled.log.Logger;
-import studio.magemonkey.fabled.shield.ShieldDisplay;
 
 import java.util.*;
 
