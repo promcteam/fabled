@@ -1,11 +1,11 @@
 package studio.magemonkey.fabled.dynamic.trigger;
 
-import java.util.List;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.player.PlayerHarvestBlockEvent;
 import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.api.Settings;
+
+import java.util.List;
 
 public class HarvestTrigger implements Trigger<PlayerHarvestBlockEvent> {
 

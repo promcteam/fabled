@@ -2,12 +2,11 @@ package studio.magemonkey.fabled.dynamic.condition;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.cast.PlayerTextCastingData;
 
 public class ActionBarCondition extends ConditionComponent {
-    private static final String CASTING  = "casting";
+    private static final String CASTING = "casting";
 
     private boolean casting;
 

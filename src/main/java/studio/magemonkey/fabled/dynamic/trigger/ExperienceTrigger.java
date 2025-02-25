@@ -33,7 +33,7 @@ public class ExperienceTrigger implements Trigger<PlayerExpChangeEvent> {
     @Override
     public boolean shouldTrigger(final PlayerExpChangeEvent event, final int level, final Settings settings) {
         final double minExperience = settings.getDouble("min-experience", 0);
-        return event.getAmount() >= minExperience;    
+        return event.getAmount() >= minExperience;
     }
 
     /**

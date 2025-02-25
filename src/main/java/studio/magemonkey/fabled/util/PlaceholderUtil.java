@@ -23,7 +23,6 @@ import studio.magemonkey.fabled.dynamic.DynamicSkill;
 import studio.magemonkey.fabled.hook.PlaceholderAPIHook;
 import studio.magemonkey.fabled.hook.PluginChecker;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +35,7 @@ abstract interface PlaceholderFunction<T, U, V, R> {
 
 public class PlaceholderUtil {
 
-    private static       long                                                                   legacyMessageTime;
+    private static       long                                                                           legacyMessageTime;
     private static final Map<String, PlaceholderFunction<OfflinePlayer, List<String>, Integer, String>> actions =
             new HashMap<>();
 
@@ -895,7 +894,7 @@ public class PlaceholderUtil {
     // Returns the name of a skill at the specified location. "" if not found.
     private static String skillsNamePlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            return getSkills(player, arguments, accountId).get(Integer.parseInt(arguments.remove(0))-1);
+            return getSkills(player, arguments, accountId).get(Integer.parseInt(arguments.remove(0)) - 1);
         } catch (Exception e) {
             return "";
         }
@@ -904,7 +903,7 @@ public class PlaceholderUtil {
     // Returns the information of a skill at the specified location and given placeholder. "" if not found.
     private static String skillsInfoPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
-            arguments.add(getSkills(player, arguments, accountId).get(Integer.parseInt(arguments.remove(0))-1));
+            arguments.add(getSkills(player, arguments, accountId).get(Integer.parseInt(arguments.remove(0)) - 1));
             return actions.getOrDefault(arguments.remove(0), (a, b, c) -> null).apply(player, arguments, accountId);
         } catch (Exception e) {
             return "";

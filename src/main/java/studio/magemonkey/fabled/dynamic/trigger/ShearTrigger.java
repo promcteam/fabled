@@ -1,13 +1,13 @@
 package studio.magemonkey.fabled.dynamic.trigger;
 
-import java.util.List;
-import java.util.Locale;
-
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.api.Settings;
+
+import java.util.List;
+import java.util.Locale;
 
 public class ShearTrigger implements Trigger<PlayerShearEntityEvent> {
 

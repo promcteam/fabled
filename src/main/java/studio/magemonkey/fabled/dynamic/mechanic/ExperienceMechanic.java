@@ -2,7 +2,6 @@ package studio.magemonkey.fabled.dynamic.mechanic;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.enums.ExpSource;
 import studio.magemonkey.fabled.api.player.PlayerClass;
@@ -46,24 +45,23 @@ public class ExperienceMechanic extends MechanicComponent {
         if (!(caster instanceof Player)) return false;
         Player player = (Player) caster;
 
-        boolean     vanilla       = settings.getBool(VANILLA, false);
+        boolean vanilla = settings.getBool(VANILLA, false);
 
         if (vanilla) {
             return vanillaExperienceMechanic(player, level, targets, force);
-        }
-        else {
+        } else {
             return classExperienceMechanic(player, level, targets, force);
         }
     }
 
-    public boolean vanillaExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force){
-        int expValue = (int) getNum(caster, EXP, 0.0);
-        String mode = settings.getString(MODE, "give").toLowerCase();
-        String type = settings.getString(TYPE, "flat").toLowerCase();
+    public boolean vanillaExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force) {
+        int     expValue  = (int) getNum(caster, EXP, 0.0);
+        String  mode      = settings.getString(MODE, "give").toLowerCase();
+        String  type      = settings.getString(TYPE, "flat").toLowerCase();
         boolean levelDown = settings.getBool(LEVEL_DOWN, true);
-    
+
         int previousLevel = caster.getLevel();
-    
+
         // Levels
         if (type.equals("levels")) {
             switch (mode) {
@@ -118,24 +116,24 @@ public class ExperienceMechanic extends MechanicComponent {
         } else {
             return false; // Invalid
         }
-    
+
         // Prevent level down if not allowed
-        if (caster.getLevel() < previousLevel){
+        if (caster.getLevel() < previousLevel) {
             if (!levelDown) {
                 caster.setLevel(previousLevel);
                 caster.setExp(0);
             }
         }
-    
+
         return true;
     }
 
-    public boolean classExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force){
-        int expValue = (int) getNum(caster, EXP, 0.0);
-        String mode = settings.getString(MODE, "give").toLowerCase();
-        String type = settings.getString(TYPE, "flat").toLowerCase();
+    public boolean classExperienceMechanic(Player caster, int level, List<LivingEntity> targets, boolean force) {
+        int     expValue  = (int) getNum(caster, EXP, 0.0);
+        String  mode      = settings.getString(MODE, "give").toLowerCase();
+        String  type      = settings.getString(TYPE, "flat").toLowerCase();
         boolean levelDown = settings.getBool(LEVEL_DOWN, true);
-        String group  = settings.getString(GROUP, "class");
+        String  group     = settings.getString(GROUP, "class");
         if (Fabled.getGroups().stream().noneMatch(c -> c.equalsIgnoreCase(group))) return false;
         PlayerClass playerClass     = Fabled.getData(caster).getClass(group);
         double      allNextLevelExp = playerClass.getData().getRequiredExp(playerClass.getLevel());
@@ -184,8 +182,7 @@ public class ExperienceMechanic extends MechanicComponent {
                 default:
                     return false;
             }
-        }
-        else {
+        } else {
             return false; // Invalid
         }
         return true;
