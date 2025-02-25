@@ -25,6 +25,7 @@
 package studio.magemonkey.fabled;
 
 import com.sucy.skill.SkillAPI;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -72,6 +73,7 @@ import studio.magemonkey.fabled.hook.mimic.MimicHook;
 import studio.magemonkey.fabled.listener.*;
 import studio.magemonkey.fabled.listener.attribute.AttributeListener;
 import studio.magemonkey.fabled.manager.*;
+import studio.magemonkey.fabled.shield.ShieldManager;
 import studio.magemonkey.fabled.task.CooldownTask;
 import studio.magemonkey.fabled.task.GUITask;
 import studio.magemonkey.fabled.task.ManaTask;
@@ -106,6 +108,9 @@ public class Fabled extends SkillAPI {
     private IAttributeManager   attributeManager = new NullAttributeManager();
     private AttributeProvider   fabledProvider   = null;
     private BuffProvider        buffManager      = null;
+
+    @Getter
+    private ShieldManager shieldManager;
 
     private MainThread mainThread;
     private BukkitTask manaTask;
@@ -518,6 +523,7 @@ public class Fabled extends SkillAPI {
 
         AttributeRegistry.unregisterProvider(fabledProvider);
         BuffRegistry.unregisterProvider(buffManager);
+        BuffRegistry.unregisterProvider(shieldManager);
 
         GUITool.cleanUp();
         EffectManager.cleanUp();
@@ -698,8 +704,11 @@ public class Fabled extends SkillAPI {
 
         fabledProvider = new FabledAttributeProvider();
         AttributeRegistry.registerProvider(fabledProvider);
+
         buffManager = new BuffManager();
+        shieldManager = new ShieldManager(this);
         BuffRegistry.registerProvider(buffManager);
+        BuffRegistry.registerProvider(shieldManager);
 
         loaded = true;
     }
