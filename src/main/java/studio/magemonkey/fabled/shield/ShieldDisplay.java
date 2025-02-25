@@ -5,5 +5,4 @@ public enum ShieldDisplay {
     CHAT,
     TITLE,
     BOSS_BAR
-    // TODO Maybe add an option to display it on the scoreboard?
 }

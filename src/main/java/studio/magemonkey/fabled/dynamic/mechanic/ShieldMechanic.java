@@ -1,8 +1,10 @@
 package studio.magemonkey.fabled.dynamic.mechanic;
 
+import org.bukkit.Keyed;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
+import studio.magemonkey.codex.util.SoundUT;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.shield.ShieldDisplay;
@@ -24,6 +26,9 @@ public class ShieldMechanic extends MechanicComponent {
     private static final String DURATION   = "duration";
     private static final String COLOR      = "color";
     private static final String STYLE      = "style";
+
+    private static final String HIT_SOUND   = "hit-sound";
+    private static final String BREAK_SOUND = "break-sound";
 
     @Override
     public String getKey() {
@@ -72,12 +77,38 @@ public class ShieldMechanic extends MechanicComponent {
             }
         }
 
+        Keyed hitSound   = null;
+        Keyed breakSound = null;
+
+        String hitStr = settings.getString(HIT_SOUND);
+        if (hitStr != null && !hitStr.equalsIgnoreCase("none")) {
+            try {
+                hitSound = SoundUT.getSound(hitStr.toUpperCase(Locale.US).replace(" ", "_"));
+            } catch (IllegalArgumentException e) {
+                Fabled.inst().getLogger().warning("Invalid hit sound: " + hitStr);
+            }
+        }
+
+        String breakStr = settings.getString(BREAK_SOUND);
+        if (breakStr != null && !breakStr.equalsIgnoreCase("none")) {
+            try {
+                breakSound = SoundUT.getSound(breakStr.toUpperCase(Locale.US).replace(" ", "_"));
+            } catch (IllegalArgumentException e) {
+                Fabled.inst().getLogger().warning("Invalid break sound: " + breakStr);
+            }
+        }
+
         for (LivingEntity target : targets) {
             ShieldEffect effect =
                     new ShieldEffect(name, classifier, amount, percent);
+
             effect.setBarColor(color);
             effect.setBarStyle(style);
             effect.setDisplayLocation(display);
+
+            effect.setHitSound(hitSound);
+            effect.setBreakSound(breakSound);
+
             manager.addEffect(target, effect, ticks);
         }
 

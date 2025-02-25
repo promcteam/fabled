@@ -2,6 +2,7 @@ package studio.magemonkey.fabled.shield;
 
 import lombok.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Keyed;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -23,9 +24,13 @@ public class ShieldEffect {
 
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
-    private BossBar    bossBar;
-    private BarColor   barColor = BarColor.GREEN;
-    private BarStyle   barStyle = BarStyle.SOLID;
+    private BossBar  bossBar;
+    private BarColor barColor = BarColor.GREEN;
+    private BarStyle barStyle = BarStyle.SOLID;
+
+    private Keyed hitSound;
+    private Keyed breakSound;
+
     private BukkitTask task;
 
     public ShieldEffect(String name, String classifier, double amount, double percent) {
@@ -45,8 +50,21 @@ public class ShieldEffect {
         }
     }
 
-    public void breakShield() {
-        // TODO Play a sound? Send a message? Call an event?
+    /**
+     * Breaks the shield effect, removing it from the entity.
+     * This calls a {@link FabledShieldBreakEvent}
+     * Also, optionally plays a sound to the player.
+     *
+     * @param entity the entity to break the shield for
+     */
+    public void breakShield(LivingEntity entity) {
+        if (breakSound != null && entity instanceof Player) {
+            ((Player) entity).playSound(entity.getLocation(), breakSound.getKey().getKey(), 1, 1);
+        }
+
+        // Call the event
+        FabledShieldBreakEvent event = new FabledShieldBreakEvent(entity, this);
+        entity.getServer().getPluginManager().callEvent(event);
 
         destroy();
     }
@@ -55,21 +73,31 @@ public class ShieldEffect {
      * Applies damage to the shield effect, first reducing the damage by the percent value.
      * If the shield does not absorb all the damage, the remaining damage is returned.
      *
+     * @param entity the entity to play the hit sound to
      * @param amount the amount of damage to apply
      * @return the remaining damage that was not absorbed by the shield
      */
-    public double damage(double amount) {
+    public double damage(LivingEntity entity, double amount) {
         double modified = amount * percent;
         modified = Math.min(modified, getRemaining());
 
         taken += modified;
-        if (isExhausted()) breakShield();
+        if (isExhausted()) breakShield(entity);
+        else {
+            // Play hit sound
+            if (hitSound != null && entity instanceof Player) {
+                ((Player) entity).playSound(entity.getLocation(), hitSound.getKey().getKey(), 1, 1);
+            }
+        }
+
+        FabledShieldDamageEvent event = new FabledShieldDamageEvent(entity, this, modified);
+        entity.getServer().getPluginManager().callEvent(event);
 
         return amount - modified;
     }
 
     public double damageAndDisplay(double amount, LivingEntity entity) {
-        double remaining = damage(amount);
+        double remaining = damage(entity, amount);
         if (entity instanceof Player) display((Player) entity);
         return remaining;
     }
