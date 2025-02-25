@@ -32,7 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import studio.magemonkey.codex.mccore.config.parse.DataSection;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class Data {
                     meta.setCustomModelData(data);
                 }
                 if (lore != null && !lore.isEmpty()) {
-                    final List<String> colored = TextFormatter.colorStringList(lore);
+                    final List<String> colored = StringUT.color(lore);
                     meta.setDisplayName(colored.remove(0));
                     meta.setLore(colored);
                 }

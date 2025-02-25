@@ -31,7 +31,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import studio.magemonkey.codex.mccore.config.FilterType;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.player.PlayerClass;
 import studio.magemonkey.fabled.api.player.PlayerData;
@@ -81,7 +81,7 @@ public class GUITask extends RepeatThreadTask {
         oldHealth = Fabled.getSettings().isOldHealth();
 
         useAction = Fabled.getSettings().isUseActionBar();
-        actionText = TextFormatter.colorString(Fabled.getSettings().getActionText());
+        actionText = StringUT.color(Fabled.getSettings().getActionText());
 
         Logger.log(LogType.GUI,
                 1,

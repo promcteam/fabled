@@ -30,7 +30,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.skills.PassiveSkill;
 import studio.magemonkey.fabled.api.skills.Skill;
@@ -70,7 +70,7 @@ public class WolfMechanic extends MechanicComponent {
         String color  = settings.getString(COLOR);
         double health = parseValues(player, HEALTH, level, 10.0);
         String name =
-                TextFormatter.colorString(filter(caster,
+                StringUT.color(filter(caster,
                         null,
                         settings.getString(NAME, "").replace("{player}", player.getName())));
         double       damage  = parseValues(player, DAMAGE, level, 3.0);

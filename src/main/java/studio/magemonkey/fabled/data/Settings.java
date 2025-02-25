@@ -42,7 +42,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import studio.magemonkey.codex.mccore.config.CommentedConfig;
 import studio.magemonkey.codex.mccore.config.parse.DataSection;
 import studio.magemonkey.codex.mccore.config.parse.NumberParser;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.CombatProtection;
 import studio.magemonkey.fabled.api.DefaultCombatProtection;
@@ -1178,7 +1178,7 @@ public class Settings extends com.sucy.skill.data.Settings {
         downScaling = config.getBoolean(GUI_DOWNSCALE);
         forceScaling = config.getBoolean(GUI_FORCE);
         levelBar = config.getString(GUI_LVLBAR);
-        levelText = TextFormatter.colorString(config.getString(GUI_LVLTXT, "Level"));
+        levelText = StringUT.color(config.getString(GUI_LVLTXT, "Level"));
         foodBar = config.getString(GUI_FOOD);
         blockSaturation = config.getBoolean(GUI_SATURATION, true);
         useActionBar = config.getBoolean(GUI_ACTION);
@@ -1361,11 +1361,11 @@ public class Settings extends com.sucy.skill.data.Settings {
             }
 
             if (icon.isList("text")) {
-                List<String> format = TextFormatter.colorStringList(icon.getList("text"));
+                List<String> format = StringUT.color(icon.getList("text"));
                 meta.setDisplayName(format.remove(0));
                 meta.setLore(format);
             } else {
-                meta.setDisplayName(TextFormatter.colorString(icon.getString("text", "&7Unassigned")));
+                meta.setDisplayName(StringUT.color(icon.getString("text", "&7Unassigned")));
             }
 
             if (meta instanceof Damageable) {

@@ -37,7 +37,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import studio.magemonkey.codex.CodexEngine;
 import studio.magemonkey.codex.mccore.config.parse.DataSection;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.ReadOnlySettings;
 import studio.magemonkey.fabled.api.Settings;
@@ -669,10 +669,10 @@ public abstract class FabledClass implements IconHolder {
             icon.setItemMeta(iconMeta);
         }
 
-        actionBar = TextFormatter.colorString(config.getString(ACTION_BAR, ""));
-        prefix = TextFormatter.colorString(config.getString(PREFIX, prefix));
+        actionBar = StringUT.color(config.getString(ACTION_BAR, ""));
+        prefix = StringUT.color(config.getString(PREFIX, prefix));
         group = config.getString(GROUP, "class");
-        mana = TextFormatter.colorString(config.getString(MANA, mana));
+        mana = StringUT.color(config.getString(MANA, mana));
         maxLevel = config.getInt(MAX, maxLevel);
         expSources = config.getInt(EXP, expSources);
         manaRegen = config.getDouble(REGEN, manaRegen);

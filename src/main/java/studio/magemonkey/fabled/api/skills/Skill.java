@@ -47,6 +47,7 @@ import studio.magemonkey.codex.mccore.config.parse.DataSection;
 import studio.magemonkey.codex.mccore.config.parse.NumberParser;
 import studio.magemonkey.codex.mccore.util.TextFormatter;
 import studio.magemonkey.codex.registry.DamageRegistry;
+import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.ReadOnlySettings;
 import studio.magemonkey.fabled.api.Settings;
@@ -934,13 +935,13 @@ public abstract class Skill implements IconHolder {
      */
     public void load(DataSection config) {
         name = config.getString(NAME, name);
-        type = TextFormatter.colorString(config.getString(TYPE, name));
+        type = StringUT.color(config.getString(TYPE, name));
         indicator = Data.parseIcon(config);
         maxLevel = config.getInt(MAX, maxLevel);
         skillReq = config.getString(REQ);
         if (skillReq == null || skillReq.isEmpty()) skillReq = null;
         skillReqLevel = config.getInt(REQLVL, skillReqLevel);
-        message = TextFormatter.colorString(config.getString(MSG, message));
+        message = StringUT.color(config.getString(MSG, message));
         needsPermission = config.getString(PERM, needsPermission + "").equalsIgnoreCase("true");
         cooldownMessage = config.getBoolean(COOLDOWN_MESSAGE, true);
         incompatibleSkills = config.getList(INCOMPATIBLE, new ArrayList<>());
@@ -951,7 +952,7 @@ public abstract class Skill implements IconHolder {
             description.addAll(config.getList(DESC));
         }
         if (config.isList(LAYOUT)) {
-            iconLore = TextFormatter.colorStringList(config.getList(LAYOUT));
+            iconLore = StringUT.color(config.getList(LAYOUT));
         }
 
         settings.load(config.getSection(ATTR));

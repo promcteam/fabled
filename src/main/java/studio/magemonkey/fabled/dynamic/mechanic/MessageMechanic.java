@@ -28,7 +28,7 @@ package studio.magemonkey.fabled.dynamic.mechanic;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import studio.magemonkey.codex.mccore.util.TextFormatter;
+import studio.magemonkey.codex.util.StringUT;
 
 import java.util.List;
 
@@ -43,22 +43,13 @@ public class MessageMechanic extends MechanicComponent {
         return "message";
     }
 
-    /**
-     * Executes the component
-     *
-     * @param caster  caster of the skill
-     * @param level   level of the skill
-     * @param targets targets to apply to
-     * @param force
-     * @return true if applied to something, false otherwise
-     */
     @Override
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets, boolean force) {
         if (targets.isEmpty() || !settings.has(MESSAGE))
             return false;
 
-        String message = TextFormatter.colorString(settings.getString(MESSAGE));
-        if (message == null) return false;
+        String message = StringUT.color(settings.getString(MESSAGE));
+        if (message.isBlank()) return false;
 
         // Display message
         boolean worked = false;
