@@ -1038,7 +1038,7 @@ class PartyTarget extends FabledTarget {
 			data:         [
 				new AttributeSelect('Range', 'range', 5)
 					.setTooltip('The max distance the location can be from the target\'s eyes'),
-				...targetOptions().splice(1),
+				...targetOptions().splice(1)
 			],
 			preview:      [
 				...particlesAtTargetPreviewOptions()
@@ -4566,6 +4566,50 @@ class RepeatMechanic extends FabledMechanic {
 	public static override new = () => new this();
 }
 
+class ShieldMechanic extends FabledMechanic {
+	public constructor() {
+		super({
+			name:         'Shield',
+			description:  'Applies a shield to the target that absorbs a certain amount of damage',
+			data:         [
+				new StringSelect('Name', 'name', 'Shield')
+					.setTooltip('The name of the shield. This is used for display purposes'),
+				new AttributeSelect('Amount', 'amount', 5)
+					.setTooltip('The amount of damage the shield can absorb'),
+				new AttributeSelect('Duration', 'duration', 3)
+					.setTooltip('How long in seconds the shield will last'),
+				new StringSelect('Classifier', 'classifier', 'skill_defense_default')
+					.setTooltip('The classifier of the shield. This is intended to be used with damage classifiers from the DamageMechanic, or Divinity damage types using <code>DIVINITY_type</code>'),
+				new AttributeSelect('Percent', 'percent', 1)
+					.setTooltip('The percentage of damage to absorb. 1 is 100% and 0.5 is 50%'),
+				new DropdownSelect('Display', 'display', ['Action Bar', 'Title', 'Chat', 'Boss Bar'])
+					.setTooltip('Where to display the shield information when active'),
+				new DropdownSelect('Bar Color', 'color', [
+					'Blue',
+					'Green',
+					'Pink',
+					'Purple',
+					'Red',
+					'White',
+					'Yellow'
+				], 'Green')
+					.setTooltip('The color of the boss bar when displayed')
+					.requireValue('display', ['Boss Bar']),
+				new DropdownSelect('Bar Style', 'style', ['Solid', 'Segmented 6', 'Segmented 10', 'Segmented 12', 'Segmented 20'], 'Solid')
+					.setTooltip('The style of the boss bar when displayed')
+					.requireValue('display', ['Boss Bar']),
+				new DropdownSelect('Hit Sound', 'hit-sound', () => ['None', ...getSounds()], 'None')
+					.setTooltip('The sound to play when the shield is hit'),
+				new DropdownSelect('Break Sound', 'break-sound', () => ['None', ...getSounds()], 'None')
+					.setTooltip('The sound to play when the shield is broken')
+			],
+			summaryItems: ['amount', 'duration', 'percent', 'display']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class SignalEmitMechanic extends FabledMechanic {
 	public constructor() {
 		super({
@@ -5599,6 +5643,7 @@ export const initComponents = () => {
 		PUSH:               { name: 'Push', component: PushMechanic },
 		REMEMBER_TARGETS:   { name: 'Remember Targets', component: RememberTargetsMechanic },
 		REPEAT:             { name: 'Repeat', component: RepeatMechanic },
+		SHIELD:             { name: 'Shield', component: ShieldMechanic },
 		SIGNAL_EMIT:        { name: 'Signal Emit', component: SignalEmitMechanic },
 		SKILL_CAST:         { name: 'Skill Cast', component: SkillCastMechanic },
 		SOUND:              { name: 'Sound', component: SoundMechanic },
