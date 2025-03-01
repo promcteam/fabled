@@ -38,7 +38,7 @@ public class PlaceholderUtilTest {
     private FabledClass classClass, raceClass;
 
     @BeforeEach
-    void setup() throws NoSuchFieldException, IllegalAccessException {
+    void setup() {
         player = mock(Player.class);
         UUID uuid = UUID.randomUUID();
         when(player.getName()).thenReturn("player");
@@ -75,13 +75,13 @@ public class PlaceholderUtilTest {
         when(raceClass.getMaxLevel()).thenReturn(10);
         when(raceClass.getGroupSettings()).thenReturn(mock(GroupSettings.class));
 
+        VersionManager.setNms(mock(NMS.class));
+
         playerData.setClass(null, classClass, false);
         playerData.setClass(null, raceClass, false);
 
         fabledMock.when(() -> Fabled.getData(player)).thenReturn(playerData);
         fabledMock.when(() -> Fabled.hasPlayerData(player)).thenReturn(true);
-
-        VersionManager.setNms(mock(NMS.class));
     }
 
     @AfterEach
