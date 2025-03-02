@@ -233,6 +233,7 @@ public class ComponentRegistry {
         register(new ValueLoreMechanic());
         register(new ValueLoreSlotMechanic());
         register(new ValueManaMechanic());
+        register(new ValueMathMechanic());
         register(new ValueMultiplyMechanic());
         register(new ValuePlaceholderMechanic());
         register(new ValueRandomMechanic());

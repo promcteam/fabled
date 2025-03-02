@@ -1,10 +1,10 @@
 /**
  * Fabled
- * studio.magemonkey.fabled.dynamic.mechanic.value.ValueAddMechanic
+ * studio.magemonkey.fabled.dynamic.mechanic.value.ValueMathMechanic
  * <p>
  * The MIT License (MIT)
  * <p>
- * Copyright (c) 2024 MageMonkeyStudio
+ * Copyright (c) 2025 MageMonkeyStudio
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software") to deal
@@ -28,6 +28,7 @@ package studio.magemonkey.fabled.dynamic.mechanic.value;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
+import studio.magemonkey.codex.util.eval.Evaluator;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.dynamic.DynamicSkill;
@@ -38,14 +39,14 @@ import java.util.List;
 /**
  * Adds to a cast data value
  */
-public class ValueAddMechanic extends MechanicComponent {
-    private static final String KEY    = "key";
-    private static final String AMOUNT = "amount";
-    private static final String SAVE   = "save";
+public class ValueMathMechanic extends MechanicComponent {
+    private static final String KEY      = "key";
+    private static final String FUNCTION = "function";
+    private static final String SAVE     = "save";
 
     @Override
     public String getKey() {
-        return "value add";
+        return "value math";
     }
 
     @Override
@@ -54,14 +55,17 @@ public class ValueAddMechanic extends MechanicComponent {
             return false;
         }
 
-        String   key    = settings.getString(KEY);
-        double   amount = parseValues(caster, AMOUNT, level, 1) * targets.size();
-        CastData data   = DynamicSkill.getCastData(caster);
-        if (!data.contains(key)) {
-            data.put(key, amount);
-        } else {
-            data.put(key, amount + data.getDouble(key));
+        String   key  = settings.getString(KEY);
+        String   func = filter(caster, targets.get(0), settings.getString(FUNCTION));
+        CastData data = DynamicSkill.getCastData(caster);
+
+        double amount = Evaluator.eval(func, 1);
+        if (Double.isInfinite(amount) || Double.isNaN(amount)) {
+            Fabled.inst().getLogger().warning("Invalid math function: \"" + func + "\", produced: " + amount);
+            return false;
         }
+
+        data.put(key, amount);
         if (settings.getBool(SAVE, false))
             Fabled.getData((OfflinePlayer) caster).setPersistentData(key, data.getRaw(key));
         return true;
