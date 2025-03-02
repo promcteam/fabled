@@ -153,4 +153,22 @@ class ValueMathMechanicTest {
         assertTrue(result);
         assertEquals(2.374627231574972, DynamicSkill.getCastData(player).getDouble("key"));
     }
+
+    @Test
+    void execute_maxValue() {
+        data.put("key", 100d);
+        when(settings.getString("function")).thenReturn("max({key}, 10)");
+        boolean result = mechanic.execute(player, 1, List.of(player), false);
+        assertTrue(result);
+        assertEquals(100, DynamicSkill.getCastData(player).getDouble("key"));
+    }
+
+    @Test
+    void execute_average() {
+        data.put("key", 100d);
+        when(settings.getString("function")).thenReturn("avg({key}, 10)");
+        boolean result = mechanic.execute(player, 1, List.of(player), false);
+        assertTrue(result);
+        assertEquals(55, DynamicSkill.getCastData(player).getDouble("key"));
+    }
 }
