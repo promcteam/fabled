@@ -5725,6 +5725,5 @@ export const deprecated: (typeof FabledComponent)[] = [
 	ValueAddMechanic,
 	ValueDivideMechanic,
 	ValueMultiplyMechanic,
-	ValueRandomMechanic,
 	ValueRoundMechanic
 ];
