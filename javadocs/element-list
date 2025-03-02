@@ -54,6 +54,7 @@ studio.magemonkey.fabled.listener
 studio.magemonkey.fabled.listener.attribute
 studio.magemonkey.fabled.log
 studio.magemonkey.fabled.manager
+studio.magemonkey.fabled.shield
 studio.magemonkey.fabled.task
 studio.magemonkey.fabled.thread
 studio.magemonkey.fabled.tree
