@@ -38,6 +38,7 @@ import java.util.List;
 /**
  * Adds to a cast data value
  */
+@Deprecated
 public class ValueAddMechanic extends MechanicComponent {
     private static final String KEY    = "key";
     private static final String AMOUNT = "amount";

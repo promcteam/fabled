@@ -38,6 +38,7 @@ import java.util.List;
 /**
  * Divides a value
  */
+@Deprecated
 public class ValueDivideMechanic extends MechanicComponent {
     private static final String KEY     = "key";
     private static final String DIVISOR = "divisor";

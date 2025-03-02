@@ -39,6 +39,7 @@ import java.util.Locale;
 /**
  * Adds to a cast data value
  */
+@Deprecated
 public class ValueRoundMechanic extends MechanicComponent {
     private static final String KEY  = "key";
     private static final String TYPE = "type";
