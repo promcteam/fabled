@@ -5107,6 +5107,31 @@ class ValueManaMechanic extends FabledMechanic {
 	public static override new = () => new this();
 }
 
+class ValueMathMechanic extends FabledMechanic {
+	public constructor() {
+		super({
+			name:         'Value Math',
+			description:  'Performs mathematical calculations using a custom formula to determine the value to set. ' +
+											'The formula can use values as <code>{value}</code> type placeholders and complex math operations ' +
+											'including addition, subtraction, multiplication, division, modulo (<code>%</code>), ' +
+											'square root (<code>sqrt()</code>), exponents (<code>^</code>), and more. Use <code>random()</code> ' +
+											'to generate a psuedo-random number between 0 and 1. See the ' +
+											'<a href="https://github.com/magemonkeystudio/fabled/wiki/Formulas-‐-Complex">wiki</a> for more information',
+			data:         [
+				new StringSelect('Key', 'key', 'value')
+					.setTooltip('The unique key to store the value under. This key can be used in place of attribute values to use the stored value'),
+				new AttributeSelect('Amount', 'amount', 1)
+					.setTooltip('The amount to add to the value'),
+				new BooleanSelect('Save', 'save', false)
+					.setTooltip('If true, save the key value to persistent value. Persistent value is not lost when the player leaves the server and is stored separately on each account')
+			],
+			summaryItems: ['key', 'amount', 'save']
+		}, false);
+	}
+
+	public static override new = () => new this();
+}
+
 class ValueMultiplyMechanic extends FabledMechanic {
 	public constructor() {
 		super({
@@ -5677,6 +5702,7 @@ export const initComponents = () => {
 		VALUE_LORE:        { name: 'Value Lore', component: ValueLoreMechanic, section: 'Value' },
 		VALUE_LORE_SLOT:   { name: 'Value Lore Slot', component: ValueLoreSlotMechanic, section: 'Value' },
 		VALUE_MANA:        { name: 'Value Mana', component: ValueManaMechanic, section: 'Value' },
+		VALUE_MATH:        { name: 'Value Math', component: ValueMathMechanic, section: 'Value' },
 		VALUE_MULTIPLY:    { name: 'Value Multiply', component: ValueMultiplyMechanic, section: 'Value' },
 		VALUE_PLACEHOLDER: { name: 'Value Placeholder', component: ValuePlaceholderMechanic, section: 'Value' },
 		VALUE_RANDOM:      { name: 'Value Random', component: ValueRandomMechanic, section: 'Value' },
@@ -5695,4 +5721,10 @@ export const initComponents = () => {
 };
 
 // Add deprecated components to this list
-export const deprecated: (typeof FabledComponent)[] = [];
+export const deprecated: (typeof FabledComponent)[] = [
+	ValueAddMechanic,
+	ValueDivideMechanic,
+	ValueMultiplyMechanic,
+	ValueRandomMechanic,
+	ValueRoundMechanic
+];
