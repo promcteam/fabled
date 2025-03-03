@@ -14,7 +14,7 @@
   "devDependencies": {
     "@sveltejs/adapter-auto": "^4.0.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.17.2",
+    "@sveltejs/kit": "^2.17.3",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
