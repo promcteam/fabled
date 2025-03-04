@@ -5120,12 +5120,12 @@ class ValueMathMechanic extends FabledMechanic {
 			data:         [
 				new StringSelect('Key', 'key', 'value')
 					.setTooltip('The unique key to store the value under. This key can be used in place of attribute values to use the stored value'),
-				new StringSelect('Formula', 'function', '1 + {value}')
-					.setTooltip('The formula used to determine the value'),
+				new StringSelect('Function', 'function', '1 + {value}')
+					.setTooltip('The function used to determine the value'),
 				new BooleanSelect('Save', 'save', false)
 					.setTooltip('If true, save the key value to persistent value. Persistent value is not lost when the player leaves the server and is stored separately on each account')
 			],
-			summaryItems: ['key', 'amount', 'save']
+			summaryItems: ['key', 'function', 'save']
 		}, false);
 	}
 
