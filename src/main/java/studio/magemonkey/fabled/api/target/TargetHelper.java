@@ -60,7 +60,8 @@ public abstract class TargetHelper {
             aabb.expand(tolerance);
             AABB.Vec3D collision = aabb.intersectsRay(ray, 0, range);
             if (collision != null) {
-                targets.put(new Vector(collision.x, collision.y, collision.z).distance(origin), (LivingEntity) entity);
+                targets.put(((LivingEntity) entity).getEyeLocation().toVector().distance(origin),
+                        (LivingEntity) entity);
             }
         }
         return new ArrayList<>(targets.values());
