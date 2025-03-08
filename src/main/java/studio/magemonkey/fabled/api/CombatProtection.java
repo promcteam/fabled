@@ -62,7 +62,7 @@ public interface CombatProtection {
     static boolean canAttackExternally(@NotNull Entity damager,
                                        @NotNull Entity entity,
                                        @NotNull EntityDamageEvent.DamageCause cause) {
-        EntityDamageByEntityEvent event = VersionManager.getNms().createEntityDamageEvent(damager, entity, cause, 5);
+        EntityDamageByEntityEvent event = VersionManager.getNms().createEntityDamageEvent(entity, damager, cause, 5);
 
         DefaultCombatProtection.fakeDamageEvents.add(event);
         boolean externallyCancelled = false;
