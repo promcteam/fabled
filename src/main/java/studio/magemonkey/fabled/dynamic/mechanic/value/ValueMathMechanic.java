@@ -35,6 +35,7 @@ import studio.magemonkey.fabled.dynamic.DynamicSkill;
 import studio.magemonkey.fabled.dynamic.mechanic.MechanicComponent;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Adds to a cast data value
@@ -43,6 +44,8 @@ public class ValueMathMechanic extends MechanicComponent {
     private static final String KEY      = "key";
     private static final String FUNCTION = "function";
     private static final String SAVE     = "save";
+
+    private static final Pattern placeholderPattern = Pattern.compile("\\{([^}]+)}");
 
     @Override
     public String getKey() {
@@ -58,6 +61,12 @@ public class ValueMathMechanic extends MechanicComponent {
         String   key  = settings.getString(KEY);
         String   func = filter(caster, targets.get(0), settings.getString(FUNCTION));
         CastData data = DynamicSkill.getCastData(caster);
+
+        // If there are any placeholders remaining, replace them with 0 and log the remaining placeholders as a warning
+        if (placeholderPattern.matcher(func).find()) {
+            Fabled.inst().getLogger().warning("Invalid math function: \"" + func + "\", contains unresolved placeholders. We'll help you out and replace them with 0.");
+            func = placeholderPattern.matcher(func).replaceAll("0");
+        }
 
         double amount = Evaluator.eval(func, 1);
         if (Double.isInfinite(amount) || Double.isNaN(amount)) {
