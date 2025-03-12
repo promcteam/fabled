@@ -79,9 +79,15 @@ public class SkillCastMechanic extends MechanicComponent {
     }
 
     private static void cast(Player player, String sk, int lv, boolean force) {
+        if (sk == null || sk.isBlank()) return;
+
         PlayerData data = Fabled.getData(player);
         if (lv <= 0) lv = (data.hasSkill(sk) && data.getSkill(sk).getLevel() > 0) ? data.getSkill(sk).getLevel() : 1;
         Skill skill = Fabled.getSkill(sk);
+        if (skill == null) {
+            Fabled.inst().getLogger().warning("Attempted to cast skill " + sk + " but it does not exist.");
+            return;
+        }
         ((SkillShot) skill).cast(player, lv, force);
     }
 }
