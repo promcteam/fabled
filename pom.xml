@@ -114,7 +114,6 @@
             <artifactId>codex</artifactId>
             <version>${codex.version}</version>
         </dependency>
-
         <!-- Test Dependencies -->
         <dependency>
             <groupId>com.mojang</groupId>
