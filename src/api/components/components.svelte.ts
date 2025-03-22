@@ -1249,6 +1249,24 @@ class ArmorCondition extends FabledCondition {
 	public static override new = () => new this();
 }
 
+class AttackIndicatorCondition extends FabledCondition {
+	public constructor() {
+		super({
+			name:         'Attack Indicator',
+			description:  `Requires the target's attack to be charged to a certain amount.`,
+			data:         [
+				new AttributeSelect('Min', 'min', 0)
+					.setTooltip('The minimum amount of charge the target requires (0-1)'),
+				new AttributeSelect('Max', 'max', 1)
+					.setTooltip('The maximum amount of charge the target requires (0-1)')
+			],
+			summaryItems: ['min', 'max']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class AttributeCondition extends FabledCondition {
 	public constructor() {
 		super({
@@ -5564,6 +5582,7 @@ export const initComponents = () => {
 		AIR:            { name: 'Air', component: AirCondition },
 		ALTITUDE:       { name: 'Altitude', component: AltitudeCondition },
 		ARMOR:          { name: 'Armor', component: ArmorCondition },
+		ATK_INDICATOR:  { name: 'Attack Indicator', component: AttackIndicatorCondition },
 		ATTRIBUTE:      { name: 'Attribute', component: AttributeCondition },
 		BIOME:          { name: 'Biome', component: BiomeCondition },
 		BLOCK:          { name: 'Block', component: BlockCondition },
