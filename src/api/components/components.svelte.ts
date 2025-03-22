@@ -1249,6 +1249,24 @@ class ArmorCondition extends FabledCondition {
 	public static override new = () => new this();
 }
 
+class AttackIndicatorCondition extends FabledCondition {
+	public constructor() {
+		super({
+			name:         'Attack Indicator',
+			description:  `Requires the target's attack to be charged to a certain amount.`,
+			data:         [
+				new AttributeSelect('Min', 'min', 0)
+					.setTooltip('The minimum amount of charge the target requires (0-1)'),
+				new AttributeSelect('Max', 'max', 1)
+					.setTooltip('The maximum amount of charge the target requires (0-1)')
+			],
+			summaryItems: ['min', 'max']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class AttributeCondition extends FabledCondition {
 	public constructor() {
 		super({
@@ -5120,12 +5138,12 @@ class ValueMathMechanic extends FabledMechanic {
 			data:         [
 				new StringSelect('Key', 'key', 'value')
 					.setTooltip('The unique key to store the value under. This key can be used in place of attribute values to use the stored value'),
-				new AttributeSelect('Amount', 'amount', 1)
-					.setTooltip('The amount to add to the value'),
+				new StringSelect('Function', 'function', '1 + {value}')
+					.setTooltip('The function used to determine the value'),
 				new BooleanSelect('Save', 'save', false)
 					.setTooltip('If true, save the key value to persistent value. Persistent value is not lost when the player leaves the server and is stored separately on each account')
 			],
-			summaryItems: ['key', 'amount', 'save']
+			summaryItems: ['key', 'function', 'save']
 		}, false);
 	}
 
@@ -5564,6 +5582,7 @@ export const initComponents = () => {
 		AIR:            { name: 'Air', component: AirCondition },
 		ALTITUDE:       { name: 'Altitude', component: AltitudeCondition },
 		ARMOR:          { name: 'Armor', component: ArmorCondition },
+		ATK_INDICATOR:  { name: 'Attack Indicator', component: AttackIndicatorCondition },
 		ATTRIBUTE:      { name: 'Attribute', component: AttributeCondition },
 		BIOME:          { name: 'Biome', component: BiomeCondition },
 		BLOCK:          { name: 'Block', component: BlockCondition },
