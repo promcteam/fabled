@@ -191,7 +191,7 @@ public class ParticleEffect implements IParticleEffect {
                     double z = p1.z * animSize + this.animDir.rotateZ(p2, trig[j]) * size + loc.getZ();
 
                     players.forEach(player ->
-                            player.spawnParticle(effect, x, y, z, count, dx, dy, dz, speed, object));
+                            ParticleHelper.spawnParticle(player, effect, new Location(world, x, y, z), count, dx, dy, dz, speed, object));
                 }
                 ++j;
             }

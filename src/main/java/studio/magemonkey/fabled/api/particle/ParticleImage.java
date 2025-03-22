@@ -95,7 +95,8 @@ public class ParticleImage implements IParticleEffect {
                 } catch (NoSuchFieldError e) {
                     particle = Particle.valueOf("REDSTONE");
                 }
-                player.spawnParticle(particle,
+                ParticleHelper.spawnParticle(player,
+                        particle,
                         location,
                         1,
                         0,

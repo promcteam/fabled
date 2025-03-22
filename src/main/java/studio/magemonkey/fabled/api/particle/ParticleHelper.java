@@ -153,7 +153,7 @@ public final class ParticleHelper {
                 if (viewers == null)
                     viewers = filterPlayers(Objects.requireNonNull(loc.getWorld()).getPlayers(), loc, visibleRadius);
                 viewers.forEach(
-                        player -> player.spawnParticle(particle, loc, amount, dx, dy, dz, speed, object));
+                        player -> spawnParticle(player, particle, loc, amount, dx, dy, dz, speed, object));
                 break;
         }
     }
@@ -209,7 +209,7 @@ public final class ParticleHelper {
             }
 
             if (viewers == null) viewers = filterPlayers(worldPlayers, temp, visibleRadius);
-            viewers.forEach(player -> player.spawnParticle(particle, temp, amount, dx, dy, dz, speed, object));
+            viewers.forEach(player -> spawnParticle(player, particle, temp, amount, dx, dy, dz, speed, object));
             index++;
         }
     }
@@ -248,7 +248,7 @@ public final class ParticleHelper {
 
             if (viewers == null) viewers = filterPlayers(worldPlayers, temp, visibleRadius);
             viewers.forEach(
-                    player -> player.spawnParticle(particle, temp, amount, dx, dy, dz, speed, object));
+                    player -> spawnParticle(player, particle, temp, amount, dx, dy, dz, speed, object));
             index++;
         }
     }
@@ -287,7 +287,7 @@ public final class ParticleHelper {
 
             if (viewers == null) viewers = filterPlayers(worldPlayers, temp, visibleRadius);
             viewers.forEach(
-                    player -> player.spawnParticle(particle, temp, amount, dx, dy, dz, speed, object));
+                    player -> spawnParticle(player, particle, temp, amount, dx, dy, dz, speed, object));
             index++;
         }
     }
@@ -380,5 +380,21 @@ public final class ParticleHelper {
             }
         }
         return result;
+    }
+
+    public static void spawnParticle(Player player,
+                                     Particle particle,
+                                     Location location,
+                                     int count,
+                                     double offsetX,
+                                     double offsetY,
+                                     double offsetZ,
+                                     double speed,
+                                     Object data) {
+        try {
+            player.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, speed, data, true);
+        } catch (NoSuchMethodError ignored) {
+            player.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, speed, data);
+        }
     }
 }
