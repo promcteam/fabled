@@ -1,9 +1,12 @@
 package studio.magemonkey.fabled.dynamic.trigger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.api.Settings;
 import studio.magemonkey.fabled.api.event.SkillDamageEvent;
+
+import java.util.List;
 
 /**
  * Fabled © 2024
@@ -41,5 +44,14 @@ public class SkillDealtTrigger extends SkillTrigger {
     @Override
     public void setValues(final SkillDamageEvent event, final CastData data) {
         data.put("api-dealt", event.getDamage());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean shouldTrigger(SkillDamageEvent event, int level, Settings settings) {
+        final List<String> damageTypes = settings.getStringList("category");
+        return damageTypes.isEmpty() || damageTypes.contains("default") || damageTypes.contains(event.getClassification());
     }
 }
