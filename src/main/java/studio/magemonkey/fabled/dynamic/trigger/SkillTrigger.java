@@ -30,7 +30,7 @@ public abstract class SkillTrigger implements Trigger<SkillDamageEvent> {
         final List<String> types = settings.getStringList("category");
         final boolean      empty = types.isEmpty() || types.get(0).isEmpty();
         return event.getDamage() >= min && event.getDamage() <= max &&
-                (empty || types.contains(event.getClassification()));
+                (empty || types.contains("default") || types.contains(event.getClassification()));
     }
 
     /**

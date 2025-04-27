@@ -45,13 +45,4 @@ public class SkillDealtTrigger extends SkillTrigger {
     public void setValues(final SkillDamageEvent event, final CastData data) {
         data.put("api-dealt", event.getDamage());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean shouldTrigger(SkillDamageEvent event, int level, Settings settings) {
-        final List<String> damageTypes = settings.getStringList("category");
-        return damageTypes.isEmpty() || damageTypes.contains("default") || damageTypes.contains(event.getClassification());
-    }
 }
