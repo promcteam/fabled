@@ -199,7 +199,7 @@ public class BuffManager implements BuffProvider {
                 amount);
     }
 
-    /**@Override
+    /** //@Override
     public double scaleValue(String name, LivingEntity player, double value) { //changed
         final BuffData data = getBuffData(player, false);
         if (data != null) {
