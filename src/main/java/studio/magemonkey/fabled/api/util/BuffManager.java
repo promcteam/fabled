@@ -28,8 +28,11 @@ package studio.magemonkey.fabled.api.util;
 
 import lombok.Getter;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import studio.magemonkey.codex.registry.BuffRegistry;
 import studio.magemonkey.codex.registry.provider.BuffProvider;
+import studio.magemonkey.fabled.log.LogType;
+import studio.magemonkey.fabled.log.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -196,13 +199,43 @@ public class BuffManager implements BuffProvider {
                 amount);
     }
 
-    @Override
-    public double scaleValue(String name, LivingEntity player, double value) {
+    /** //@Override
+    public double scaleValue(String name, LivingEntity player, double value) { //changed
         final BuffData data = getBuffData(player, false);
         if (data != null) {
             return data.apply(name, value);
         }
         return value;
+    }**/
+
+    @Override
+    public double scaleValue(String name, LivingEntity entity, double value) {
+        final BuffData data = getBuffData(entity, false);
+        if (data == null) {
+            Logger.log(LogType.BUFF, 1, "No buff data for entity: " + entity.getName());
+            return value;
+        }
+
+        // Handle custom types like FABLED_skill_damage_<classification>
+        BuffType type = BuffType.getByNameOrLocal(name);
+        String category = null;
+        if (type == null && name.startsWith(BuffType.SKILL_DAMAGE.getLocalizedName() + "_")) {
+            type = BuffType.SKILL_DAMAGE;
+            category = name.substring(BuffType.SKILL_DAMAGE.getLocalizedName().length() + 1);
+            Logger.log(LogType.BUFF, 1, "Parsed custom skill damage type: " + name + " as type: " + type.getLocalizedName() + ", category: " + category);
+        } else if (type == null && name.startsWith(BuffType.SKILL_DEFENSE.getLocalizedName() + "_")) {
+            type = BuffType.SKILL_DEFENSE;
+            category = name.substring(BuffType.SKILL_DEFENSE.getLocalizedName().length() + 1);
+            Logger.log(LogType.BUFF, 1, "Parsed custom skill defense type: " + name + " as type: " + type.getLocalizedName() + ", category: " + category);
+        } else if (type == null) {
+            Logger.log(LogType.BUFF, 1, "Unknown buff type: " + name + ", returning unscaled value");
+            return value;
+        }
+
+        Player player = (entity instanceof Player) ? (Player) entity : null;
+        double result = data.apply(type, category, value, player);
+        Logger.log(LogType.BUFF, 1, "Scaled value for " + name + " on " + entity.getName() + ": " + value + " -> " + result);
+        return result;
     }
 
     /**

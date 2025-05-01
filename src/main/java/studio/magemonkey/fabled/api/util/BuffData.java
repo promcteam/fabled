@@ -28,6 +28,7 @@ package studio.magemonkey.fabled.api.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.event.BuffExpiredEvent;
@@ -169,9 +170,13 @@ public class BuffData {
      * @param value value to modify
      * @return value after all buff applications
      */
-    public double apply(final String type, final double value) {
+    /**public double apply(final String type, final double value) { //changed
         return doApply(value, type);
+    }**/
+    public double apply(final String type, final double value) {
+        return doApply(value, null, type);
     }
+
 
     /**
      * Applies all buffs of the given type to the specified value
@@ -214,12 +219,18 @@ public class BuffData {
      * @param value    value to modify
      * @return value after all buff applications
      */
-    public double apply(final BuffType type, final String category, final double value) {
+    /**public double apply(final BuffType type, final String category, final double value) { //changed
         return category == null || category.isEmpty() ? doApply(value, type.getLocalizedName())
                 : doApply(value, type.getLocalizedName(), type.getLocalizedName() + "_" + category);
+    }**/
+
+    public double apply(final BuffType type, final String category, final double value, final Player player) {
+        return category == null || category.isEmpty() ? doApply(value, player, type.getLocalizedName())
+                : doApply(value,player, type.getLocalizedName(), type.getLocalizedName() + "_" + category);
     }
 
-    private double doApply(final double value, final String... types) {
+    /**private double doApply(final double value, final String... types) {**/ //changed
+    private double doApply(final double value, final Player player, final String... types) {
 
         // Ignore zeroed out values that shouldn't get buffs
         if (value <= 0) return value;
