@@ -5,8 +5,6 @@ import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.api.Settings;
 import studio.magemonkey.fabled.api.event.SkillDamageEvent;
 
-import java.util.List;
-
 /**
  * Fabled © 2024
  * studio.magemonkey.fabled.dynamic.trigger.BlockBreakTrigger
