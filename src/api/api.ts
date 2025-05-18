@@ -58,5 +58,5 @@ export const localStore = <T>(key: string, def: T) => {
 
 export const parseBool = (val: string | boolean | undefined) => {
 	if (typeof val === 'boolean') return val;
-	return val === 'true';
+	return val?.toLowerCase().trim() === 'true';
 };
