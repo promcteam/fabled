@@ -27,6 +27,7 @@
 package studio.magemonkey.fabled.dynamic.mechanic;
 
 import org.bukkit.entity.LivingEntity;
+import studio.magemonkey.fabled.api.CastData;
 import studio.magemonkey.fabled.dynamic.DynamicSkill;
 
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.List;
  */
 public class RememberTargetsMechanic extends MechanicComponent {
     private static final String KEY = "key";
+    private static final String OVERWRITE = "overwrite";
 
     @Override
     public String getKey() {
@@ -53,12 +55,21 @@ public class RememberTargetsMechanic extends MechanicComponent {
      */
     @Override
     public boolean execute(LivingEntity caster, int level, List<LivingEntity> targets, boolean force) {
-        if (targets.size() == 0 || !settings.has(KEY)) {
+        if (targets.isEmpty() || !settings.has(KEY)) {
             return false;
         }
 
         String key = settings.getString(KEY);
-        DynamicSkill.getCastData(caster).put(key, targets);
+        boolean overwrite = settings.getBool(OVERWRITE, true);
+        CastData castData = DynamicSkill.getCastData(caster);
+
+        if (!overwrite && castData.getRaw(key) instanceof List<?> rawTargets) {
+            @SuppressWarnings("unchecked")
+            List<LivingEntity> originalTargets = (List<LivingEntity>) rawTargets;
+            originalTargets.addAll(targets);
+        } else {
+            DynamicSkill.getCastData(caster).put(key, targets);
+        }
         return true;
     }
 }
