@@ -62,13 +62,14 @@ public class RememberTargetsMechanic extends MechanicComponent {
         String key = settings.getString(KEY);
         boolean overwrite = settings.getBool(OVERWRITE, true);
         CastData castData = DynamicSkill.getCastData(caster);
+        Object rawTargets = castData.getRaw(key);
 
-        if (!overwrite && castData.getRaw(key) instanceof List<?>) {
+        if (!overwrite && rawTargets instanceof List<?>) {
             @SuppressWarnings("unchecked")
-            List<LivingEntity> originalTargets = (List<LivingEntity>) castData.getRaw(key);
+            List<LivingEntity> originalTargets = (List<LivingEntity>) rawTargets;
             originalTargets.addAll(targets);
         } else {
-            DynamicSkill.getCastData(caster).put(key, targets);
+            castData.put(key, targets);
         }
         return true;
     }
