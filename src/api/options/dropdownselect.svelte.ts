@@ -71,6 +71,7 @@ export default class DropdownSelect extends Requirements implements ComponentOpt
 		if (val !== undefined) {
 			if (this.data.multiple && !(val instanceof Array)) this.data.selected = [val];
 			else if (!this.data.multiple && val instanceof Array) this.data.selected = val[0];
+			else this.data.selected = val;
 		}
 	};
 }
