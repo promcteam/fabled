@@ -4553,7 +4553,9 @@ class RememberTargetsMechanic extends FabledMechanic {
 			description:  'Stores the current targets for later use under a specified key',
 			data:         [
 				new StringSelect('Key', 'key', 'target')
-					.setTooltip('The unique key to store the targets under. The "Remember" target will use this key to apply effects to the targets later on')
+					.setTooltip('The unique key to store the targets under. The "Remember" target will use this key to apply effects to the targets later on'),
+				new BooleanSelect('Overwrite', 'overwrite', true)
+					.setTooltip('Whether to overwrite an existing target group, setting this to False would append all targets to said group')
 			],
 			summaryItems: ['key']
 		}, false);
