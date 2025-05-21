@@ -26,21 +26,49 @@
  */
 package studio.magemonkey.fabled.api.event;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An event for when an entity is healed by
  * another entity with the use of a skill.
  */
-public class SkillHealEvent extends Event implements Cancellable {
+public class SkillHealEvent extends EntityRegainHealthEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
+    /**
+     * -- GETTER --
+     * Retrieves the entity that dealt the heal
+     *
+     * @return entity that dealt the heal
+     */
+    @Getter
     private final LivingEntity healer;
+    /**
+     * -- GETTER --
+     * Retrieves the entity that received the heal
+     *
+     * @return entity that received the heal
+     */
+    @Getter
     private final LivingEntity target;
-    private       double       damage;
+    /**
+     * -- GETTER --
+     * Retrieves the amount of health healed
+     *
+     * @return amount of health healed
+     * -- SETTER --
+     * Sets the amount of health healed
+     * @param amount amount of health healed
+     */
+    @Getter
+    @Setter
+    private double amount;
     private       boolean      cancelled;
 
     /**
@@ -48,49 +76,14 @@ public class SkillHealEvent extends Event implements Cancellable {
      *
      * @param healer entity dealing the damage
      * @param target entity receiving the damage
-     * @param damage the amount of damage dealt
+     * @param damage the amount of health healed
      */
     public SkillHealEvent(LivingEntity healer, LivingEntity target, double damage) {
+        super(target, damage, RegainReason.CUSTOM);
         this.healer = healer;
         this.target = target;
-        this.damage = damage;
+        this.amount = damage;
         this.cancelled = false;
-    }
-
-    /**
-     * Retrieves the entity that dealt the damage
-     *
-     * @return entity that dealt the damage
-     */
-    public LivingEntity getHealer() {
-        return healer;
-    }
-
-    /**
-     * Retrieves the entity that received the damage
-     *
-     * @return entity that received the damage
-     */
-    public LivingEntity getTarget() {
-        return target;
-    }
-
-    /**
-     * Retrieves the amount of damage dealt
-     *
-     * @return amount of damage dealt
-     */
-    public double getAmount() {
-        return damage;
-    }
-
-    /**
-     * Sets the amount of damage dealt
-     *
-     * @param amount amount of damage dealt
-     */
-    public void setAmount(double amount) {
-        damage = amount;
     }
 
     /**
@@ -118,8 +111,7 @@ public class SkillHealEvent extends Event implements Cancellable {
      *
      * @return list of event handlers
      */
-    @Override
-    public HandlerList getHandlers() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 
@@ -128,7 +120,8 @@ public class SkillHealEvent extends Event implements Cancellable {
      *
      * @return list of event handlers
      */
-    public static HandlerList getHandlerList() {
+    @Override
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }
