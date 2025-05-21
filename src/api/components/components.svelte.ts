@@ -4834,7 +4834,7 @@ class TriggerMechanic extends FabledMechanic {
 					.requireValue('trigger', ['Crouch'])
 					.setTooltip('Whether you want to apply components when crouching or not crouching'),
 
-				//DROP_ITEM
+				// DROP_ITEM
 				new DropdownSelect('Drop multiple', 'drop multiple', ['True', 'False', 'Ignore'], 'Ignore')
 					.requireValue('trigger', ['Drop Item'])
 					.setTooltip('Whether the player has to drop multiple items or a single item'),
@@ -4844,7 +4844,15 @@ class TriggerMechanic extends FabledMechanic {
 					.requireValue('trigger', ['Environment Damage'])
 					.setTooltip('The source of damage to apply for'),
 
-				//ITEM_SWAP
+				// HEAL
+				new DoubleSelect('Min Heal', 'heal-min', 0)
+					.setTooltip('The minimum health that needs to be received')
+					.requireValue('trigger', ['Heal']),
+				new DoubleSelect('Max Heal', 'heal-max', 999)
+					.setTooltip('The maximum health that needs to be received')
+					.requireValue('trigger', ['Heal']),
+
+				// ITEM_SWAP
 				new BooleanSelect('Cancel swap', 'cancel', true)
 					.requireValue('trigger', ['Item Swap'])
 					.setTooltip('True cancels the item swap. False allows the item swap'),
