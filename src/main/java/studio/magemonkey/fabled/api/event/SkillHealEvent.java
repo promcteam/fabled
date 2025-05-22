@@ -29,18 +29,13 @@ package studio.magemonkey.fabled.api.event;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An event for when an entity is healed by
  * another entity with the use of a skill.
  */
-public class SkillHealEvent extends EntityRegainHealthEvent implements Cancellable {
-    private static final HandlerList handlers = new HandlerList();
-
+public class SkillHealEvent extends EntityRegainHealthEvent {
     /**
      * -- GETTER --
      * Retrieves the entity that dealt the heal
@@ -74,15 +69,15 @@ public class SkillHealEvent extends EntityRegainHealthEvent implements Cancellab
     /**
      * Initializes a new event
      *
-     * @param healer entity dealing the damage
-     * @param target entity receiving the damage
-     * @param damage the amount of health healed
+     * @param healer entity dealing the heal
+     * @param target entity receiving the heal
+     * @param amount the amount of health healed
      */
-    public SkillHealEvent(LivingEntity healer, LivingEntity target, double damage) {
-        super(target, damage, RegainReason.CUSTOM);
+    public SkillHealEvent(LivingEntity healer, LivingEntity target, double amount) {
+        super(target, amount, RegainReason.CUSTOM);
         this.healer = healer;
         this.target = target;
-        this.amount = damage;
+        this.amount = amount;
         this.cancelled = false;
     }
 
@@ -104,24 +99,5 @@ public class SkillHealEvent extends EntityRegainHealthEvent implements Cancellab
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    /**
-     * Retrieves the handlers for the event
-     *
-     * @return list of event handlers
-     */
-    public static @NotNull HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    /**
-     * Retrieves the handlers for the event
-     *
-     * @return list of event handlers
-     */
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlers;
     }
 }
