@@ -2819,7 +2819,10 @@ class DamageBuffMechanic extends FabledMechanic {
 				new AttributeSelect('Value', 'value', 1)
 					.setTooltip('The amount to increase/decrease the damage by. A negative amount with the "Flat" type will decrease damage, similar to a number less than 1 for the multiplier'),
 				new AttributeSelect('Seconds', 'seconds', 3)
-					.setTooltip('The duration of the buff in seconds')
+					.setTooltip('The duration of the buff in seconds'),
+				new StringSelect('Classification', 'classification', 'default')
+					.setTooltip('The classification of the buff. This is intended to be used with damage classifiers from the DamageMechanic, or Divinity damage types using <code>DIVINITY_type</code>')
+					.requireValue('skill', [true])
 			],
 			summaryItems: ['type', 'skill', 'value', 'seconds']
 		}, false);
@@ -2872,7 +2875,10 @@ class DefenseBuffMechanic extends FabledMechanic {
 				new AttributeSelect('Value', 'value', 1)
 					.setTooltip('The amount to increase/decrease incoming damage by'),
 				new AttributeSelect('Seconds', 'seconds', 3)
-					.setTooltip('The duration of the buff in seconds')
+					.setTooltip('The duration of the buff in seconds'),
+				new StringSelect('Classification', 'classification', 'default')
+					.setTooltip('The classification of the buff. This is intended to be used with damage classifiers from the DamageMechanic, or Divinity damage types using <code>DIVINITY_type</code>')
+					.requireValue('skill', [true])
 			],
 			summaryItems: ['type', 'skill', 'value', 'seconds']
 		}, false);
