@@ -69,15 +69,15 @@ public class SkillHealEvent extends EntityRegainHealthEvent {
     /**
      * Initializes a new event
      *
-     * @param healer entity dealing the damage
-     * @param target entity receiving the damage
-     * @param damage the amount of health healed
+     * @param healer entity dealing the heal
+     * @param target entity receiving the heal
+     * @param amount the amount of health healed
      */
-    public SkillHealEvent(LivingEntity healer, LivingEntity target, double damage) {
-        super(target, damage, RegainReason.CUSTOM);
+    public SkillHealEvent(LivingEntity healer, LivingEntity target, double amount) {
+        super(target, amount, RegainReason.CUSTOM);
         this.healer = healer;
         this.target = target;
-        this.amount = damage;
+        this.amount = amount;
         this.cancelled = false;
     }
 
