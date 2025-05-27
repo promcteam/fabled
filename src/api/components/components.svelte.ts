@@ -4660,14 +4660,14 @@ class SkillCastMechanic extends FabledMechanic {
 	public constructor() {
 		super({
 			name:         'Skill cast',
-			description:  'Make target cast other skill. Applicable to players only!',
+			description:  'Make target cast other skill. Recommended for use on players.',
 			data:         [
 				new DropdownSelect('Cast mode', 'mode', ['All', 'First', 'Random'], 'All')
 					.setTooltip('Choose which skills to cast (excluding unavailable skills).'),
 				new BooleanSelect('Force cast', 'force', false)
-					.setTooltip('True if player will cast regardless of whether they have that skill or not'),
+					.setTooltip('True if target will cast regardless of whether they have that skill or not'),
 				new StringListSelect('Skills', 'skills')
-					.setTooltip('The list of skills.Each skill can come with the level like "example skill:3". If player has skill, level will is available level. Else, level is 1.')
+					.setTooltip('The list of skills. Each skill can come with the level like "example skill:3". If the target is a player and has the skill, level will is available level. Else, level is 1.')
 			],
 			summaryItems: ['mode', 'force', 'skills']
 		}, false);
