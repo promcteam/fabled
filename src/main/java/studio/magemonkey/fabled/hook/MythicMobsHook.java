@@ -2,6 +2,7 @@ package studio.magemonkey.fabled.hook;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+
 import studio.magemonkey.codex.CodexEngine;
 
 /**
@@ -20,5 +21,9 @@ public class MythicMobsHook {
 
     public static String getMythicMobId(Entity entity) {
         return CodexEngine.get().getMythicMobs().getMythicNameByEntity(entity);
+    }
+
+    public static void castMythicMobSkill(final LivingEntity target, String skill) {
+        CodexEngine.get().getMythicMobs().castSkill(target, skill);
     }
 }
