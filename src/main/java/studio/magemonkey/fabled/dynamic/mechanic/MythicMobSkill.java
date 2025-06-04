@@ -1,17 +1,18 @@
 package studio.magemonkey.fabled.dynamic.mechanic;
 
 import org.bukkit.entity.LivingEntity;
-import studio.magemonkey.fabled.hook.MythicMobsHook;
+
+import io.lumine.mythic.bukkit.MythicBukkit;
 import studio.magemonkey.fabled.hook.PluginChecker;
 
 import java.util.List;
 
 public class MythicMobSkill extends MechanicComponent {
-    private static final String MYTHICSKILL   = "mythicskill";
+    private static final String SKILL   = "skill";
 
     @Override
     public String getKey() {
-        return "mythic mob skill";
+        return "mythicmob skill";
     }
 
     /**
@@ -28,10 +29,10 @@ public class MythicMobSkill extends MechanicComponent {
         if (!PluginChecker.isMythicMobsActive()) {
             return false;
         }
-        String mythicskill = settings.getString(MYTHICSKILL, "");
+        String skill = settings.getString(SKILL, "");
 
         for (final LivingEntity target : targets) {
-            MythicMobsHook.castMythicMobSkill(target, mythicskill);;
+            MythicBukkit.inst().getAPIHelper().castSkill(target, skill);
         }
 
         return true;
