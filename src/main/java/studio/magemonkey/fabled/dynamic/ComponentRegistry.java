@@ -199,6 +199,7 @@ public class ComponentRegistry {
         register(new MineMechanic());
         register(new MoneyMechanic());
         register(new MountMechanic());
+        register(new MythicMobSkill());
         register(new ParticleAnimationMechanic());
         register(new ParticleEffectMechanic());
         register(new ParticleImageMechanic());
