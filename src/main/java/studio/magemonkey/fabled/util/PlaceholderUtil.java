@@ -157,7 +157,7 @@ public class PlaceholderUtil {
     }
 
     public static String replace(OfflinePlayer player, String identifier) {
-        List<String> arguments   = new ArrayList<>(Arrays.asList(identifier.toLowerCase().strip().split("_")));
+        List<String> arguments   = new ArrayList<>(Arrays.asList(identifier.strip().split("_")));
         String       placeholder = arguments.remove(0);
         return actions.getOrDefault(placeholder, (a, b, c) -> {
 

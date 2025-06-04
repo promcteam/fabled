@@ -37,10 +37,11 @@ import java.util.List;
  * Applies a flag to each target
  */
 public class DamageBuffMechanic extends MechanicComponent {
-    private static final String TYPE    = "type";
-    private static final String SKILL   = "skill";
-    private static final String VALUE   = "value";
-    private static final String SECONDS = "seconds";
+    private static final String TYPE           = "type";
+    private static final String SKILL          = "skill";
+    private static final String VALUE          = "value";
+    private static final String SECONDS        = "seconds";
+    private static final String CLASSIFICATION = "classification";
 
     @Override
     public String getKey() {
@@ -54,14 +55,14 @@ public class DamageBuffMechanic extends MechanicComponent {
         }
 
         boolean skill   = settings.getString(SKILL, "false").equalsIgnoreCase("true");
-        boolean percent = settings.getString(TYPE, "flat").toLowerCase().equals("multiplier");
+        boolean percent = settings.getString(TYPE, "flat").equalsIgnoreCase("multiplier");
         double  value   = parseValues(caster, VALUE, level, 1.0);
         double  seconds = parseValues(caster, SECONDS, level, 3.0);
         int     ticks   = (int) (seconds * 20);
         for (LivingEntity target : targets) {
-            BuffManager.addBuff(
-                    target,
-                    skill ? BuffType.SKILL_DAMAGE : BuffType.DAMAGE,
+            BuffManager.getBuffData(target, true).addBuff(
+                    (skill ? BuffType.SKILL_DAMAGE : BuffType.DAMAGE).getLocalizedName(),
+                    skill ? settings.getString(CLASSIFICATION, "default") : null,
                     new Buff(this.skill.getName(), value, percent),
                     ticks);
         }
