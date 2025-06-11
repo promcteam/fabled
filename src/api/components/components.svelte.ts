@@ -3682,6 +3682,21 @@ class MountMechanic extends FabledMechanic {
 	public static override new = () => new this();
 }
 
+class MythicMobSkill extends FabledMechanic {
+	public constructor() {
+		super({
+			name:         'MythicMob Skill',
+			description:  'Casts a MythicMob skill on current the targets.',
+			data:         [
+				new StringSelect('MythicMob Skill', 'skill')
+					.setTooltip('The MythicMob skill to cast')
+			],
+			summaryItems: ['skill']
+		});
+	}
+	public static override new = () => new this();
+}
+
 class ParticleMechanic extends FabledMechanic {
 	public constructor() {
 		super({
@@ -5694,6 +5709,7 @@ export const initComponents = () => {
 		MINE:               { name: 'Mine', component: MineMechanic },
 		MONEY:              { name: 'Money', component: MoneyMechanic },
 		MOUNT:              { name: 'Mount', component: MountMechanic },
+		MYTHICMOB_SKILL:    { name: 'MythicMob Skill', component: MythicMobSkill },
 		PASSIVE:            { name: 'Passive', component: PassiveMechanic },
 		PERMISSION:         { name: 'Permission', component: PermissionMechanic },
 		POTION:             { name: 'Potion', component: PotionMechanic },
