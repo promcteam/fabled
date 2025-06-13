@@ -33,6 +33,7 @@ import org.bukkit.plugin.Plugin;
 import studio.magemonkey.codex.mccore.commands.ConfigurableCommand;
 import studio.magemonkey.codex.mccore.commands.IFunction;
 import studio.magemonkey.fabled.Fabled;
+import studio.magemonkey.fabled.api.player.PlayerClass;
 import studio.magemonkey.fabled.api.player.PlayerData;
 
 /**
@@ -42,6 +43,7 @@ public class CmdSkill implements IFunction {
     private static final String CANNOT_USE = "cannot-use";
     private static final String NO_SKILLS  = "no-skills";
     private static final String DISABLED   = "world-disabled";
+    private static final String INVALID_GROUP = "invalid-group";
     private static final String MAP_GIVEN  = "map-given";
     private static final String MAP_OWNED  = "map-owned";
 
@@ -64,8 +66,20 @@ public class CmdSkill implements IFunction {
         else if (sender instanceof Player) {
             Player     p    = (Player) sender;
             PlayerData data = Fabled.getData(p);
-            if (!data.showSkills(p)) {
-                cmd.sendMessage(sender, NO_SKILLS, ChatColor.RED + "You have no skills to view");
+            if (args.length > 0){
+                String group = String.join("", args);
+                PlayerClass className = data.getClass(group);
+                if (className == null){
+                    cmd.sendMessage(sender, INVALID_GROUP, ChatColor.RED + "The specified group was not found");
+                }
+                else if (!data.showSkills(p, className)) {
+                    cmd.sendMessage(sender, NO_SKILLS, ChatColor.RED + "You have no skills to view for the given group");
+                }
+            }
+            else {
+                if (!data.showSkills(p)) {
+                    cmd.sendMessage(sender, NO_SKILLS, ChatColor.RED + "You have no skills to view");
+                }
             }
         }
 
