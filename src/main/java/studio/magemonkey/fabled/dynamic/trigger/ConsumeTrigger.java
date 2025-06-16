@@ -27,7 +27,7 @@ public class ConsumeTrigger implements Trigger<PlayerItemConsumeEvent> {
      */
     @Override
     public boolean shouldTrigger(PlayerItemConsumeEvent event, int level, Settings settings) {
-        return ItemChecker.check(event.getItem(), level, settings);
+        return ItemChecker.checkList(event.getItem(), level, settings);
     }
 
     /**

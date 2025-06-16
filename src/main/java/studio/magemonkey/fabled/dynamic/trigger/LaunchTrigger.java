@@ -1,5 +1,7 @@
 package studio.magemonkey.fabled.dynamic.trigger;
 
+import java.util.List;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import studio.magemonkey.fabled.api.CastData;
@@ -32,8 +34,10 @@ public class LaunchTrigger implements Trigger<ProjectileLaunchEvent> {
      */
     @Override
     public boolean shouldTrigger(final ProjectileLaunchEvent event, final int level, final Settings settings) {
-        final String type = settings.getString("type", "any");
-        return type.equalsIgnoreCase("ANY") || type.equalsIgnoreCase(event.getEntity().getType().name());
+        final List<String> types = settings.getStringList("types");
+        return types.isEmpty() || types.contains("Any") 
+                || types.stream()
+                .anyMatch(proj -> event.getEntity().getType().name().equalsIgnoreCase(proj.replace(' ', '_')));
     }
 
     /**
