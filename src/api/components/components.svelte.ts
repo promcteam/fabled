@@ -174,7 +174,7 @@ class ConsumeTrigger extends FabledTrigger {
 			name:         'Consume',
 			description:  'Applies skill effects when a player consumes an item',
 			data:         [
-				...itemConditionOptions(new DropdownSelect('Material', 'material', getAnyConsumable, 'Any')
+				...itemConditionOptions(new DropdownSelect('Material', 'material', getAnyConsumable, 'Any', true)
 					.setTooltip('The type of item that the player has consumed.')
 					.requireValue('check-mat', [true]))
 			],
@@ -466,9 +466,9 @@ class LaunchTrigger extends FabledTrigger {
 		super({
 			name:         'Launch',
 			description:  'Applies skill effects when a player launches a projectile',
-			data:         [new DropdownSelect('Type', 'type', getAnyProjectiles, 'Any')
+			data:         [new DropdownSelect('Types', 'types', getAnyProjectiles, 'Any', true)
 				.setTooltip('The type of projectile that should be launched')],
-			summaryItems: ['type']
+			summaryItems: ['types']
 		});
 	}
 
