@@ -32,7 +32,7 @@ public class FlagExpireTrigger implements Trigger<FlagExpireEvent> {
     public boolean shouldTrigger(final FlagExpireEvent event, final int level, final Settings settings) {
         final List<String> flags = settings.getStringList("flags");
         final boolean inverted  = settings.getBool("inverted", false);
-        return (flags.isEmpty() || flags.contains("any") || flags.contains(event.getFlag())) != inverted;
+        return (flags.isEmpty() || flags.contains("Any") || flags.contains(event.getFlag())) != inverted;
     }
 
     /**

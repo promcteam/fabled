@@ -39,7 +39,7 @@ public class FlagTrigger implements Trigger<FlagApplyEvent> {
         if (event.getTicks() < ticks){
             return false;
         };
-        return (flags.isEmpty() || flags.contains("any") || flags.contains(event.getFlag())) != inverted;
+        return (flags.isEmpty() || flags.contains("Any") || flags.contains(event.getFlag())) != inverted;
     }
 
     /**
