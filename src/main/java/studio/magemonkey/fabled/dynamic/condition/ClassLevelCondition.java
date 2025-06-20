@@ -31,13 +31,16 @@ import org.bukkit.entity.Player;
 import studio.magemonkey.codex.mccore.config.parse.DataSection;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.player.PlayerClass;
+import studio.magemonkey.fabled.api.player.PlayerData;
 import studio.magemonkey.fabled.dynamic.DynamicSkill;
 
 public class ClassLevelCondition extends ConditionComponent {
     private static final String MIN_LEVEL = "min-level";
     private static final String MAX_LEVEL = "max-level";
+    private static final String GROUP = "group";
 
     private int min, max;
+    private String group;
 
     @Override
     public String getKey() {
@@ -49,13 +52,18 @@ public class ClassLevelCondition extends ConditionComponent {
         super.load(skill, config);
         min = settings.getInt(MIN_LEVEL);
         max = settings.getInt(MAX_LEVEL);
+        group = settings.getString(GROUP, null);
     }
 
     @Override
     boolean test(final LivingEntity caster, final int level, final LivingEntity target) {
         if (!(target instanceof Player)) return false;
+        PlayerData playerData = Fabled.getData((Player) target);
+        PlayerClass playerClass = playerData.getMainClass();
+        if (group != null || group != "main"){
+            playerClass = playerData.getClass(group);
+        }
 
-        final PlayerClass playerClass = Fabled.getData((Player) target).getMainClass();
         return playerClass != null && playerClass.getLevel() >= min && playerClass.getLevel() <= max;
     }
 }
