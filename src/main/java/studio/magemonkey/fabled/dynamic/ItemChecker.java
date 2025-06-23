@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 public class ItemChecker {
     private static final String CHECK_MAT         = "check-mat";
     private static final String MATERIAL          = "material";
+    private static final String MATERIALS          = "materials";
     private static final String CHECK_DATA        = "check-data";
     private static final String DATA              = "data";
     private static final String CHECK_CUSTOM_DATA = "check-custom-data";
@@ -169,6 +170,61 @@ public class ItemChecker {
                 && (!lore || checkLore(item, text, regex))
                 && (!name || checkName(item, display, regex));
     }
+
+    /**
+     * Checks an individual item agaisnt a list of options to see if any matche the given settings
+     *
+     * @param item     item to check
+     * @param level    level of the effect
+     * @param settings settings to apply (takes in a list)
+     * @return true if passes all conditions, false otherwise
+     */
+    public static boolean checkList(ItemStack item, int level, Settings settings) {
+        // Checks to do
+        boolean mat         = settings.getBool(CHECK_MAT, true);
+        boolean data        = settings.getBool(CHECK_DATA, true);
+        boolean checkCustom = settings.getBool(CHECK_CUSTOM_DATA, false);
+        boolean lore        = settings.getBool(CHECK_LORE, false);
+        boolean name        = settings.getBool(CHECK_NAME, false);
+        boolean regex       = settings.getBool(REGEX, false);
+
+        // Normalize and collect material list in lowercase
+        List<String> materialList = new ArrayList<>();
+        for (String matName : settings.getStringList("materials")) {
+            materialList.add(matName.trim().toLowerCase(Locale.US).replace(" ", "_"));
+        }
+
+        boolean anyMaterial = materialList.contains("any");
+
+        String potion    = settings.getString("potion", "Any").toUpperCase(Locale.US).replace(" ", "_");
+        boolean anyPotion = potion.equals("ANY");
+
+        int dur        = settings.getInt(DATA, 0);
+        int customData = settings.getInt(CUSTOM_DATA, 0);
+        String text    = settings.getString(LORE, "");
+        String display = settings.getString(NAME, "");
+
+        List<String> potionTypes = new ArrayList<>();
+        if (item != null && item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta) {
+            PotionType pType = ((PotionMeta) item.getItemMeta()).getBasePotionType();
+            if (pType != null) {
+                for (PotionEffect potionEffect : pType.getPotionEffects()) {
+                    potionTypes.add(potionEffect.getType().getName());
+                }
+            }
+        }
+
+        return (item == null && materialList.contains("air"))
+                || item != null
+                && (!mat || anyMaterial || materialList.contains(item.getType().name().toLowerCase(Locale.US)))
+                && (!item.getType().name().toLowerCase(Locale.US).contains("potion") || anyPotion || potionTypes.contains(potion))
+                && (!data || item.getDurability() == dur)
+                && (!checkCustom || (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()
+                && item.getItemMeta().getCustomModelData() == customData))
+                && (!lore || checkLore(item, text, regex))
+                && (!name || checkName(item, display, regex));
+    }
+
 
     /**
      * Checks the display name of the item
