@@ -1,5 +1,6 @@
 package studio.magemonkey.fabled.dynamic.trigger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
@@ -34,8 +35,11 @@ public class LaunchTrigger implements Trigger<ProjectileLaunchEvent> {
      */
     @Override
     public boolean shouldTrigger(final ProjectileLaunchEvent event, final int level, final Settings settings) {
-        final List<String> types = settings.getStringList("types");
-        return types.isEmpty() || types.contains("Any") 
+        List<String> types = settings.getStringList("types");
+        if (types.isEmpty()) {
+            types = new ArrayList<>(List.of(settings.getString("type", "Any")));
+        } 
+        return types.contains("Any") 
                 || types.stream()
                 .anyMatch(proj -> event.getEntity().getType().name().equalsIgnoreCase(proj.replace(' ', '_')));
     }
