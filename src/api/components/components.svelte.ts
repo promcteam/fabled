@@ -668,6 +668,22 @@ class SprintTrigger extends FabledTrigger {
 	public static override new = () => new this();
 }
 
+class StripLogTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Strip Log',
+			description:  'Applies skill effects when a player strips a block matching the given details',
+			data:         [new BlockSelect(
+				'The type of block expected to be broken',
+				'The expected data value of the block (-1 for any data value)'
+			)],
+			summaryItems: ['block']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class TookPhysicalTrigger extends FabledTrigger {
 	public constructor() {
 		super({
@@ -5575,6 +5591,7 @@ export const initComponents = () => {
 		SIGNAL:        { name: 'Signal', component: SignalTrigger },
 		SKILL_CAST:    { name: 'Skill Cast', component: SkillCastTrigger },
 		SPRINT:        { name: 'Sprint', component: SprintTrigger },
+		STRIP_LOG:    { name: 'Strip Log', component: StripLogTrigger },
 		WORLD_CHANGE:  { name: 'World Change', component: WorldChangeTrigger },
 
 		ARMOR_EQUIP: { name: 'Armor Equip', component: ArmorEquipTrigger, section: 'Item' },
