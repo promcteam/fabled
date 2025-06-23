@@ -1434,9 +1434,11 @@ class ClassLevelCondition extends FabledCondition {
 				new IntSelect('Min Level', 'min-level', 2)
 					.setTooltip('The minimum class level the player should be. If the player has multiple classes, this will be of their main class'),
 				new IntSelect('Max Level', 'max-level', 99)
-					.setTooltip('The maximum class level the player should be. If the player has multiple classes, this will be of their main class')
+					.setTooltip('The maximum class level the player should be. If the player has multiple classes, this will be of their main class'),
+				new StringSelect('Group', 'group', "main")
+					.setTooltip("The specified group to check the class level for. If set to main will choose the main class group.")
 			],
-			summaryItems: ['min-level', 'max-level']
+			summaryItems: ['min-level', 'max-level', 'group']
 		});
 	}
 
