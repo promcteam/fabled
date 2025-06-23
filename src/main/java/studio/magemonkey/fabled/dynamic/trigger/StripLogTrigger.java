@@ -46,7 +46,7 @@ public class StripLogTrigger implements Trigger<PlayerInteractEvent> {
         if (block == null || item == null || item.getType() == Material.AIR) return false;
         if (!item.getType().toString().endsWith("_AXE")) return false;
 
-        final List<String> types = settings.getStringList("materials");
+        final List<String> types = settings.getStringList("material");
         final Material blockType = block.getType();
         final String blockName = blockType.name();
 
