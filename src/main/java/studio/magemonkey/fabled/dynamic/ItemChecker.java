@@ -190,7 +190,7 @@ public class ItemChecker {
 
         // Normalize and collect material list in lowercase
         List<String> materialList = new ArrayList<>();
-        for (String matName : settings.getStringList("materials")) {
+        for (String matName : settings.getStringList("material")) {
             materialList.add(matName.trim().toLowerCase(Locale.US).replace(" ", "_"));
         }
 
