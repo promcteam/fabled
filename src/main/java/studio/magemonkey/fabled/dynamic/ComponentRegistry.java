@@ -81,6 +81,7 @@ public class ComponentRegistry {
         register(new SkillCastTrigger());
         register(new SkillDealtTrigger());
         register(new SkillTakenTrigger());
+        register(new StripLogTrigger());
         register(new WorldChangeTrigger());
 
         // Targets
