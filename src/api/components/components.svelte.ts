@@ -174,7 +174,7 @@ class ConsumeTrigger extends FabledTrigger {
 			name:         'Consume',
 			description:  'Applies skill effects when a player consumes an item',
 			data:         [
-				...itemConditionOptions(new DropdownSelect('Material', 'material', getAnyConsumable, 'Any')
+				...itemConditionOptions(new DropdownSelect('Material', 'material', getAnyConsumable, 'Any', true)
 					.setTooltip('The type of item that the player has consumed.')
 					.requireValue('check-mat', [true]))
 			],
@@ -504,9 +504,9 @@ class LaunchTrigger extends FabledTrigger {
 		super({
 			name:         'Launch',
 			description:  'Applies skill effects when a player launches a projectile',
-			data:         [new DropdownSelect('Type', 'type', getAnyProjectiles, 'Any')
+			data:         [new DropdownSelect('Types', 'types', getAnyProjectiles, 'Any', true)
 				.setTooltip('The type of projectile that should be launched')],
-			summaryItems: ['type']
+			summaryItems: ['types']
 		});
 	}
 
@@ -551,7 +551,7 @@ class PhysicalDamageTrigger extends FabledTrigger {
 				new DoubleSelect('Min Damage', 'dmg-min', 0)
 					.setTooltip('The minimum damage that needs to be dealt'),
 				new DoubleSelect('Max Damage', 'dmg-max', 999)
-					.setTooltip('The minimum damage that needs to be dealt')
+					.setTooltip('The maximum damage that needs to be dealt')
 			],
 			summaryItems: ['target', 'type', 'dmg-min', 'dmg-max']
 		});
@@ -706,6 +706,22 @@ class SprintTrigger extends FabledTrigger {
 	public static override new = () => new this();
 }
 
+class StripLogTrigger extends FabledTrigger {
+	public constructor() {
+		super({
+			name:         'Strip Log',
+			description:  'Applies skill effects when a player strips a block matching the given details',
+			data:         [new BlockSelect(
+				'The type of block expected to be broken',
+				'The expected data value of the block (-1 for any data value)'
+			)],
+			summaryItems: ['block']
+		});
+	}
+
+	public static override new = () => new this();
+}
+
 class TookPhysicalTrigger extends FabledTrigger {
 	public constructor() {
 		super({
@@ -760,9 +776,9 @@ class ShieldTrigger extends FabledTrigger {
 					.setTooltip('True makes children target the caster. False makes children target the attacking entity'),
 				new DropdownSelect('Type', 'type', ['Both', 'Melee', 'Projectile'], 'Both')
 					.setTooltip('The type of damage dealt'),
-				new DoubleSelect('Damage Heal', 'dmg-min', 0)
+				new DoubleSelect('Damage Blocked', 'dmg-min', 0)
 					.setTooltip('The minimum damage that needs to be blocked'),
-				new DoubleSelect('Damage Heal', 'dmg-max', 999)
+				new DoubleSelect('Damage Blocked', 'dmg-max', 999)
 					.setTooltip('The maximum damage that needs to be blocked')
 			],
 			summaryItems: ['target', 'type', 'dmg-min', 'dmg-max']
@@ -1456,9 +1472,11 @@ class ClassLevelCondition extends FabledCondition {
 				new IntSelect('Min Level', 'min-level', 2)
 					.setTooltip('The minimum class level the player should be. If the player has multiple classes, this will be of their main class'),
 				new IntSelect('Max Level', 'max-level', 99)
-					.setTooltip('The maximum class level the player should be. If the player has multiple classes, this will be of their main class')
+					.setTooltip('The maximum class level the player should be. If the player has multiple classes, this will be of their main class'),
+				new StringSelect('Group', 'group', "main")
+					.setTooltip("The specified group to check the class level for. If set to main will choose the main class group.")
 			],
-			summaryItems: ['min-level', 'max-level']
+			summaryItems: ['min-level', 'max-level', 'group']
 		});
 	}
 
@@ -5613,6 +5631,7 @@ export const initComponents = () => {
 		SIGNAL:        { name: 'Signal', component: SignalTrigger },
 		SKILL_CAST:    { name: 'Skill Cast', component: SkillCastTrigger },
 		SPRINT:        { name: 'Sprint', component: SprintTrigger },
+		STRIP_LOG:    { name: 'Strip Log', component: StripLogTrigger },
 		WORLD_CHANGE:  { name: 'World Change', component: WorldChangeTrigger },
 
 		ARMOR_EQUIP: { name: 'Armor Equip', component: ArmorEquipTrigger, section: 'Item' },
