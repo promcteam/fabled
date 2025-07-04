@@ -513,7 +513,7 @@ class PhysicalDamageTrigger extends FabledTrigger {
 				new DoubleSelect('Min Damage', 'dmg-min', 0)
 					.setTooltip('The minimum damage that needs to be dealt'),
 				new DoubleSelect('Max Damage', 'dmg-max', 999)
-					.setTooltip('The minimum damage that needs to be dealt')
+					.setTooltip('The maximum damage that needs to be dealt')
 			],
 			summaryItems: ['target', 'type', 'dmg-min', 'dmg-max']
 		});
@@ -738,9 +738,9 @@ class ShieldTrigger extends FabledTrigger {
 					.setTooltip('True makes children target the caster. False makes children target the attacking entity'),
 				new DropdownSelect('Type', 'type', ['Both', 'Melee', 'Projectile'], 'Both')
 					.setTooltip('The type of damage dealt'),
-				new DoubleSelect('Damage Heal', 'dmg-min', 0)
+				new DoubleSelect('Damage Blocked', 'dmg-min', 0)
 					.setTooltip('The minimum damage that needs to be blocked'),
-				new DoubleSelect('Damage Heal', 'dmg-max', 999)
+				new DoubleSelect('Damage Blocked', 'dmg-max', 999)
 					.setTooltip('The maximum damage that needs to be blocked')
 			],
 			summaryItems: ['target', 'type', 'dmg-min', 'dmg-max']
