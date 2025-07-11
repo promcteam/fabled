@@ -152,6 +152,10 @@ public class Settings extends com.sucy.skill.data.Settings {
             CAST_INSTANT          = CAST_BASE + "instant-item",
             CAST_FORMAT_SKILL     = CAST_BASE + "message-mode-format.skill",
             CAST_FORMAT_SEPARATOR = CAST_BASE + "message-mode-format.separator",
+            CAST_FORMAT_WHEEL_SELECTED_SKILL = CAST_BASE + "wheel.selected-skill",
+            CAST_FORMAT_WHEEL_UNSELECTED_SKILL = CAST_BASE + "wheel.unselected-skill",
+            CAST_FORMAT_WHEEL_PREVIOUS_SEPARATOR = CAST_BASE + "wheel.previous-separator",
+            CAST_FORMAT_WHEEL_NEXT_SEPARATOR = CAST_BASE + "wheel.next-separator",
 
     INTERACT_BASE                = "Interaction",
             INTERACT_CLICK       = INTERACT_BASE + ".interact-is-right-click",
@@ -577,6 +581,15 @@ public class Settings extends com.sucy.skill.data.Settings {
     private String        messageFormatSkill;
     @Getter
     private String        messageFormatSeparator;
+    @Getter
+    private String        wheelFormatSelectedSkill;
+    @Getter
+    private String        wheelFormatUnselectedSkill;
+    @Getter
+    private String        wheelFormatPreviousSeparator;
+    @Getter
+    private String        wheelFormatNextSeparator;
+
     /**
      * @return enabled clicks as an array of booleans indexed by click ID
      */
@@ -1227,6 +1240,11 @@ public class Settings extends com.sucy.skill.data.Settings {
         instantItem = GUITool.markCastItem(GUITool.parseItem(config.getSection(CAST_INSTANT)));
         messageFormatSkill = config.getString(CAST_FORMAT_SKILL, "&6[%number%] &a%skill%");
         messageFormatSeparator = config.getString(CAST_FORMAT_SEPARATOR, "&7 - ");
+        wheelFormatSelectedSkill = config.getString(CAST_FORMAT_WHEEL_SELECTED_SKILL, "&6[%number%] &a%skill%");
+        wheelFormatUnselectedSkill = config.getString(CAST_FORMAT_WHEEL_UNSELECTED_SKILL, "&6[%number%] &a%skill%");
+        wheelFormatPreviousSeparator = config.getString(CAST_FORMAT_WHEEL_PREVIOUS_SEPARATOR, "&7<-");
+        wheelFormatNextSeparator = config.getString(CAST_FORMAT_WHEEL_NEXT_SEPARATOR, "&7->");
+
         castEnabled = castEnabled && castItem != null;
     }
 

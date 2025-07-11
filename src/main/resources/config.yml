@@ -372,6 +372,14 @@ Casting:
   # - Assigned skills are displayed in the chat
   # - Pressing the corresponding number key casts the desired skill
   # - Skills are assigned through the /class skill menu
+  # WHEEL:
+  # - Hand swapping (F by default) enters casting mode
+  # - Unlocked skills are displayed in the action bar (Previous <- Current -> Next)
+  # - Scroll up to go to next skill, scroll down to go to previous skill
+  # - Drop Button (Q) to cast selected spell
+  # - Loops around like a "wheel"
+  # - Hold Shift to Scroll or Offhand normally (Configurable)
+  # - No limit on skills, can be ordered with /class orderskills
   mode: ACTION_BAR
   #
   # Global cooldown between skill casts in seconds
@@ -426,6 +434,13 @@ Casting:
   message-mode-format:
     skill: "&6[%number%] &a%skill%"
     separator: "&7 - "
+  
+  wheel:
+    selected-skill: "&6[%number%] &a%skill%"
+    unselected-skill: "&8[%number%] &7%skill%"
+    previous-separator: "&7 <- "
+    next-separator: "&7 -> "
+
 
 Interaction:
   # Whether right-clicking an entity should be considered a right click

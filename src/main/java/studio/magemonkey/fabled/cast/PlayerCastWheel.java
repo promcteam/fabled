@@ -52,8 +52,10 @@ public String getMessage() {
     int currentIndex = index % size;
     if (currentIndex < 0) currentIndex += size; // Handle negatives
 
-    String skillFormat = StringUT.color(Fabled.getSettings().getMessageFormatSkill());
-    String separator   = StringUT.color(Fabled.getSettings().getMessageFormatSeparator());
+    String selectedSkill = StringUT.color(Fabled.getSettings().getWheelFormatSelectedSkill());
+    String unselectedSkill = StringUT.color(Fabled.getSettings().getWheelFormatUnselectedSkill());
+    String previousSeparator   = StringUT.color(Fabled.getSettings().getWheelFormatPreviousSeparator());
+    String nextSeparator   = StringUT.color(Fabled.getSettings().getWheelFormatNextSeparator());
 
     int prevIndex = (currentIndex - 1 + size) % size;
     int nextIndex = (currentIndex + 1) % size;
@@ -61,19 +63,19 @@ public String getMessage() {
     StringBuilder stringBuilder = new StringBuilder();
 
     // Append previous
-    stringBuilder.append(skillFormat
+    stringBuilder.append(unselectedSkill
         .replace("%number%", String.valueOf(prevIndex + 1))
         .replace("%skill%", skills.get(prevIndex).getData().getName()));
 
     // Append separator + current
-    stringBuilder.append(separator)
-        .append(skillFormat
+    stringBuilder.append(previousSeparator)
+        .append(selectedSkill
         .replace("%number%", String.valueOf(currentIndex + 1))
         .replace("%skill%", skills.get(currentIndex).getData().getName()));
 
     // Append separator + next
-    stringBuilder.append(separator)
-        .append(skillFormat
+    stringBuilder.append(nextSeparator)
+        .append(unselectedSkill
         .replace("%number%", String.valueOf(nextIndex + 1))
         .replace("%skill%", skills.get(nextIndex).getData().getName()));
     return stringBuilder.toString();
