@@ -440,6 +440,10 @@ Casting:
     unselected-skill: "&8[%number%] &7%skill%"
     previous-separator: "&7 <- "
     next-separator: "&7 -> "
+    sounds:
+      start-casting: 
+      stop-casting:
+      scroll:
 
 
 Interaction:
