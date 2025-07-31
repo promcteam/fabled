@@ -440,10 +440,14 @@ Casting:
     unselected-skill: "&8[%number%] &7%skill%"
     previous-separator: "&7 <- "
     next-separator: "&7 -> "
+    sneak-to-offhand: true
+    sneak-to-scroll: true
+    cast-key: "left_click"
     sounds:
-      start-casting: 
-      stop-casting:
-      scroll:
+      volume: 100
+      start-casting: warrior_sounds:samus.warrior_slash
+      stop-casting: warrior_sounds:samus.warrior_slash
+      scroll: warrior_sounds:samus.warrior_slash
 
 
 Interaction:

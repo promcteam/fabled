@@ -2,13 +2,17 @@ package studio.magemonkey.fabled.listener;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -23,7 +27,7 @@ import studio.magemonkey.fabled.hook.PlaceholderAPIHook;
 import studio.magemonkey.fabled.hook.PluginChecker;
 
 public class CastWheelListener extends FabledListener {
-    private       boolean                    enabled = true;
+    private boolean enabled = true;
 
     @Override
     public void init() {
@@ -106,17 +110,17 @@ public class CastWheelListener extends FabledListener {
     public void onHandSwap(PlayerSwapHandItemsEvent event) {
         Player player = event.getPlayer();
         // Allow hand swap if Player is sneaking
-        if (player.isSneaking()) return;
+        if (Fabled.getSettings().getWheelSneakToOffhand() && player.isSneaking()) return;
         event.setCancelled(true);
         PlayerData playerData = Fabled.getData(player);
         PlayerCastWheel castWheel = playerData.getCastWheel();
         if (castWheel.isCasting()) {
             castWheel.setCasting(false);
             // Stop casting sound
-            player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.0f);
+            player.playSound(player.getLocation(), Fabled.getSettings().getWheelSoundsStopCasting(), Fabled.getSettings().getWheelSoundsVolume(), 1);
         } else if (!castWheel.isEmpty()) {
             // Stop casting sound
-            player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.0f);
+            player.playSound(player.getLocation(), Fabled.getSettings().getWheelSoundsStartCasting(), Fabled.getSettings().getWheelSoundsVolume(), 1);
             castWheel.setCasting(true);
             new CastWheelTask(playerData).runTaskTimer(Fabled.inst(), 0, 1);
         }
@@ -132,10 +136,10 @@ public class CastWheelListener extends FabledListener {
         // Return if Player is Sneaking
         // Otherwise cancel scroll, change wheel
         if (!castWheel.isCasting()) return;
-        if (player.isSneaking()) return;
+        if (Fabled.getSettings().getWheelSneakToScroll() && player.isSneaking()) return;
         event.setCancelled(true);
 
-        player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.0f);
+        player.playSound(player.getLocation(), Fabled.getSettings().getWheelSoundsScroll(), Fabled.getSettings().getWheelSoundsVolume(), 1);
 
         int previousSlot = event.getPreviousSlot();
         int newSlot = event.getNewSlot();
@@ -149,6 +153,7 @@ public class CastWheelListener extends FabledListener {
 
     // Stops casting if you move items in your
     // inventory to allow regular dropping.
+    // Only if using DROP mode
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
