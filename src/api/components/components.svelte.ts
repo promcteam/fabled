@@ -347,7 +347,7 @@ class FlagTrigger extends FabledTrigger {
 	public constructor() {
 		super({
 			name:         'Flag',
-			description:  'Applies skill effects when a flag expires on a player.',
+			description:  'Applies skill effects when the player receives a flag from a mechanic.',
 			data:         [
 				new StringListSelect('Flags', 'flags', ['Any'])
 					.setTooltip('The flags to check for, "Any" will trigger regardless of flag name'),
@@ -367,7 +367,7 @@ class FlagExpireTrigger extends FabledTrigger {
 	public constructor() {
 		super({
 			name:         'Flag Expire',
-			description:  'Applies skill effects when the player receives a flag from a mechanic.',
+			description:  'Applies skill effects when a flag expires on a player.',
 			data:         [
 				new StringListSelect('Flags', 'flags', ['Any'])
 					.setTooltip('The flags to check for, "Any" will trigger regardless of flag name'),
