@@ -2397,6 +2397,85 @@ const homingOptions = (): ComponentOption[] => {
 	];
 };
 
+const transformOptions = (): ComponentOption[] => {
+	return [
+		
+				new BooleanSelect('Matrix Transform', 'matrix-transform', false)
+					.setTooltip('Whether to use a matrix transform for the display. This allows for more complex transformations'),
+				new StringListSelect('Transform', 'transform', [
+						'1 | 0 | 0 | 0', 
+						'0 | 1 | 0 | 0', 
+						'0 | 0 | 1 | 0', 
+						'0 | 0 | 0 | 1'
+					])
+					.requireValue('matrix-transform', [true])
+					.setTooltip('The Homogeneous Transformation Matrix to apply to the display.'),
+
+				// Offsets
+				new BooleanSelect('Use Offsets', 'use-offsets', false)
+					.requireValue('matrix-transform', [false])
+					.setTooltip('Whether to use the offsets for the display.'),
+				new AttributeSelect('Forward Offset', 'forward', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-offsets', [true])
+					.setTooltip('How far forward in front of the target the display should be in blocks. A negative value will put it behind'),
+				new AttributeSelect('Upward Offset', 'upward', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-offsets', [true])
+					.setTooltip('How far above the target the display should be in blocks. A negative value will put it below'),
+				new AttributeSelect('Right Offset', 'right', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-offsets', [true])
+					.setTooltip('How far to the right the display should be of the target. A negative value will put it to the left'),
+
+				// Scale
+				new BooleanSelect('Use Scale', 'use-scale', false)
+					.requireValue('matrix-transform', [false])
+					.setTooltip('Whether to use the scale for the display.'),
+				new BooleanSelect('Inconsistent scale', 'inconsistent-scale', false)
+					.requireValue('use-scale', [true])
+					.requireValue('matrix-transform', [false])
+					.setTooltip('Whether the display should have an inconsistent scale'),
+				new AttributeSelect('Scale', 'scale', 1, 0)
+					.requireValue('inconsistent-scale', [false])
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-scale', [true])
+					.setTooltip('The scale of the display. 1 is normal size'),
+				new AttributeSelect('Scale X', 'scale-x', 1, 0)
+					.requireValue('inconsistent-scale', [true])
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-scale', [true])
+					.setTooltip('The scale of the display. 1 is normal size'),
+				new AttributeSelect('Scale Y', 'scale-y', 1, 0)
+					.requireValue('inconsistent-scale', [true])
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-scale', [true])
+					.setTooltip('The scale of the display. 1 is normal size'),
+				new AttributeSelect('Scale Z', 'scale-z', 1, 0)
+					.requireValue('inconsistent-scale', [true])
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-scale', [true])
+					.setTooltip('The scale of the display. 1 is normal size'),
+
+				// Rotation
+				new BooleanSelect('Use Rotation', 'use-rotation', false)
+					.requireValue('matrix-transform', [false])
+					.setTooltip('Whether to use the rotation for the display.'),
+				new AttributeSelect('Rotation X', 'rotation-x', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-rotation', [true])
+					.setTooltip('The rotation of the display around the X axis in degrees.'),
+				new AttributeSelect('Rotation Y', 'rotation-y', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-rotation', [true])	
+					.setTooltip('The rotation of the display around the Y axis in degrees.'),
+				new AttributeSelect('Rotation Z', 'rotation-z', 0)
+					.requireValue('matrix-transform', [false])
+					.requireValue('use-rotation', [true])
+					.setTooltip('The rotation of the display around the Z axis in degrees.')
+	]
+}
+
 const appendOptional = (value: ComponentOption & Requirements) => {
 	value.requireValue('use-effect', [true]);
 	return value;
@@ -3031,6 +3110,59 @@ class DisguiseMechanic extends FabledMechanic {
 					.setTooltip('Block to use for the disguise type.')
 			],
 			summaryItems: ['duration', 'type', 'mob', 'player', 'misc']
+		}, false);
+	}
+
+	public static override new = () => new this();
+}
+
+
+class DisplayMechanic extends FabledMechanic {
+	public constructor() {
+		super({
+			name:         'Display',
+			description:  'Creates a display entity.',
+			data:         [
+				new StringSelect('Display Key', 'key', 'default')
+					.setTooltip('The key to refer to the display by. Only one display of each key can be active per target at a time'),
+				new DropdownSelect('Type', 'type', ['Text', 'Item', 'Block'], 'Text'),
+				new StringSelect('Text', 'text', 'TEXT')
+					.requireValue('type', ['Text'])
+					.setTooltip('The text to display. Use & for color codes'),
+				// Text options
+				new MaterialSelect()
+					.requireValue('type', ['Item'])
+					.setTooltip('The item to display. Use the material name or ID'),
+				new StringSelect("Font", 'font', 'default')
+					.requireValue('type', ['Item'])
+					.setTooltip('The font to use for the text display.'),
+				// Item options
+				new AttributeSelect('Amount', 'amount', 1)
+					.requireValue('type', ['Item'])
+					.setTooltip('The amount of items to display.'),
+				// Block options
+				new DropdownSelect('Block', 'block', getBlocks, 'Diamond block')
+					.setTooltip('The block to display.')
+					.requireValue('type', ['Block']),
+				// General options
+
+				// Billboard
+				new DropdownSelect("Billboard", 'billboard', 
+					['None', 'Horizontal', 'Vertical', "All"], 'All')
+					.setTooltip('The billboard type to use for the display.'),
+				// Brightness
+				new AttributeSelect('Brightness', 'brightness', 15, 0)
+					.setTooltip('The brightness of the display. 0 is dark, 15 is bright'),
+				new AttributeSelect('View Distance', 'view-distance', 10, 1)
+					.setTooltip('How far away the display can be seen in blocks. 10 is the default, 1 is very close, 100 is very far'),
+				new AttributeSelect('Duration', 'duration', 5, 0) // seconds
+					.setTooltip('How long the display should last in seconds.'),
+
+				// Transform
+				new SectionMarker('Base Transform'),
+				...transformOptions(),
+			],
+			summaryItems: ['key','type', 'text', 'item', 'block']
 		}, false);
 	}
 
@@ -5746,6 +5878,7 @@ export const initComponents = () => {
 		DEFENSE_BUFF:       { name: 'Defense Buff', component: DefenseBuffMechanic },
 		DELAY:              { name: 'Delay', component: DelayMechanic },
 		DISGUISE:           { name: 'Disguise', component: DisguiseMechanic },
+		DISPLAY:            { name: 'Display', component: DisplayMechanic },
 		DURABILITY:         { name: 'Durability', component: DurabilityMechanic },
 		EXPERIENCE:         { name: 'Experience', component: ExperienceMechanic },
 		EXPLOSION:          { name: 'Explosion', component: ExplosionMechanic },
