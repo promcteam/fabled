@@ -4,30 +4,41 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import studio.magemonkey.fabled.Fabled;
+import studio.magemonkey.fabled.api.event.KeyPressEvent;
+import studio.magemonkey.fabled.api.event.PlayerClassChangeEvent;
+import studio.magemonkey.fabled.api.event.PlayerSkillDowngradeEvent;
 import studio.magemonkey.fabled.api.event.PlayerSkillUnlockEvent;
 import studio.magemonkey.fabled.api.player.PlayerData;
+import studio.magemonkey.fabled.api.player.PlayerSkill;
 import studio.magemonkey.fabled.cast.PlayerCastWheel;
 import studio.magemonkey.fabled.hook.PlaceholderAPIHook;
 import studio.magemonkey.fabled.hook.PluginChecker;
 
 public class CastWheelListener extends FabledListener {
     private boolean enabled = true;
+    private Map<UUID, Long> dropPlayers = new HashMap<>();
 
     @Override
     public void init() {
@@ -67,6 +78,17 @@ public class CastWheelListener extends FabledListener {
     }
 
     /**
+     * Re-initializes cast data on class change
+     *
+     * @param event event details
+     */
+    @EventHandler
+    public void onClassChange(PlayerClassChangeEvent event) {
+        PlayerData data = event.getPlayerData();
+        event.getPlayerData().getCastWheel().validate(data);
+    }
+
+    /**
      * Adds unlocked skills to the skill bar if applicable
      *
      * @param event event details
@@ -74,6 +96,20 @@ public class CastWheelListener extends FabledListener {
     @EventHandler
     public void onUnlock(PlayerSkillUnlockEvent event) {
         event.getPlayerData().getCastWheel().unlock(event.getUnlockedSkill());
+    }
+
+    /**
+     * Validate skills after a skill downgrade
+     * 
+     * @param event event details
+     */
+    @EventHandler
+    public void onDowngrade(PlayerSkillDowngradeEvent event) {
+        PlayerData data = event.getPlayerData();
+        PlayerSkill skill = event.getDowngradedSkill();
+        if (skill.getLevel() == 1) {
+            data.getCastWheel().remove(skill);
+        }
     }
 
     public class CastWheelTask extends BukkitRunnable {
@@ -139,7 +175,9 @@ public class CastWheelListener extends FabledListener {
         if (Fabled.getSettings().getWheelSneakToScroll() && player.isSneaking()) return;
         event.setCancelled(true);
 
-        player.playSound(player.getLocation(), Fabled.getSettings().getWheelSoundsScroll(), Fabled.getSettings().getWheelSoundsVolume(), 1);
+        if (castWheel.wheelSize() > 1) {
+            player.playSound(player.getLocation(), Fabled.getSettings().getWheelSoundsScroll(), Fabled.getSettings().getWheelSoundsVolume(), 1);
+        }
 
         int previousSlot = event.getPreviousSlot();
         int newSlot = event.getNewSlot();
@@ -153,7 +191,7 @@ public class CastWheelListener extends FabledListener {
 
     // Stops casting if you move items in your
     // inventory to allow regular dropping.
-    // Only if using DROP mode
+    // Also prevents skills not being cleared by downgrade.
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -162,9 +200,89 @@ public class CastWheelListener extends FabledListener {
         castWheel.setCasting(false);
     }
 
+    // Cast Spell if using DROP Mode
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
+        player.sendMessage(Fabled.getSettings().getWheelCastKey());
+        UUID playerId = player.getUniqueId();
+        dropPlayers.put(playerId, System.currentTimeMillis());
+        Bukkit.getScheduler().runTaskLater(Fabled.getPlugin(Fabled.class), () -> {
+            dropPlayers.remove(playerId);
+        }, 3L); // 3 ticks = ~150ms
+        if (!Fabled.getSettings().isWorldEnabled(player.getWorld())) return;
+        if (!Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("DROP")) return;
+        PlayerData playerData = Fabled.getData(player);
+        PlayerCastWheel castWheel = playerData.getCastWheel();
+        if (!castWheel.isCasting()) return;
+        event.setCancelled(true);
+        castWheel.cast();
+    }
+
+    /**
+     * Registers clicks as they happen
+     *
+     * @param event event details
+     */
+    @EventHandler
+    public void onClick(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (!Fabled.getSettings().isWorldEnabled(player.getWorld())) return;
+        if (Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("DROP")) return;
+        UUID playerId = event.getPlayer().getUniqueId();
+        Long dropTime = dropPlayers.get(playerId);
+
+        if (dropTime != null) {
+            long now = System.currentTimeMillis();
+
+            // If a player dropped an item within 3 ticks ignore click event.
+            if (now - dropTime < 150) {
+                return;
+            } else {
+                dropPlayers.remove(playerId); // cleanup
+            }
+        }
+
+            // Left clicks
+            if ((event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) && !Fabled.getSettings().isAnimationLeftClick() && Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("LEFT_CLICK")) {
+                PlayerData playerData = Fabled.getData(player);
+                PlayerCastWheel castWheel = playerData.getCastWheel();
+                if (!castWheel.isCasting()) return;
+                event.setCancelled(true);
+                castWheel.cast();
+            }
+
+            // Right clicks
+            else if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) && Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("RIGHT_CLICK")) {
+                PlayerData playerData = Fabled.getData(player);
+                PlayerCastWheel castWheel = playerData.getCastWheel();
+                if (!castWheel.isCasting()) return;
+                event.setCancelled(true);
+                castWheel.cast();
+            }
+    }
+
+    @EventHandler
+    public void onEntityClick(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (!Fabled.getSettings().isWorldEnabled(player.getWorld())) return;
+        if (!Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("RIGHT_CLICK")) return;
+        if (!Fabled.getSettings().isInteractRightClick()) return;
+        PlayerData playerData = Fabled.getData(player);
+        PlayerCastWheel castWheel = playerData.getCastWheel();
+        if (!castWheel.isCasting()) return;
+        event.setCancelled(true);
+        castWheel.cast();
+    }
+
+    @EventHandler
+    public void animation(PlayerAnimationEvent event) {
+        Player player = event.getPlayer();
+        if (!Fabled.getSettings().isWorldEnabled(player.getWorld())) return;
+        if (!Fabled.getSettings().getWheelCastKey().equalsIgnoreCase("LEFT_CLICK")) return;
+        if (!Fabled.getSettings().isAnimationLeftClick()) return;
         PlayerData playerData = Fabled.getData(player);
         PlayerCastWheel castWheel = playerData.getCastWheel();
         if (!castWheel.isCasting()) return;

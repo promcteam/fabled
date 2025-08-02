@@ -1,20 +1,12 @@
 package studio.magemonkey.fabled.cast;
 
 import lombok.Getter;
-import studio.magemonkey.codex.mccore.config.Filter;
-import studio.magemonkey.codex.mccore.config.FilterType;
 import studio.magemonkey.codex.util.StringUT;
 import studio.magemonkey.fabled.Fabled;
 import studio.magemonkey.fabled.api.player.PlayerData;
 import studio.magemonkey.fabled.api.player.PlayerSkill;
-import studio.magemonkey.fabled.gui.handlers.AttributeHandler;
-import studio.magemonkey.fabled.gui.tool.GUITool;
-import studio.magemonkey.fabled.language.GUINodes;
-import studio.magemonkey.fabled.language.RPGFilter;
 
 import java.util.ArrayList;
-
-import org.bukkit.entity.Player;
 
 public class PlayerCastWheel {
     private final PlayerData player;
@@ -33,7 +25,9 @@ public class PlayerCastWheel {
         }
     }
 
+    /* Clear list and read skills. */
     public void validate(PlayerData data){
+        skills.clear();
         for (PlayerSkill skill : data.getSkills()){
             if (skill.getData().canCast() && skill.isUnlocked()) skills.add(skill);
         }
@@ -49,8 +43,16 @@ public class PlayerCastWheel {
             skills.add(skill);
     }
 
+    public void remove(PlayerSkill skill) {
+        skills.remove(skill);
+    }
+
     public boolean isEmpty(){
         return skills.isEmpty();
+    }
+
+    public int wheelSize(){
+        return skills.size();
     }
 
 public String getMessage() {
@@ -70,25 +72,27 @@ public String getMessage() {
 
     StringBuilder stringBuilder = new StringBuilder();
 
-    // Append previous
-    stringBuilder.append(unselectedSkill
+    // Append previous and separator if more than 1 skill
+    if (size > 1){
+        stringBuilder.append(unselectedSkill
         .replace("%number%", String.valueOf(prevIndex + 1))
-        .replace("%skill%", skills.get(prevIndex).getData().getName()));
+        .replace("%skill%", skills.get(prevIndex).getData().getName())).append(previousSeparator);
+    }
 
-    // Append separator + current
-    stringBuilder.append(previousSeparator)
-        .append(selectedSkill
+    // Append current
+    stringBuilder.append(selectedSkill
         .replace("%number%", String.valueOf(currentIndex + 1))
         .replace("%skill%", skills.get(currentIndex).getData().getName()));
 
-    // Append separator + next
-    stringBuilder.append(nextSeparator)
-        .append(unselectedSkill
-        .replace("%number%", String.valueOf(nextIndex + 1))
-        .replace("%skill%", skills.get(nextIndex).getData().getName()));
+    // Append separator + next if more than 1 skill
+    if (size > 1) {
+        stringBuilder.append(nextSeparator)
+            .append(unselectedSkill
+            .replace("%number%", String.valueOf(nextIndex + 1))
+            .replace("%skill%", skills.get(nextIndex).getData().getName()));
+    }
     return stringBuilder.toString();
 }
-
 
     public void setCasting(boolean casting) {
         this.casting = casting;
@@ -110,10 +114,6 @@ public String getMessage() {
         if (!skills.isEmpty()) {
             index = (index + skills.size() - 1) % skills.size();
         }
-    }
-
-    public void orderSkillsMenu(){
-        return;
     }
 
 }

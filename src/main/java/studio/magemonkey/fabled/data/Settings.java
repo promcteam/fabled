@@ -162,6 +162,7 @@ public class Settings extends com.sucy.skill.data.Settings {
             CAST_FORMAT_WHEEL_SOUNDS_STOP_CASTING = CAST_BASE + "wheel.sounds.stop-casting",
             CAST_FORMAT_WHEEL_SOUNDS_SCROLL = CAST_BASE + "wheel.sounds.scroll",
             CAST_FORMAT_WHEEL_SOUNDS_VOLUME = CAST_BASE + "wheel.sounds.volume",
+            CAST_FORMAT_WHEEL_CAST_KEY = CAST_BASE + "wheel.cast-key",
 
 
     INTERACT_BASE                = "Interaction",
@@ -608,6 +609,8 @@ public class Settings extends com.sucy.skill.data.Settings {
     private String       wheelSoundsScroll;
     @Getter
     private int       wheelSoundsVolume;
+    @Getter
+    private String wheelCastKey;
 
     /**
      * @return enabled clicks as an array of booleans indexed by click ID
@@ -1269,6 +1272,7 @@ public class Settings extends com.sucy.skill.data.Settings {
         wheelSoundsStopCasting = config.getString(CAST_FORMAT_WHEEL_SOUNDS_STOP_CASTING, "None");
         wheelSoundsScroll = config.getString(CAST_FORMAT_WHEEL_SOUNDS_SCROLL, "None");
         wheelSoundsVolume = config.getInt(CAST_FORMAT_WHEEL_SOUNDS_VOLUME, 100);
+        wheelCastKey = config.getString(CAST_FORMAT_WHEEL_CAST_KEY, "LEFT_CLICK");
 
 
 
