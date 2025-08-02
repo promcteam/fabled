@@ -660,6 +660,9 @@ public class Fabled extends SkillAPI {
                     listen(new CastOffhandListener(), true);
                 }
                 case ACTION_BAR, TITLE, SUBTITLE, CHAT -> listen(new CastTextListener(settings.getCastMode()), true);
+                case WHEEL -> {
+                    listen(new CastWheelListener(), true);
+                }
             }
         }
         listen(new LingeringPotionListener(), true);
