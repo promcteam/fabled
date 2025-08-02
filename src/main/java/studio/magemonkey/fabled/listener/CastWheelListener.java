@@ -204,7 +204,6 @@ public class CastWheelListener extends FabledListener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        player.sendMessage(Fabled.getSettings().getWheelCastKey());
         UUID playerId = player.getUniqueId();
         dropPlayers.put(playerId, System.currentTimeMillis());
         Bukkit.getScheduler().runTaskLater(Fabled.getPlugin(Fabled.class), () -> {
