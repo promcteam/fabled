@@ -18,6 +18,7 @@ import studio.magemonkey.fabled.api.player.PlayerSkill;
 import studio.magemonkey.fabled.api.skills.Skill;
 import studio.magemonkey.fabled.api.util.FlagData;
 import studio.magemonkey.fabled.api.util.FlagManager;
+import studio.magemonkey.fabled.cast.PlayerCastWheel;
 import studio.magemonkey.fabled.cast.PlayerTextCastingData;
 import studio.magemonkey.fabled.dynamic.DynamicSkill;
 import studio.magemonkey.fabled.hook.PlaceholderAPIHook;
@@ -914,8 +915,9 @@ public class PlaceholderUtil {
     private static String castingPlaceholder(OfflinePlayer player, List<String> arguments, Integer accountId) {
         try {
             PlayerData            playerData = getPlayerData(player, accountId);
-            PlayerTextCastingData skillData  = playerData.getTextCastingData();
-            return String.valueOf(skillData.isCasting());
+            PlayerTextCastingData textData  = playerData.getTextCastingData();
+            PlayerCastWheel wheelData  = playerData.getCastWheel();
+            return String.valueOf(textData.isCasting() || wheelData.isCasting());
         } catch (Exception e) {
             return "false";
         }
