@@ -15,10 +15,9 @@
 	import FabledMechanic from '$api/components/mechanics.svelte';
 	import BooleanSelectOption from '$components/options/BooleanSelectOption.svelte';
 	import ProInput from '$input/ProInput.svelte';
-	import type { ComponentOption } from '$api/options/options';
-	import DropdownSelect from '$api/options/dropdownselect.svelte';
 	// NEW: import shared blockly logic
 	import { workspace_config, Toolbox, setupToolbox, setupStyle, componentToBlock, workspaceToSkill, blockToComponent, type FabledBlockSvg, focusSearch } from '$api/blockly/blockly.svelte';
+	import { BlockDuplicator } from '$api/blockly/block-duplicator';
 
 	// Removed duplicated logic now residing in $api/blockly/blockly.svelte
 </script>
@@ -33,6 +32,7 @@
 	let { skill, onupdate, onsave }: Props = $props();
 	let workspace: Blockly.WorkspaceSvg;
 	let selected: Writable<string | undefined> = writable(undefined);
+	let blockDuplicator: BlockDuplicator;
 
 	function blocklyInit(node: HTMLElement) {
 		console.debug('Blockly init');
@@ -41,6 +41,13 @@
 		setupStyle();
 		workspace = Blockly.inject(node, { toolbox: Toolbox.get(), ...workspace_config });
 		new Blockly.WorkspaceAudio(workspace).preload();
+		
+		// Initialize block duplicator with update callback
+		blockDuplicator = new BlockDuplicator(workspace, () => {
+			workspaceToSkill(workspace, skill);
+			if (onupdate) onupdate();
+		});
+		
 		skill.triggers.forEach((trigger) => { componentToBlock(workspace, trigger); });
 		workspace.addChangeListener((e) => {
 			if (['change', 'delete', 'create'].includes(e.type)) {
@@ -59,6 +66,7 @@
 			updateSelected();
 			$selected = blockId;
 		});
+		
 		let lastClickId: string = '';
 		let lastClickTime: number = 0;
 		// @ts-ignore
@@ -94,6 +102,22 @@
 
 	function handleGlobalKey(e: KeyboardEvent) {
 		if (!workspace) return;
+		
+		if (e.type === 'keydown' && e.key === 'd' && e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			const target = e.target as HTMLElement | null;
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+			
+			e.preventDefault();
+			if (blockDuplicator && $selected) {
+				const newBlockId = blockDuplicator.duplicateSelectedBlock();
+				if (newBlockId) {
+					$selected = newBlockId;
+					workspaceToSkill(workspace, skill);
+					if (onupdate) onupdate();
+				}
+			}
+		}
+		
 		if (e.key === '/' && !e.altKey && !e.ctrlKey && !e.metaKey) {
 			const target = e.target as HTMLElement | null;
 			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
