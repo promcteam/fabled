@@ -13,6 +13,8 @@ import { EmbedField } from '$api/blockly/blockly-fields';
 import DropdownSelect from '$api/options/dropdownselect.svelte';
 import type { ComponentOption } from '$api/options/options';
 
+import { initializeFabledRenderer } from '$api/blockly/fabled-renderer';
+
 // Workspace configuration (exported for injector usage)
 export const workspace_config = {
 	collapse: true,
@@ -34,14 +36,16 @@ export const workspace_config = {
 		startScale: 1,
 		maxScale: 3,
 		minScale: 0.3,
-		scaleSpeed: 1.01
+		scaleSpeed: 1.05
 	},
 	grid: {
 		spacing: 20,
 		length: 0,
 		colour: '#555',
 		snap: true
-	}
+	},
+	// Use custom renderer & theme
+	renderer: 'fabled'
 };
 
 export const Toolbox = {
@@ -78,24 +82,15 @@ export const Toolbox = {
 
 export function getColor(type: string) {
 	switch (type.toLowerCase()) {
-		case 'trigger':
-			return '#005AA4';
-		case 'condition':
-			return '#e07b00';
-		case 'target':
-			return '#00671F';
-		case 'general mechanic':
-			return '#00aad9';
-		case 'particle mechanic':
-			return '#8200F3';
-		case 'flag mechanic':
-			return '#AE1A1A';
-		case 'value mechanic':
-			return '#4247CC';
-		case 'warp mechanic':
-			return '#008089';
-		default:
-			return '#000';
+		case 'trigger': 			return '#457B9D'; 
+		case 'condition': 			return '#407a09'; 
+		case 'target': 				return '#2A9D8F'; 
+		case 'general mechanic': 	return '#2545ac'; 
+		case 'particle mechanic': 	return '#8A2BE2'; 
+		case 'flag mechanic': 		return '#E63946'; 
+		case 'value mechanic': 		return '#D97706'; 
+		case 'warp mechanic': 		return '#264653'; 
+		default: 					return '#000';
 	}
 }
 
@@ -168,15 +163,28 @@ export function setupStyle() {
 
 export function getIcon(component: FabledComponent) {
 	if (get(useSymbols)) {
-		if (component instanceof FabledTrigger) return '🚩';
-		else if (component instanceof FabledCondition) return '⚠';
-		else if (component instanceof FabledTarget) return '🎯';
-		else if (component instanceof FabledMechanic) return '🔧';
+		// Use component.category if available, otherwise fall back to instanceof
+		const category = (component as any).category?.toLowerCase() || '';
+		
+		if (component instanceof FabledTrigger || category.includes('trigger')) return '🚩';
+		else if (component instanceof FabledCondition || category.includes('condition')) return '⚠️';
+		else if (component instanceof FabledTarget || category.includes('target')) return '🎯';
+		else if (component instanceof FabledMechanic || category.includes('mechanic')) {
+			if (category.includes('particle')) return '✨';
+			else if (category.includes('flag')) return '🏷️';
+			else if (category.includes('value')) return '🔢';
+			else if (category.includes('warp')) return '🛸';
+			else return '🧩';
+		}
+		return '❓';
 	}
-	if (component instanceof FabledTrigger) return 'Trigger';
-	else if (component instanceof FabledCondition) return 'Condition';
-	else if (component instanceof FabledTarget) return 'Target';
-	else if (component instanceof FabledMechanic) return 'Mechanic';
+	
+	// Non-symbol fallback
+	const category = (component as any).category?.toLowerCase() || '';
+	if (component instanceof FabledTrigger || category.includes('trigger')) return 'Trigger';
+	else if (component instanceof FabledCondition || category.includes('condition')) return 'Condition';
+	else if (component instanceof FabledTarget || category.includes('target')) return 'Target';
+	else if (component instanceof FabledMechanic || category.includes('mechanic')) return 'Mechanic';
 	return '???';
 }
 
@@ -202,13 +210,17 @@ function migrateRegistry() {
 						const self = this as FabledBlockSvg;
 						// @ts-ignore
 						const component = (new value.component() as FabledComponent).defaultOpen();
+						
+						// Set category information for safe icon determination
+						(component as any).category = value.section || type;
+						
 						self.assign(component);
 						if (!type.startsWith('trigger')) {
 							self.setPreviousStatement(true, null);
 							self.setNextStatement(true, null);
 						}
 						self.setColour(color);
-						self.appendEndRowInput().appendField(new EmbedField(`&l${getIcon(component)}&r: ${component.name}`));
+						self.appendEndRowInput().appendField(new EmbedField(`&l${getIcon(component)} ${component.name}`));
 						if (get(showSummaryItems) && component.summaryItems && component.summaryItems.length) {
 							const alignLimit = 3;
 							const rows = Math.ceil(component.summaryItems.length / alignLimit);
@@ -305,11 +317,21 @@ export function setupToolbox() {
 	migrateRegistry();
 }
 
+/**
+ * Initialize workspace with safe renderer setup
+ */
+export function initializeWorkspace(workspace: Blockly.WorkspaceSvg): void {
+	// Initialize the custom renderer event system
+	initializeFabledRenderer(workspace);
+}
+
 export function componentToBlock(
 	workspace: Blockly.WorkspaceSvg,
 	component: FabledComponent,
 	parent: Blockly.BlockSvg | null = null
 ): Blockly.BlockSvg {
+	initializeFabledRenderer(workspace);
+	
 	const key = `${component.type}_${component.name.toLowerCase().replace(/\s/g, '_')}`;
 	const com = workspace.newBlock(key) as FabledBlockSvg;
 	com.assign(component);
@@ -325,6 +347,8 @@ export function componentToBlock(
 }
 
 export function workspaceToSkill(workspace: Blockly.WorkspaceSvg, skill: FabledSkill) {
+	initializeFabledRenderer(workspace);
+	
 	const components = [
 		...workspace.getTopBlocks(true)
 			.filter((b) => b.isEnabled() && b.type.startsWith('trigger'))
@@ -350,18 +374,17 @@ export function blockToComponent(block: FabledBlockSvg): FabledComponent | undef
 	return component;
 }
 
-// Programmatically open the toolbox search category and focus input
 export function focusSearch(workspace: Blockly.WorkspaceSvg) {
+	initializeFabledRenderer(workspace);
+	
 	const toolbox: any = workspace.getToolbox?.();
 	if (!toolbox) return;
-	// Try to locate the search category index from the toolbox items first
 	let index = -1;
 	if (toolbox.getToolboxItems) {
 		const items = toolbox.getToolboxItems();
 		index = items.findIndex((it: any) => (it?.toolboxItemDef_?.kind || '').toLowerCase() === 'search');
 	}
 	if (index < 0) {
-		// Fallback to languageTree scanning
 		const languageTree: any = workspace.options.languageTree;
 		const contents = languageTree?.contents || [];
 		index = contents.findIndex((c: any) => (c.kind || '').toLowerCase() === 'search');
@@ -369,7 +392,6 @@ export function focusSearch(workspace: Blockly.WorkspaceSvg) {
 	if (index < 0) return;
 	try {
 		toolbox.selectItemByPosition(index);
-		// Focus input after DOM update
 		requestAnimationFrame(() => {
 			const input: HTMLInputElement | null = toolbox.HtmlDiv?.querySelector('input[type="search"]');
 			if (input) {
