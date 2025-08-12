@@ -14,6 +14,8 @@ import DropdownSelect from '$api/options/dropdownselect.svelte';
 import type { ComponentOption } from '$api/options/options';
 
 import { initializeFabledRenderer } from '$api/blockly/fabled-renderer';
+import { CrossTabClipboard } from '$api/blockly/cross-tab-clipboard';
+import { addCopyPasteContextMenu, removeCopyPasteContextMenu as removeContextMenu } from '$api/blockly/context-menu';
 
 // Workspace configuration (exported for injector usage)
 export const workspace_config = {
@@ -269,7 +271,17 @@ function migrateRegistry() {
 						return { 'component_data': this.component.toYamlObj() };
 					},
 					loadExtraState: function (state: any) {
-						this.component.deserialize(state.component_data);
+						if (state && state.component_data && this.component) {
+							try {
+								this.component.deserialize(state.component_data);
+								// Update the summary fields after loading state
+								if (typeof this.updateSummary === 'function') {
+									this.updateSummary();
+								}
+							} catch (error) {
+								console.warn('Failed to load component state:', error);
+							}
+						}
 					}
 				};
 				return [key, definition] as [string, any];
@@ -402,4 +414,54 @@ export function focusSearch(workspace: Blockly.WorkspaceSvg) {
 	} catch (e) {
 		console.warn('Unable to focus search category', e);
 	}
+}
+
+/**
+ * Copy the selected block to cross-tab clipboard
+ */
+export function copySelectedBlock(): boolean {
+	return CrossTabClipboard.copySelectedBlock();
+}
+
+/**
+ * Paste block from cross-tab clipboard
+ */
+export function pasteBlock(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): string | null {
+	initializeFabledRenderer(workspace);
+	return CrossTabClipboard.pasteBlock(workspace, onUpdate);
+}
+
+/**
+ * Check if there's valid clipboard data available
+ */
+export function hasClipboardData(): boolean {
+	return CrossTabClipboard.hasClipboardData();
+}
+
+/**
+ * Get a preview of what's in the clipboard
+ */
+export function getClipboardPreview(): string | null {
+	return CrossTabClipboard.getClipboardPreview();
+}
+
+/**
+ * Clear the clipboard
+ */
+export function clearClipboard(): void {
+	CrossTabClipboard.clearClipboard();
+}
+
+/**
+ * Setup context menu for copy/paste
+ */
+export function setupCopyPasteContextMenu(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): void {
+	addCopyPasteContextMenu(workspace, onUpdate);
+}
+
+/**
+ * Remove context menu for copy/paste
+ */
+export function removeCopyPasteContextMenu(): void {
+	removeContextMenu();
 }

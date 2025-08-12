@@ -16,8 +16,9 @@
 	import BooleanSelectOption from '$components/options/BooleanSelectOption.svelte';
 	import ProInput from '$input/ProInput.svelte';
 	// NEW: import shared blockly logic
-	import { workspace_config, Toolbox, setupToolbox, setupStyle, componentToBlock, workspaceToSkill, blockToComponent, type FabledBlockSvg, focusSearch } from '$api/blockly/blockly.svelte';
+	import { workspace_config, Toolbox, setupToolbox, setupStyle, componentToBlock, workspaceToSkill, blockToComponent, type FabledBlockSvg, focusSearch, copySelectedBlock, pasteBlock, hasClipboardData, setupCopyPasteContextMenu, removeCopyPasteContextMenu } from '$api/blockly/blockly.svelte';
 	import { BlockDuplicator } from '$api/blockly/block-duplicator';
+	import ClipboardIndicator from './ClipboardIndicator.svelte';
 
 	// Removed duplicated logic now residing in $api/blockly/blockly.svelte
 </script>
@@ -44,6 +45,12 @@
 		
 		// Initialize block duplicator with update callback
 		blockDuplicator = new BlockDuplicator(workspace, () => {
+			workspaceToSkill(workspace, skill);
+			if (onupdate) onupdate();
+		});
+		
+		// Setup context menu for copy/paste
+		setupCopyPasteContextMenu(workspace, () => {
 			workspaceToSkill(workspace, skill);
 			if (onupdate) onupdate();
 		});
@@ -98,11 +105,22 @@
 			this.setResizesEnabled(true);
 		};
 		setTimeout(() => { workspace.cleanUp(); }, 100);
+		
+		// Return cleanup function
+		return {
+			destroy() {
+				removeCopyPasteContextMenu();
+				if (blockDuplicator) {
+					blockDuplicator.dispose();
+				}
+			}
+		};
 	}
 
 	function handleGlobalKey(e: KeyboardEvent) {
 		if (!workspace) return;
 		
+		// Handle Ctrl+D for duplication (existing functionality)
 		if (e.type === 'keydown' && e.key === 'd' && e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
 			const target = e.target as HTMLElement | null;
 			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
@@ -118,12 +136,113 @@
 			}
 		}
 		
+		// Handle Ctrl+C for cross-tab copy
+		if (e.type === 'keydown' && e.key === 'c' && e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			const target = e.target as HTMLElement | null;
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+			
+			const selectedBlock = Blockly.getSelected();
+			if (selectedBlock && selectedBlock instanceof Blockly.BlockSvg) {
+				e.preventDefault();
+				const success = copySelectedBlock();
+				if (success) {
+					// Show visual feedback
+					showCopyFeedback();
+				}
+			}
+		}
+		
+		// Handle Ctrl+V for cross-tab paste
+		if (e.type === 'keydown' && e.key === 'v' && e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			const target = e.target as HTMLElement | null;
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+			
+			if (hasClipboardData()) {
+				e.preventDefault();
+				const newBlockId = pasteBlock(workspace, () => {
+					workspaceToSkill(workspace, skill);
+					if (onupdate) onupdate();
+				});
+				if (newBlockId) {
+					$selected = newBlockId;
+					// Show visual feedback
+					showPasteFeedback();
+				}
+			}
+		}
+		
+		// Handle / for search (existing functionality)
 		if (e.key === '/' && !e.altKey && !e.ctrlKey && !e.metaKey) {
 			const target = e.target as HTMLElement | null;
 			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 			e.preventDefault();
 			focusSearch(workspace);
 		}
+	}
+
+	// Visual feedback functions
+	function showCopyFeedback() {
+		// Create a temporary notification
+		const notification = document.createElement('div');
+		notification.textContent = 'Block copied to clipboard';
+		notification.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: #4CAF50;
+			color: white;
+			padding: 10px 20px;
+			border-radius: 4px;
+			z-index: 10000;
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+			transition: opacity 0.3s ease;
+		`;
+		
+		document.body.appendChild(notification);
+		
+		// Fade out and remove
+		setTimeout(() => {
+			notification.style.opacity = '0';
+			setTimeout(() => {
+				if (notification.parentNode) {
+					notification.parentNode.removeChild(notification);
+				}
+			}, 300);
+		}, 2000);
+	}
+
+	function showPasteFeedback() {
+		// Create a temporary notification
+		const notification = document.createElement('div');
+		notification.textContent = 'Block pasted from clipboard';
+		notification.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: #2196F3;
+			color: white;
+			padding: 10px 20px;
+			border-radius: 4px;
+			z-index: 10000;
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+			transition: opacity 0.3s ease;
+		`;
+		
+		document.body.appendChild(notification);
+		
+		// Fade out and remove
+		setTimeout(() => {
+			notification.style.opacity = '0';
+			setTimeout(() => {
+				if (notification.parentNode) {
+					notification.parentNode.removeChild(notification);
+				}
+			}, 300);
+		}, 2000);
 	}
 
 	function getSelected(): FabledComponent | undefined {
@@ -178,6 +297,7 @@
 			</div>
 		{/if}
 		{/key}
+		<ClipboardIndicator />
 	</div>
 {/key}
 
