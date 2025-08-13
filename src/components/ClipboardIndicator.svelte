@@ -74,7 +74,7 @@
 <style>
 	.clipboard-indicator {
 		position: fixed;
-		bottom: 20px;
+		top: 180px;
 		right: 20px;
 		z-index: 1000;
 		background: #333;
