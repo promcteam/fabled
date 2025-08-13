@@ -26,10 +26,11 @@ export function addCopyPasteContextMenu(workspace: Blockly.WorkspaceSvg, onUpdat
 		callback: (scope: any) => {
 			if (scope.block) {
 				Blockly.common.setSelected(scope.block);
-				const success = copySelectedBlock();
-				if (success) {
-					console.log('Block copied to cross-tab clipboard');
-				}
+				copySelectedBlock().then(success => {
+					if (success) {
+						console.log('Block copied to system clipboard (base64 encoded)');
+					}
+				});
 			}
 		},
 		scopeType: Blockly.ContextMenuRegistry.ScopeType.BLOCK,
@@ -41,13 +42,16 @@ export function addCopyPasteContextMenu(workspace: Blockly.WorkspaceSvg, onUpdat
 		weight: 201,
 		displayText: 'Paste (Cross-tab)',
 		preconditionFn: (scope: any) => {
-			// Show if there's clipboard data
-			return hasClipboardData() ? 'enabled' : 'disabled';
+			// Always show enabled since clipboard check is async
+			return 'enabled';
 		},
-		callback: (scope: any) => {
-			const newBlockId = pasteBlock(workspace, onUpdate);
-			if (newBlockId) {
-				console.log('Block pasted from cross-tab clipboard');
+		callback: async (scope: any) => {
+			const hasData = await hasClipboardData();
+			if (hasData) {
+				const newBlockId = await pasteBlock(workspace, onUpdate);
+				if (newBlockId) {
+					console.log('Block pasted from cross-tab clipboard (base64 decoded)');
+				}
 			}
 		},
 		scopeType: Blockly.ContextMenuRegistry.ScopeType.WORKSPACE,
@@ -59,34 +63,37 @@ export function addCopyPasteContextMenu(workspace: Blockly.WorkspaceSvg, onUpdat
 		weight: 202,
 		displayText: 'Paste After (Cross-tab)',
 		preconditionFn: (scope: any) => {
-			// Show if there's clipboard data and we're on a block
-			return scope.block && hasClipboardData() ? 'enabled' : 'hidden';
+			// Show if we're on a block - clipboard check is done in callback
+			return scope.block ? 'enabled' : 'hidden';
 		},
-		callback: (scope: any) => {
+		callback: async (scope: any) => {
 			if (scope.block) {
-				const newBlockId = pasteBlock(workspace, onUpdate);
-				if (newBlockId) {
-					// Try to connect the pasted block after the selected block
-					const selectedBlock = scope.block;
-					const pastedBlock = workspace.getBlockById(newBlockId);
-					
-					if (pastedBlock && selectedBlock.nextConnection && pastedBlock.previousConnection) {
-						// Disconnect any existing next block
-						const existingNext = selectedBlock.nextConnection.targetBlock();
-						if (existingNext) {
-							selectedBlock.nextConnection.disconnect();
+				const hasData = await hasClipboardData();
+				if (hasData) {
+					const newBlockId = await pasteBlock(workspace, onUpdate);
+					if (newBlockId) {
+						// Try to connect the pasted block after the selected block
+						const selectedBlock = scope.block;
+						const pastedBlock = workspace.getBlockById(newBlockId);
+						
+						if (pastedBlock && selectedBlock.nextConnection && pastedBlock.previousConnection) {
+							// Disconnect any existing next block
+							const existingNext = selectedBlock.nextConnection.targetBlock();
+							if (existingNext) {
+								selectedBlock.nextConnection.disconnect();
+							}
+							
+							// Connect the pasted block
+							selectedBlock.nextConnection.connect(pastedBlock.previousConnection);
+							
+							// If there was an existing next block, connect it after the pasted block
+							if (existingNext && pastedBlock.nextConnection) {
+								pastedBlock.nextConnection.connect(existingNext.previousConnection);
+							}
 						}
 						
-						// Connect the pasted block
-						selectedBlock.nextConnection.connect(pastedBlock.previousConnection);
-						
-						// If there was an existing next block, connect it after the pasted block
-						if (existingNext && pastedBlock.nextConnection) {
-							pastedBlock.nextConnection.connect(existingNext.previousConnection);
-						}
+						console.log('Block pasted after selected block (base64 decoded)');
 					}
-					
-					console.log('Block pasted after selected block');
 				}
 			}
 		},

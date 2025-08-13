@@ -417,39 +417,39 @@ export function focusSearch(workspace: Blockly.WorkspaceSvg) {
 }
 
 /**
- * Copy the selected block to cross-tab clipboard
+ * Copy the selected block to system clipboard
  */
-export function copySelectedBlock(): boolean {
-	return CrossTabClipboard.copySelectedBlock();
+export async function copySelectedBlock(): Promise<boolean> {
+	return await CrossTabClipboard.copySelectedBlock();
 }
 
 /**
- * Paste block from cross-tab clipboard
+ * Paste block from system clipboard
  */
-export function pasteBlock(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): string | null {
+export async function pasteBlock(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): Promise<string | null> {
 	initializeFabledRenderer(workspace);
-	return CrossTabClipboard.pasteBlock(workspace, onUpdate);
+	return await CrossTabClipboard.pasteBlock(workspace, onUpdate);
 }
 
 /**
  * Check if there's valid clipboard data available
  */
-export function hasClipboardData(): boolean {
-	return CrossTabClipboard.hasClipboardData();
+export async function hasClipboardData(): Promise<boolean> {
+	return await CrossTabClipboard.hasClipboardData();
 }
 
 /**
  * Get a preview of what's in the clipboard
  */
-export function getClipboardPreview(): string | null {
-	return CrossTabClipboard.getClipboardPreview();
+export async function getClipboardPreview(): Promise<string | null> {
+	return await CrossTabClipboard.getClipboardPreview();
 }
 
 /**
  * Clear the clipboard
  */
-export function clearClipboard(): void {
-	CrossTabClipboard.clearClipboard();
+export async function clearClipboard(): Promise<void> {
+	await CrossTabClipboard.clearClipboard();
 }
 
 /**

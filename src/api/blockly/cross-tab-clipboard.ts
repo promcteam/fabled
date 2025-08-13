@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly';
 
 export interface ClipboardBlock {
-	xml: string;
+	xml: string; // Plain XML string (entire clipboard data will be base64 encoded)
 	timestamp: number;
 	sourceWorkspaceId: string;
 	extraState?: { [blockId: string]: any };
@@ -10,11 +10,12 @@ export interface ClipboardBlock {
 export class CrossTabClipboard {
 	private static readonly STORAGE_KEY = 'fabled_blockly_clipboard';
 	private static readonly MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+	private static readonly CLIPBOARD_PREFIX = 'FABLED_BLOCK:';
 
 	/**
-	 * Copy the selected block to cross-tab clipboard
+	 * Copy the selected block to system clipboard (with localStorage fallback)
 	 */
-	static copySelectedBlock(): boolean {
+	static async copySelectedBlock(): Promise<boolean> {
 		const selectedBlock = Blockly.getSelected();
 		if (!selectedBlock || !(selectedBlock instanceof Blockly.BlockSvg)) {
 			return false;
@@ -25,22 +26,42 @@ export class CrossTabClipboard {
 			const blockXml = Blockly.Xml.blockToDom(selectedBlock);
 			const xmlString = Blockly.Xml.domToText(blockXml);
 
+			console.debug('Original XML length:', xmlString.length, 'characters');
+
 			// Collect extra state from all blocks in the tree
 			const extraState = this.collectExtraState(selectedBlock);
 
-			// Create clipboard data
+			// Create clipboard data (keep XML as plain text internally)
 			const clipboardData: ClipboardBlock = {
-				xml: xmlString,
+				xml: xmlString, // Keep as plain text for internal processing
 				timestamp: Date.now(),
 				sourceWorkspaceId: selectedBlock.workspace.id,
 				extraState: extraState
 			};
 
-			// Store in localStorage for cross-tab access
-			localStorage.setItem(this.STORAGE_KEY, JSON.stringify(clipboardData));
+			// Serialize the entire clipboard data
+			const serializedData = JSON.stringify(clipboardData);
 			
-			// Also copy to system clipboard as fallback
-			this.copyToSystemClipboard(xmlString);
+			// Encode the ENTIRE serialized data as base64
+			const encodedData = this.encodeToBase64(serializedData);
+			
+			console.debug('Serialized data length:', serializedData.length, 'characters');
+			console.debug('Base64 encoded data length:', encodedData.length, 'characters');
+
+			// Add prefix to identify our clipboard format
+			const finalClipboardString = this.CLIPBOARD_PREFIX + encodedData;
+
+			// Primary: Copy to system clipboard
+			try {
+				await this.copyToSystemClipboard(finalClipboardString);
+				// Also store original data in localStorage as fallback (but still base64 encoded)
+				localStorage.setItem(this.STORAGE_KEY, encodedData);
+				console.debug('Block copied to system clipboard (entire data base64 encoded)');
+			} catch (error) {
+				// Fallback: Only use localStorage (still base64 encoded)
+				localStorage.setItem(this.STORAGE_KEY, encodedData);
+				console.debug('Block copied to localStorage (entire data base64 encoded, clipboard unavailable)');
+			}
 			
 			return true;
 		} catch (error) {
@@ -50,26 +71,44 @@ export class CrossTabClipboard {
 	}
 
 	/**
-	 * Paste block from cross-tab clipboard to the specified workspace
+	 * Paste block from system clipboard (with localStorage fallback) to the specified workspace
 	 */
-	static pasteBlock(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): string | null {
+	static async pasteBlock(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void): Promise<string | null> {
 		try {
-			const clipboardData = this.getClipboardData();
+			// Primary: Try to get from system clipboard
+			let clipboardData = await this.getFromSystemClipboard();
+			
+			// Fallback: Get from localStorage if system clipboard fails
 			if (!clipboardData) {
+				clipboardData = this.getFromLocalStorage();
+				if (clipboardData) {
+					console.debug('Using localStorage fallback for paste');
+				}
+			}
+			
+			if (!clipboardData) {
+				console.debug('No clipboard data available');
 				return null;
 			}
 
 			// Check if data is too old
 			if (Date.now() - clipboardData.timestamp > this.MAX_AGE) {
 				this.clearClipboard();
+				console.debug('Clipboard data expired');
 				return null;
 			}
 
+			// XML is now plain text, no need to decode
+			const xmlString = clipboardData.xml;
+			
+			console.debug('Using XML string, length:', xmlString.length, 'characters');
+
 			// Parse XML and create block (Blockly automatically handles extra state)
-			const xmlDoc = Blockly.utils.xml.textToDom(clipboardData.xml);
+			const xmlDoc = Blockly.utils.xml.textToDom(xmlString);
 			const newBlock = Blockly.Xml.domToBlock(xmlDoc, workspace) as Blockly.BlockSvg;
 			
 			if (!newBlock) {
+				console.debug('Failed to create block from clipboard data');
 				return null;
 			}
 
@@ -91,6 +130,7 @@ export class CrossTabClipboard {
 			// Call update callback
 			onUpdate?.();
 
+			console.debug('Block pasted successfully from clipboard (base64 decoded)');
 			return newBlock.id;
 		} catch (error) {
 			console.error('Failed to paste block:', error);
@@ -99,55 +139,108 @@ export class CrossTabClipboard {
 	}
 
 	/**
-	 * Check if there's valid clipboard data available
+	 * Check if there's valid clipboard data available (prioritize system clipboard)
 	 */
-	static hasClipboardData(): boolean {
-		const data = this.getClipboardData();
-		return data !== null && (Date.now() - data.timestamp) <= this.MAX_AGE;
+	static async hasClipboardData(): Promise<boolean> {
+		// Check system clipboard first
+		const systemData = await this.getFromSystemClipboard();
+		if (systemData && (Date.now() - systemData.timestamp) <= this.MAX_AGE) {
+			return true;
+		}
+		
+		// Fallback to localStorage
+		const localData = this.getFromLocalStorage();
+		return localData !== null && (Date.now() - localData.timestamp) <= this.MAX_AGE;
 	}
 
 	/**
-	 * Clear the clipboard
+	 * Clear both system clipboard and localStorage
 	 */
-	static clearClipboard(): void {
+	static async clearClipboard(): Promise<void> {
+		// Clear localStorage
 		localStorage.removeItem(this.STORAGE_KEY);
+		
+		// Try to clear system clipboard (limited capability)
+		try {
+			if (navigator.clipboard && window.isSecureContext) {
+				await navigator.clipboard.writeText('');
+			}
+		} catch (error) {
+			// Ignore clipboard clear errors
+			console.debug('Could not clear system clipboard:', error);
+		}
 	}
 
 	/**
-	 * Get clipboard data from localStorage
+	 * Get clipboard data from system clipboard
 	 */
-	private static getClipboardData(): ClipboardBlock | null {
+	private static async getFromSystemClipboard(): Promise<ClipboardBlock | null> {
+		try {
+			if (!navigator.clipboard || !window.isSecureContext) {
+				return null;
+			}
+
+			const text = await navigator.clipboard.readText();
+			if (!text || !text.startsWith(this.CLIPBOARD_PREFIX)) {
+				return null;
+			}
+
+			// Extract base64 data after prefix
+			const base64Data = text.substring(this.CLIPBOARD_PREFIX.length);
+			
+			// Decode the entire JSON data from base64
+			const jsonData = this.decodeFromBase64(base64Data);
+			
+			return JSON.parse(jsonData) as ClipboardBlock;
+		} catch (error) {
+			console.debug('Failed to read from system clipboard:', error);
+			return null;
+		}
+	}
+
+	/**
+	 * Get clipboard data from localStorage (fallback)
+	 */
+	private static getFromLocalStorage(): ClipboardBlock | null {
 		try {
 			const stored = localStorage.getItem(this.STORAGE_KEY);
 			if (!stored) {
 				return null;
 			}
-			return JSON.parse(stored) as ClipboardBlock;
+			
+			// Decode the entire JSON data from base64 (localStorage also stores base64)
+			const jsonData = this.decodeFromBase64(stored);
+			
+			return JSON.parse(jsonData) as ClipboardBlock;
 		} catch {
 			return null;
 		}
 	}
 
 	/**
-	 * Copy XML to system clipboard as fallback
+	 * Copy data to system clipboard
 	 */
-	private static async copyToSystemClipboard(xml: string): Promise<void> {
+	private static async copyToSystemClipboard(data: string): Promise<boolean> {
 		try {
 			if (navigator.clipboard && window.isSecureContext) {
-				await navigator.clipboard.writeText(xml);
+				await navigator.clipboard.writeText(data);
+				return true;
 			} else {
 				// Fallback for older browsers
 				const textarea = document.createElement('textarea');
-				textarea.value = xml;
+				textarea.value = data;
 				textarea.style.position = 'fixed';
 				textarea.style.opacity = '0';
+				textarea.style.left = '-9999px';
 				document.body.appendChild(textarea);
 				textarea.select();
-				document.execCommand('copy');
+				const success = document.execCommand('copy');
 				document.body.removeChild(textarea);
+				return success;
 			}
 		} catch (error) {
-			console.warn('Failed to copy to system clipboard:', error);
+			console.debug('Failed to copy to system clipboard:', error);
+			return false;
 		}
 	}
 
@@ -191,8 +284,15 @@ export class CrossTabClipboard {
 	/**
 	 * Get a preview of what's in the clipboard (for UI purposes)
 	 */
-	static getClipboardPreview(): string | null {
-		const data = this.getClipboardData();
+	static async getClipboardPreview(): Promise<string | null> {
+		// Try system clipboard first
+		let data = await this.getFromSystemClipboard();
+		
+		// Fallback to localStorage
+		if (!data) {
+			data = this.getFromLocalStorage();
+		}
+		
 		if (!data) {
 			return null;
 		}
@@ -279,5 +379,31 @@ export class CrossTabClipboard {
 		};
 		
 		restoreToBlock(block);
+	}
+
+	/**
+	 * Safely encode a string to base64, handling Unicode characters
+	 */
+	private static encodeToBase64(str: string): string {
+		try {
+			// Handle Unicode characters properly by first encoding to UTF-8
+			return btoa(unescape(encodeURIComponent(str)));
+		} catch (error) {
+			console.error('Failed to encode string to base64:', error);
+			throw new Error('Base64 encoding failed');
+		}
+	}
+
+	/**
+	 * Safely decode a base64 string, handling Unicode characters
+	 */
+	private static decodeFromBase64(base64Str: string): string {
+		try {
+			// Decode from base64 and then handle Unicode characters
+			return decodeURIComponent(escape(atob(base64Str)));
+		} catch (error) {
+			console.error('Failed to decode base64 string:', error);
+			throw new Error('Base64 decoding failed');
+		}
 	}
 }

@@ -6,13 +6,19 @@
 	let showTooltip = false;
 	let interval: ReturnType<typeof setInterval>;
 
-	function updateClipboardStatus() {
-		clipboardData = hasClipboardData() ? getClipboardPreview() : null;
+	async function updateClipboardStatus() {
+		try {
+			const hasData = await hasClipboardData();
+			clipboardData = hasData ? await getClipboardPreview() : null;
+		} catch (error) {
+			console.debug('Failed to check clipboard status:', error);
+			clipboardData = null;
+		}
 	}
 
-	function handleClearClipboard() {
-		clearClipboard();
-		updateClipboardStatus();
+	async function handleClearClipboard() {
+		await clearClipboard();
+		await updateClipboardStatus();
 	}
 
 	onMount(() => {

@@ -144,11 +144,12 @@
 			const selectedBlock = Blockly.getSelected();
 			if (selectedBlock && selectedBlock instanceof Blockly.BlockSvg) {
 				e.preventDefault();
-				const success = copySelectedBlock();
-				if (success) {
-					// Show visual feedback
-					showCopyFeedback();
-				}
+				copySelectedBlock().then(success => {
+					if (success) {
+						// Show visual feedback
+						showCopyFeedback();
+					}
+				});
 			}
 		}
 		
@@ -157,18 +158,21 @@
 			const target = e.target as HTMLElement | null;
 			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 			
-			if (hasClipboardData()) {
-				e.preventDefault();
-				const newBlockId = pasteBlock(workspace, () => {
-					workspaceToSkill(workspace, skill);
-					if (onupdate) onupdate();
-				});
-				if (newBlockId) {
-					$selected = newBlockId;
-					// Show visual feedback
-					showPasteFeedback();
+			hasClipboardData().then(hasData => {
+				if (hasData) {
+					e.preventDefault();
+					pasteBlock(workspace, () => {
+						workspaceToSkill(workspace, skill);
+						if (onupdate) onupdate();
+					}).then(newBlockId => {
+						if (newBlockId) {
+							$selected = newBlockId;
+							// Show visual feedback
+							showPasteFeedback();
+						}
+					});
 				}
-			}
+			});
 		}
 		
 		// Handle / for search (existing functionality)
