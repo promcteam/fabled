@@ -11,8 +11,8 @@ export interface ContextMenuOption {
  * Add copy/paste options to Blockly context menu
  */
 export function addCopyPasteContextMenu(workspace: Blockly.WorkspaceSvg, onUpdate?: () => void) {
-	// Store the original context menu function
-	const originalContextMenuCallback = Blockly.ContextMenuRegistry.registry.getItem('blockCopyToClipboard')?.callback;
+	// Remove any existing registrations first to prevent duplicates
+	removeCopyPasteContextMenu();
 
 	// Register copy option
 	Blockly.ContextMenuRegistry.registry.register({
